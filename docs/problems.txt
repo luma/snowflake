@@ -1,0 +1,13 @@
+
+1. We're not really making best use of Redis.
+		Redis can perform many data structure type operations directly on values, yet our code is
+		written mostly in a traditional ORM fashion: We retrieve data, operate on it, then save it.
+		Once we really start making use of Redis we can skip the first step (unless the user actually
+		wants to retrieve the data), and perform the last two as a single atomic operation.
+		
+		1.1. When Change fields we could save the changes immediately, rather than waiting for a save? That could be annoying, though. As many operations are supposed to be Atomic.
+		1.1. When the ID field is changed we should also send a RENAME command (requires Dirty tracking)
+
+2. Dirty tracking, only update modified fields.
+3. Validation
+4. Defaults

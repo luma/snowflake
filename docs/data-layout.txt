@@ -1,0 +1,14 @@
+
+For a User model
+  With
+		name 		= rolly, id = true
+		mood 		= awesome
+		tags 		= set('stuff', 'nonsense')
+		visits 	= counter, default = 0
+		stuff		= list("red", "blue", "green", "blue", "orange")
+	
+	Layout
+		users:rolly 				= {name:rolly, mood:awesome}
+		users:rolly:tags  	= set('stuff', 'nonsense')
+		users:rolly:visits  = counter
+		users:rolly:stuff		= list("red", "blue", "green", "blue", "orange")

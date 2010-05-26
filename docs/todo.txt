@@ -1,0 +1,5 @@
+1. Dirty tracking, only update modified fields.
+2. Validation
+3. More powerful defaults, we should accept a proc
+4. auto-populated created_at and updated_at
+5. If no ID field is specific automagically create one called 'id' that gets a GUID.
