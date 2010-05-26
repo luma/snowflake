@@ -6,17 +6,17 @@ module RedisGraph
           :default => 0
         ))
       end
-      
+
       def to_i
         @raw
       end
       alias :to_int :to_i
-      
+
       def raw=(raw)
         @raw =  unless raw.nil?
                   raw.to_i
                 else
-                  @options[:default] || nil
+                  default
                 end
 
         @dirty = true

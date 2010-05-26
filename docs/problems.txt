@@ -10,4 +10,6 @@
 
 2. Dirty tracking, only update modified fields.
 3. Validation
-4. Defaults
+4. Atomic Operations and Transactions:
+			See Watch: http://code.google.com/p/redis/wiki/MultiExecCommand
+			

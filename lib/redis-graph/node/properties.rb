@@ -16,13 +16,22 @@ module RedisGraph
           property_names_to_property_hash( self.class.hash_properties | self.class.non_hash_properties )
         end
 
+        # Mass-assign the Node's Properties.
+        #
+        # @param [Hash]
+        #     The new Node properties.
+        #
+        # @return [Node]
+        #     The Node.
+        #
+        # @api public
         def properties=(props)
           props.each do |name, value|
             unless self.class.properties.include?(name.to_sym)
               raise NoMethodError, "Undefined property #{name.to_s} for #{inspect}:#{self.class}"
             end
 
-            write_property(name, value, false)
+            write_property(name, value)
           end
           
           self
@@ -88,7 +97,7 @@ module RedisGraph
         end
 
         protected
-        
+
         # Retrieves only the Properties that have been changed since the last save.
         #
         # @return [Array<Properties>]

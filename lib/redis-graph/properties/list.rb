@@ -12,7 +12,7 @@ module RedisGraph
                 when Array
                   raw
                 when nil
-                  @options[:default] || nil
+                  default
                 else
                   raise ArgumentError, "Tried to assign #{raw.inspect} to a List Property. Only an Array can be assigned to a Hash Property."
                 end

@@ -16,6 +16,8 @@ $hoe = Hoe.spec 'redis-graph' do
   self.rubyforge_name       = self.name # TODO this is default value
   self.extra_deps         = [
     ['extlib','>= 0.9.10'],
+    ['redis','>= 2.0.0'],
+    ['redis-namespace','>= 0.4.4']
   ]
 
 end

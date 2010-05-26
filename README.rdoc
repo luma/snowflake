@@ -1,6 +1,6 @@
 = redis-graph
 
-* http://github.com/#{github_username}/#{project_name}
+* http://github.com/luma/redis-graph
 
 == DESCRIPTION:
 

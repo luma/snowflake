@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'spec'
+require 'ruby-debug'
 
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'redis-graph'
@@ -23,4 +24,8 @@ end
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
+  
+  config.after :each do
+    RedisGraph.flush_db
+  end
 end

@@ -11,14 +11,22 @@ module RedisGraph
       @name = name
       @options = options
       @dirty = false
-
-      @raw =  unless raw_value == nil
-                raw_value
-              else
-                options[:default] || nil
-              end
-
+      @raw = raw_value || default
       @instance_variable_name = self.class.instance_variable_name(@name)
+    end
+    
+    # Returns the default value for this Property.
+    #
+    # @return [Any]
+    #     The default value.
+    #
+    # @api public
+    def default
+      if options[:default].respond_to?(:call)
+        options[:default].call(@node, self)
+      else
+        options[:default]
+      end
     end
 
     # Indicates whether this Property represents a primitive ruby type 

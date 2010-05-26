@@ -1,14 +1,24 @@
 
-For a User model
+For a User model (layout for Nodes)
   With
 		name 		= rolly, id = true
 		mood 		= awesome
 		tags 		= set('stuff', 'nonsense')
 		visits 	= counter, default = 0
 		stuff		= list("red", "blue", "green", "blue", "orange")
+		
+		has n, :users
+		has n, :leads => :companies
 	
 	Layout
 		users:rolly 				= {name:rolly, mood:awesome}
 		users:rolly:tags  	= set('stuff', 'nonsense')
 		users:rolly:visits  = counter
 		users:rolly:stuff		= list("red", "blue", "green", "blue", "orange")
+
+		users:rolly:things  = SET(users:bob, users:jim)
+		users:rolly:leads   = SET(leads:1, leads:2, leads:3)
+
+For a relationship:
+	If a relationship has no metadata then it will be model with a set of ids of other nodes. (has n, :users)
+	If a relationship has metadata, then each relationship will have it's own has of metadata and a pointer to the other node. (has n, :leads => :companies)

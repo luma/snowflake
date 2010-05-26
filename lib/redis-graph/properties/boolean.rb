@@ -21,7 +21,7 @@ module RedisGraph
                 when 'f'
                   false
                 when nil
-                  @options[:default] || nil
+                  default
                 else
                   raise ArgumentError, "Tried to assign #{raw.inspect} to a Boolean Property. Only a Boolean or String ('t' for true, 'f' for false) can be assigned to a Boolean Property."
                 end

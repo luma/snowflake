@@ -1,5 +1,9 @@
-1. Dirty tracking, only update modified fields.
-2. Validation
-3. More powerful defaults, we should accept a proc
-4. auto-populated created_at and updated_at
-5. If no ID field is specific automagically create one called 'id' that gets a GUID.
+1. DONE Dirty tracking, only update modified fields.
+2. DONE More powerful defaults, we should accept a proc/lambda
+
+1. If no ID field is specific automagically create one called 'id' that gets a 64 bit GUID.
+2. When the ID field is changed we should also send a RENAME command (requires Dirty tracking)
+3. Validation
+4. Errors
+5. auto-populated created_at and updated_at
+6. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.

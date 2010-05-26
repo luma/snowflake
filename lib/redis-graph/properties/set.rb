@@ -14,7 +14,7 @@ module RedisGraph
                 when ::Set
                   raw
                 when nil
-                  @options[:default] || nil
+                  default
                 else
                   raise ArgumentError, "Tried to assign #{raw.inspect} to a Set Property. Only a Set or Array can be assigned to a Set Property."
                 end

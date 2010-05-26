@@ -116,14 +116,23 @@ describe RedisGraph::Property do
     end
   end
   
-=begin
-# Writes the value of this Property to the Redis store.
-#
-# @api public
-def store!
-  raise NotImplemented, "Valid Properties have to subclass the Property Class and implement the 'store' method."
-end
-=end
+  describe "#default" do
+    before(:all) do
+      @test_node = TestNode.new
+    end
+
+    it "return the default when there is no other value" do
+      pt = RedisGraph::PropertyPrototype.new(TestNode, :name, String, :default => "Yo!")
+      prop = pt.to_property(@test_node)
+      prop.default.should == "Yo!"
+    end
+
+    it "return the default from a lambda/proc when there is no other value" do
+      pt = RedisGraph::PropertyPrototype.new(TestNode, :name, String, :default => lambda { |node, property| "Yo!" } )
+      prop = pt.to_property(@test_node)
+      prop.default.should == "Yo!"
+    end
+  end
   
   describe "child class" do
     describe "#primitive?" do

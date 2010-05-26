@@ -17,7 +17,7 @@ module RedisGraph
         @raw =  unless raw.nil?
                   raw.to_i
                 else
-                  @options[:default] || nil
+                  default
                 end
 
         @dirty = true

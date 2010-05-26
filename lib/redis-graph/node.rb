@@ -5,11 +5,27 @@ module RedisGraph
     end
 
     def initialize(props = {})
+      @_saved = false
       self.id = props.delete(:id)      
       self.properties = props
     end
-
+    
+    # Indicates whether this Node has been saved yet.
     #
+    # @return [Boolean]
+    #   True if this Node has been saved, false otherwise.
+    #
+    # @api public
+    def saved?
+      @_saved == true
+    end
+
+    # Save the Node to the DB.
+    #
+    # @return [Boolean]
+    #     True if the save was successful, false otherwise.
+    #
+    # @api public
     def save
       # Bail if there's nothing to do anyways
       return true unless dirty?
@@ -18,47 +34,17 @@ module RedisGraph
         raise MissingIdPropertyError, "An instance of #{self.class.to_s} could not be saved as it lacked an ID."
       end
 
-#      puts "DIRTY: #{dirty_properties_names.inspect}"
-
       # @todo This is kind of hacky, right now
       # @todo Also, I'm using MULTI as if it's a transaction, except it isn't, as if one command fails all commands follow it will execute (http://code.google.com/p/redis/wiki/MultiExecCommand)
 #      RedisGraph.connection.multi do
         # We need to get all get Properties that should be part of the main object hash and separate them out from the others
         # They get added into a single Redis Hash
-=begin
-        hash_properties = self.class.hash_properties.collect do |name| 
-            property = read_raw_property(name)
-            if property.dirty?
-              [name, property.to_s]
-            else
-              nil
-            end
-        end.compact.flatten
-=end        
-
         unless dirty_hash_properties.empty?
-          puts "SAVING HASH: #{dirty_hash_properties.inspect}"
           RedisGraph.connection.hmset( *dirty_hash_properties.to_a.flatten.unshift(redis_key) )
         end
 
         # All other more complex properties (counters, lists, sets, etc) get serialised individually.
-=begin
-        self.class.non_hash_properties.each do |name|
-          property = read_raw_property(name)
-
-          if property.dirty?
-            puts "SAVING CUSTOM #{name}"
-            unless property == nil
-              property.store!
-            else
-              RedisGraph.connection.del( redis_key(name) )
-            end
-          end
-        end
-=end
-
         self.dirty_non_hash_properties.each do |name, property|
-          puts "SAVING CUSTOM #{name}"
           unless property == nil
             property.store!
           else
@@ -67,11 +53,20 @@ module RedisGraph
         end
 
 #      end
-
-      clean!
+      
+      reset!
 
     end
     
+    # Reset dirty tracking and saved state.
+    #
+    # @api semi-public
+    def reset!
+      @_saved = true
+      clean!
+    end
+    
+    # @api private
     def send_command(path_suffix, command, *args)
       unless path_suffix == nil
         RedisGraph.connection.send(command.to_sym, *args.unshift( redis_key(path_suffix.to_s) ) )
