@@ -57,24 +57,24 @@ module RedisGraph
           property_names_to_property_hash(self.class.non_hash_properties)
         end        
 
-        # Retrieve the value of the id property for this Node
+        # Retrieve the value of the key property for this Node
         #
         # @return [#to_s] The Id value
         #
         # @api public
-        def id
-          read_property(self.class.id)
+        def key
+          read_property(self.class.key)
         end
 
-        # Assigns the value of the id property for this Node
+        # Assigns the value of the key property for this Node
         #
-        # @param [#to_s] The ID value
+        # @param [#to_s] The key value
         #
-        # @return [#to_s] The Id value
+        # @return [#to_s] The key value
         #
         # @api public
-        def id=(new_id)
-          write_property(self.class.id, new_id)
+        def key=(new_key)
+          write_property(self.class.key, new_key)
         end
 
         # Indicates whether any properties have been modified since the last save.
@@ -297,23 +297,26 @@ module RedisGraph
         name = name.to_sym
 
         if properties.include?(name)
-          raise ArgumentError, "A Property called '#{name.to_s}' has already been defined."
+          raise PropertyNameInUseError, "A Property called '#{name.to_s}' has already been defined for #{self.inspect}."
+        end
+        
+#        if reserved_propery_names.include?(name)
+#          raise ArgumentError, "'#{name}' is a reserved property name, it cannot be used. The following are all reserved property names: #{reserved_propery_names.join(', ')}"
+#        end
+
+        # 'key' is a reserved property name, you can use it but you must set :key => true as well.
+        if name == :key && ( !options.include?(:key) || options[:key] == false )
+          raise ArgumentError, "You can't call a property 'key' unless you also set the :key option to true."
         end
 
-        #klass = Property.get(type.to_s)
-        #if klass.blank?
-        #  raise ArgumentError, "An invalid type, '#{type.to_s}', was specified for Property '#{name.to_s}'."
-        #end
-
-        #property = klass.new(self, name, options)
         prototype = PropertyPrototype.new(self, name, type, options)
 
-        # If this property is supposed to be the id then we take a note of it.
-        if prototype.id?
-          if self.id.blank?
-            self.id = name
+        # If this property is supposed to be the key then we take a note of it.
+        if prototype.key?
+          if @key.blank?
+            self.key = name
           else
-            raise InvalidPropertyError, "More than one property cannot be the Node id, #{self.id.to_s} is already the id for #{self.to_s}"
+            raise InvalidPropertyError, "More than one property cannot be the Node key, #{self.key.to_s} is already the key for #{self.inspect}"
           end
         end
 
@@ -332,11 +335,15 @@ module RedisGraph
           descendant.properties[name] ||= prototype
         end
 
-        # create reader
-        create_property_reader(prototype)
+        # Create our accessors, we don't bother if the property is named key, there are already
+        # accessors for key
+        unless name == :key
+          # create reader
+          create_property_reader(prototype)
         
-        # create writer
-        create_property_writer(prototype)
+          # create writer
+          create_property_writer(prototype)
+        end
 
         prototype
       end
@@ -371,12 +378,23 @@ module RedisGraph
         @non_hash_properties ||= Set.new
       end
       
-      def id=(property_name)
-        @id = property_name.to_sym
+      def key=(property_name)
+        @key = property_name.to_sym
       end
-      
-      def id
-        @id
+
+      def key
+        @key ||= begin
+          # Auto-magically create a default key property
+          begin
+            property :key, ::RedisGraph::Properties::Guid, :key => true
+          rescue PropertyNameInUseError => e
+            # What happens if there's is a Property called :key already? We get an exception that can be
+            # a little obscure. We make it a little more obvious here and re-raise it.
+            raise PropertyNameInUseError, "No key Property was defined on this Node, we tried to create one called 'key' for you but the property name 'key' was already in use. Please choose a property to be the Node key."
+          end
+
+          :key
+        end
       end
      
       private

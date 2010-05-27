@@ -14,7 +14,7 @@ module RedisGraph
       
       def raw=(raw)
         @dirty = true
-        @raw   = raw.to_s
+        @raw = raw != nil ? raw.to_s : default
       end
       
       def store!

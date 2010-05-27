@@ -16,7 +16,7 @@ module RedisGraph
       @reader_visibility = options.delete(:reader_visibility) || 'public'
       @writer_visibility = options.delete(:writer_visibility) || 'public'
 
-      @id = options.include?(:id) && options[:id] == true
+      @key = options.include?(:key) && options[:key] == true
       @instance_variable_name = Property.instance_variable_name(@name)
     end
     
@@ -54,14 +54,14 @@ module RedisGraph
       property_class_for_type.primitive?
     end
 
-    # Indicates whether this is also should be the ID field.
+    # Indicates whether this is also should be the key field.
     #
     # @return [Boolean]
-    #     True if this represents the ID field, false otherwise.
+    #     True if this represents the key field, false otherwise.
     #
     # @api public
-    def id?
-      @id
+    def key?
+      @key
     end
 
     # Indicates whether this Property is one of those that will be included in the main object hash
@@ -71,13 +71,13 @@ module RedisGraph
     #
     # @api private
     def hash_property?
-      [Properties::String, Properties::Boolean, Properties::Integer, Properties::Counter].include?(self.property_class_for_type)
+      [Properties::String, Properties::Boolean, Properties::Integer, Properties::Guid, Properties::Counter].include?(self.property_class_for_type)
     end
 
     # Retrieves a value from Redis by it's Key, the retrieval method used depends on the
     # Properties type.
     #
-    # @todo This is a bit of a kludge right now. I'd rather this method was necessary at all.
+    # @todo This is a bit of a kludge right now. I'd rather this method wasn't necessary at all.
     #
     # @param [#to_s] key
     #     The Property key to retrieve
@@ -87,6 +87,7 @@ module RedisGraph
     #
     # @api semi public
     def value_for_key(key)
+      # @todo Dude, this is fugly
       case @type.to_s
       when "RedisGraph::Properties::Set"
         RedisGraph.connection.smembers( key )

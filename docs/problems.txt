@@ -6,7 +6,7 @@
 		wants to retrieve the data), and perform the last two as a single atomic operation.
 		
 		1.1. When Change fields we could save the changes immediately, rather than waiting for a save? That could be annoying, though. As many operations are supposed to be Atomic.
-		1.1. When the ID field is changed we should also send a RENAME command (requires Dirty tracking)
+		1.1. When the key field is changed we should also send a RENAME command (requires Dirty tracking)
 
 2. Dirty tracking, only update modified fields.
 3. Validation

@@ -19,13 +19,17 @@ lib/redis-graph/properties/list.rb
 lib/redis-graph/properties/set.rb
 lib/redis-graph/properties/string.rb
 lib/redis-graph/properties/integer.rb
+lib/redis-graph/properties/guid.rb
 script/console
 script/destroy
 script/generate
 spec/public/property_prototype_spec.rb
 spec/public/property_spec.rb
+spec/public/node_spec.rb
 spec/semi-public/property_prototype_spec.rb
 spec/semi-public/property_spec.rb
 spec/spec.opts
+spec/rcov.opts
 spec/spec_helper.rb
 tasks/rspec.rake
+tasks/yard.rake

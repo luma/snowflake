@@ -17,7 +17,8 @@ $hoe = Hoe.spec 'redis-graph' do
   self.extra_deps         = [
     ['extlib','>= 0.9.10'],
     ['redis','>= 2.0.0'],
-    ['redis-namespace','>= 0.4.4']
+    ['redis-namespace','>= 0.4.4'],
+    ['uuidtools', '>= 2.1.1']
   ]
 
 end

@@ -8,7 +8,7 @@ require 'redis-graph'
 class TestNode
   include RedisGraph::Node
 
-  property :name,         String, :id => true
+  property :name,         String, :key => true
   property :age,          Integer
   property :mood,         String
   property :description,  String

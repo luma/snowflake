@@ -6,7 +6,7 @@ describe RedisGraph::Node do
   end
 
   describe "#get" do
-    it "returns a Node by it's ID" do
+    it "returns a Node by it's key" do
       TestNode.get('rolly').should_not be_nil
     end
 
@@ -16,7 +16,7 @@ describe RedisGraph::Node do
   end
 
   describe "#get!" do
-    it "returns a Node by it's ID" do
+    it "returns a Node by it's key" do
       TestNode.get('rolly').should_not be_nil
     end
     
@@ -50,6 +50,28 @@ describe RedisGraph::Node do
   
   describe "properties" do
     
+  end
+  
+  describe "class" do
+    describe "#key" do
+      
+      it "returns the value of the Property that is the key" do
+        @test_node.key.should == @test_node.name
+      end
+
+      it "should automagically create an key property when one is not defined" do
+        class TestNode2
+          include RedisGraph::Node
+
+          property :name,         String
+          property :age,          Integer
+          property :mood,         String
+        end
+        
+        test = TestNode2.new :name => 'bob'
+        test.key.should_not be_blank
+      end
+    end
   end
 
 end

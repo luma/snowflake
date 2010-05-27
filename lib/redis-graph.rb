@@ -8,6 +8,7 @@ require 'json'
 
 require 'redis'
 #require 'redis/namespace'
+require 'uuidtools'
 
 # Speed boost, and reduced memory leaks from standard ruby threading, if it's available: use it.
 begin
@@ -25,6 +26,9 @@ module RedisGraph
   end
 
   class InvalidPropertyError < RedisGraphError
+  end
+
+  class PropertyNameInUseError < InvalidPropertyError
   end
 
   class MissingPropertyError < RedisGraphError
@@ -97,3 +101,4 @@ require dir / 'properties/list'
 require dir / 'properties/set'
 require dir / 'properties/string'
 require dir / 'properties/integer'
+require dir / 'properties/guid'

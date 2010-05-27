@@ -6,7 +6,7 @@ module RedisGraph
 
     def initialize(props = {})
       @_saved = false
-      self.id = props.delete(:id)      
+      self.key = props.delete(:key)      
       self.properties = props
     end
     
@@ -30,10 +30,6 @@ module RedisGraph
       # Bail if there's nothing to do anyways
       return true unless dirty?
       
-      if self.id.blank?
-        raise MissingIdPropertyError, "An instance of #{self.class.to_s} could not be saved as it lacked an ID."
-      end
-
       # @todo This is kind of hacky, right now
       # @todo Also, I'm using MULTI as if it's a transaction, except it isn't, as if one command fails all commands follow it will execute (http://code.google.com/p/redis/wiki/MultiExecCommand)
 #      RedisGraph.connection.multi do
@@ -79,7 +75,7 @@ module RedisGraph
 
     # @todo I'm not sure this should be public
     def redis_key(*segments)
-      self.class.redis_key(*segments.unshift(self.id))
+      self.class.redis_key(*segments.unshift(self.key))
     end
   end # module Node
 end # module RedisGraph

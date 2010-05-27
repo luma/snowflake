@@ -1,30 +1,30 @@
 module RedisGraph
   module Node
     module ClassMethods
-      # Retrieve a Node by it's +id+, it returns nil if no Node can be found.
+      # Retrieve a Node by it's +key+, it returns nil if no Node can be found.
       #
-      # @param [#to_s] id
-      #     The id of the Node that you wish to retrieve.
+      # @param [#to_s] key
+      #     The key of the Node that you wish to retrieve.
       #
       # @return [Node, nil]
-      #   A Node with the id of +id+
-      #   If no Node was found with the id of +id+
+      #   A Node with the key of +key+
+      #   If no Node was found with the key of +key+
       # 
       # @api public
-      def get(id)
-        node_properties = RedisGraph.connection.hgetall( redis_key(id) )
+      def get(key)
+        node_properties = RedisGraph.connection.hgetall( redis_key(key) )
         return nil if node_properties.empty?
 
         # Deal with extended properties that aren't part of the hash
         non_hash_properties.each do |name|
           property = properties[name]
-          node_properties[name.to_sym] = property.value_for_key(redis_key(id, name))
+          node_properties[name.to_sym] = property.value_for_key(redis_key(key, name))
         end
 
         # We use #allocate, rather than #new, as we use #new to mean a Node that has not yet been
         # saved in the DB.
         node = self.allocate
-        node.id = id
+        node.key = key
         node.properties = node_properties
         node.reset!
         node
@@ -33,18 +33,18 @@ module RedisGraph
       # This is the same as #get, except that it raises a NodeNoFoundError exception
       # instead of returning nil, if no Node is found.
       #
-      # @param [#to_s] id
-      #     The id of the Node that you wish to retrieve.
+      # @param [#to_s] key
+      #     The key of the Node that you wish to retrieve.
       #
       # @return [Node]
-      #   A Node with the id of +id+
+      #   A Node with the key of +key+
       #
       # @raise [NodeNotFoundError]
       #   The Node was not found
       # 
       # @api public
-      def get!(id)
-        get(id) || raise(NodeNotFoundError, "A #{self.to_s} with the id of \"#{id.to_s}\" could not be found.")
+      def get!(key)
+        get(key) || raise(NodeNotFoundError, "A #{self.to_s} with the key of \"#{key.to_s}\" could not be found.")
       end
 
       # 
