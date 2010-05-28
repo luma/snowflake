@@ -39,15 +39,15 @@ module RedisGraph
         end
       end
 
-      def store!
+      protected
+
+      def store_raw
         @node.send_command( @name, :del )
         
         # @todo These should be batched
         @raw.each do |value|
           @node.send_command( @name, :rpush, value )
         end
-        
-        @dirty = false
       end
     end
   end # module Properties

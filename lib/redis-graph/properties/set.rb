@@ -31,7 +31,6 @@ module RedisGraph
         end
       end
 
-
       def coerce(other)
         case other
         when Array
@@ -43,8 +42,9 @@ module RedisGraph
         end
       end
 
-      # Store a Hash Value into
-      def store!
+      protected
+
+      def store_raw
         # TODO: There must be a better way of doing this...
         old_members = @node.send_command( @name, :smembers )
 
@@ -64,8 +64,6 @@ module RedisGraph
             @node.send_command( @name, :sadd, v )
           end
         end
-        
-        @dirty = false
       end
     end
   end # module Properties

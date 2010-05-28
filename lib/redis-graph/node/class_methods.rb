@@ -46,6 +46,19 @@ module RedisGraph
       def get!(key)
         get(key) || raise(NodeNotFoundError, "A #{self.to_s} with the key of \"#{key.to_s}\" could not be found.")
       end
+      
+      # Indicates whether a Node exists for key +key+.
+      #
+      # @param [#to_s] key
+      #     The key to test for.
+      #
+      # @return [Boolean]
+      #     True if a Node exists for key +key+, false otherwise.
+      #
+      # @api public
+      def exists?(key)
+        RedisGraph.connection.exists( redis_key(key) )
+      end
 
       # 
       # @api public

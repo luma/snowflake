@@ -9,6 +9,7 @@ require 'json'
 require 'redis'
 #require 'redis/namespace'
 require 'uuidtools'
+require 'validatable'
 
 # Speed boost, and reduced memory leaks from standard ruby threading, if it's available: use it.
 begin
@@ -34,10 +35,13 @@ module RedisGraph
   class MissingPropertyError < RedisGraphError
   end
 
-  class MissingIdPropertyError < RedisGraphError
+  class MissingKeyPropertyError < RedisGraphError
   end
 
   class NodeNotFoundError < RedisGraphError
+  end
+
+  class NodeKeyAlreadyExistsError < RedisGraphError
   end
 
   class AliasInUseError < RedisGraphError

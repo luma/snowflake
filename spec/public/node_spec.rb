@@ -1,30 +1,8 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
 describe RedisGraph::Node do
-  before(:all) do
+  before(:each) do
     @test_node = TestNode.create(:name => 'rolly', :mood => 'Awesome')
-  end
-
-  describe "#get" do
-    it "returns a Node by it's key" do
-      TestNode.get('rolly').should_not be_nil
-    end
-
-    it "returns nil when getting a Node that doesn't exist" do
-      TestNode.get('figs!').should be_nil
-    end
-  end
-
-  describe "#get!" do
-    it "returns a Node by it's key" do
-      TestNode.get('rolly').should_not be_nil
-    end
-    
-    it "raises an RedisGraph::NodeNotFoundError exception when getting a Node that doesn't exist" do
-      lambda {
-        TestNode.get!('figs!')
-      }.should raise_error(RedisGraph::NodeNotFoundError)
-    end
   end
 
   describe "#saved?" do
@@ -46,13 +24,89 @@ describe RedisGraph::Node do
       @test_node.description = "A Test Node"
       @test_node.save.should be_true
     end
+    
+    it "should rename all redis keys when modifying the node key" do
+      @test_node.key = 'bob'
+      @test_node.save
+      TestNode.get('rolly').should be_nil
+      TestNode.get('bob').should_not be_nil
+    end
   end
   
-  describe "properties" do
-    
+  describe "equality" do
+    describe "#==" do
+      it "returns true when the two Nodes are the same" do
+        @test_node.should == TestNode.get('rolly')
+      end
+
+      it "returns false when the two Nodes are not the same" do
+        @test_node.should_not == TestNode.create(:name => 'bob', :mood => 'Awesome')
+      end
+    end
+
+    describe "#eql?" do
+      it "returns true when the two Nodes are the same" do
+        @test_node.should eql(TestNode.get('rolly'))
+      end
+
+      it "returns false when the two Nodes are not the same" do
+        @test_node.should_not eql(TestNode.create(:name => 'bob', :mood => 'Awesome'))
+      end
+    end
+
+    describe "#equal?" do
+      it "returns true when the two Node Objects are the same" do
+        @test_node.should equal(@test_node)
+      end
+
+      it "returns false when the two Node Objects are not the same" do
+        @test_node.should_not equal(TestNode.get('rolly'))
+      end
+    end
+  end
+  
+  describe "validation" do
+    # @todo add proper tests for this
+    it "should not save when validation fails" do
+      @test_node.name = nil
+      @test_node.save.should be_false
+      @test_node.errors.on(:name).should_not be_blank
+    end
   end
   
   describe "class" do
+    describe "#exists?" do
+      it "returns true when a node with the desired key exists" do
+        TestNode.exists?('rolly').should be_true
+      end
+
+      it "returns false when a node with the desired key does not exist" do
+        TestNode.exists?('figs!').should be_false
+      end
+    end
+
+    describe "#get" do
+      it "returns a Node by it's key" do
+        TestNode.get('rolly').should_not be_nil
+      end
+
+      it "returns nil when getting a Node that doesn't exist" do
+        TestNode.get('figs!').should be_nil
+      end
+    end
+
+    describe "#get!" do
+      it "returns a Node by it's key" do
+        TestNode.get('rolly').should_not be_nil
+      end
+
+      it "raises an RedisGraph::NodeNotFoundError exception when getting a Node that doesn't exist" do
+        lambda {
+          TestNode.get!('figs!')
+        }.should raise_error(RedisGraph::NodeNotFoundError)
+      end
+    end
+
     describe "#key" do
       
       it "returns the value of the Property that is the key" do

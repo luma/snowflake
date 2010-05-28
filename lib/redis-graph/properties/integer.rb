@@ -49,9 +49,10 @@ module RedisGraph
         end
       end
 
-      def store!
+      protected
+
+      def store_raw
         @node.send_command( @name, :set, to_s )
-        @dirty = false
       end
     end
   end # module Properties

@@ -14,10 +14,11 @@ module RedisGraph
         @raw = raw
       end
 
+      protected
+
       # Store a Hash Value into 
-      def store!
+      def store_raw
         @node.send_command( @name, :hmset, @raw )
-        @dirty = false
       end
     end
   end # module Properties

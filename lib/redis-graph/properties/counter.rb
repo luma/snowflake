@@ -58,9 +58,10 @@ module RedisGraph
         @raw = @raw - by.to_i
       end
 
-      def store!
+      protected
+
+      def store_raw
         @node.send_command( nil, :hset, @name, to_s )
-        @dirty = false
       end
 
     end

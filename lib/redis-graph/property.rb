@@ -12,6 +12,7 @@ module RedisGraph
       @options = options
       @dirty = false
       @raw = raw_value || default
+      @saved = raw_value != nil
       @instance_variable_name = self.class.instance_variable_name(@name)
     end
     
@@ -47,6 +48,18 @@ module RedisGraph
     # @api public
     def dirty?
       @dirty
+    end
+
+    # Indicates whether this Property's raw value exists in Redis. This is different from #dirty? as
+    # #dirty? indicates whether a new raw value has been assigned, whereas if #saved? is false then
+    # if you peeked at the value for this Property in Redis you would get nil.
+    #
+    # @return [Boolean]
+    #     True if the raw value exists in Redis, false otherwise.
+    #
+    # @api public
+    def saved?
+      @saved
     end
     
     # Clear our dirty tracking
@@ -85,12 +98,23 @@ module RedisGraph
     def raw=(raw)
       raise NotImplemented, "Valid Properties have to subclass the Property Class and implement the 'raw=' method."
     end
-    
+
     # Writes the value of this Property to the Redis store.
-    #
-    # @api public
+    # 
+    # @api semi-public
     def store!
-      raise NotImplemented, "Valid Properties have to subclass the Property Class and implement the 'store' method."
+      before_store
+      store_raw
+      after_store
+    end
+    
+    def before_store
+      
+    end
+    
+    def after_store
+      @dirty = false
+      @saved = true
     end
 
     def self.inherited(child)
@@ -172,7 +196,7 @@ module RedisGraph
         end
 
         # Register these aliases as belonging to this Property Type
-        for a in aliases
+        aliases.each do |a|
           Property.aliases[a.to_s] = self.to_s
         end
 
@@ -207,6 +231,15 @@ module RedisGraph
       end
 
     end # module Attributes
+
+    protected
+    
+    # Writes the value of this Property to the Redis store.
+    # 
+    # @api semi-public
+    def store_raw
+      raise NotImplemented, "Valid Properties have to subclass the Property Class and implement the 'store' method."
+    end
 
   end # class Property
 end # module RedisGraph

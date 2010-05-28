@@ -19,6 +19,8 @@ class TestNode
   property :awards,       ::RedisGraph::Properties::List          # <-- native Redis List
   # @TODO: Hash
 
+  validates_presence_of :name
+
   #edge :
 end
 

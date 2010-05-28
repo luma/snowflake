@@ -30,9 +30,10 @@ module RedisGraph
         @raw
       end
       
-      def store!
+      protected
+
+      def store_raw
         @node.send_command( @name, :set, to_s )
-        @dirty = false
       end
     end # class Boolean
   end # module Properties

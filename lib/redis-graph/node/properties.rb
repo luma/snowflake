@@ -213,6 +213,21 @@ module RedisGraph
         def raw_properties
           property_names_to_raw_property_hash( self.class.hash_properties | self.class.non_hash_properties )
         end
+        
+        # Retrieves only properties that are **Not** part of the main object Hash.
+        #
+        # This method differs from the non_hash_properties method as it always returns the raw 
+        # Property object.
+        #
+        # @return [Hash]
+        #     The array of properties
+        #
+        # @api private
+        def non_hash_raw_properties
+          property_names_to_raw_property_hash(self.class.non_hash_properties) do |property|
+            [property.name, property]
+          end
+        end
 
         # Retrieves only properties that are:
         # 1. Dirty.
