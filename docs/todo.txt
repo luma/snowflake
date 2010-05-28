@@ -1,10 +1,13 @@
-1. DONE Dirty tracking, only update modified fields.
-2. DONE More powerful defaults, we should accept a proc/lambda
+TODO
+7. Relationships
+8. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
+9. auto-populated created_at and updated_at
 
-1. If no key field is specific automagically create one called 'id' that gets a 128 bit UUID.
-2. When the key field is changed we should also send a RENAME command (requires Dirty tracking)
-3. Validation
-4. Errors
-5. Relationships
-6. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
-7. auto-populated created_at and updated_at
+
+DONE 
+1. Dirty tracking, only update modified fields.
+2. More powerful defaults, we should accept a proc/lambda
+3. If no key field is specific automagically create one called 'id' that gets a 128 bit UUID.
+4. When the key field is changed we should also send a RENAME command (requires Dirty tracking)
+5. Validation
+6. Errors
