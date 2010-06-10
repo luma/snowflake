@@ -1,13 +1,28 @@
-TODO
-7. Relationships
-8. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
-9. auto-populated created_at and updated_at
+
+h2. TODO
+
+7. Relationships.
+8. ActiveModel support
+9. Ruby 1.9.2 support
+10. Search through Sphinx/Xapian: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily customise what gets indexed and how.
+		- Convert word docs: http://linux.die.net/man/1/antiword
+		- Convert PDF: http://en.wikipedia.org/wiki/Pdftotext
+		- http://moinmo.in/HelpOnXapian
+11. Indices
+12. auto-populated created_at and updated_at.
+13. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
 
 
-DONE 
+h2. DONE 
+
 1. Dirty tracking, only update modified fields.
 2. More powerful defaults, we should accept a proc/lambda
 3. If no key field is specific automagically create one called 'id' that gets a 128 bit UUID.
 4. When the key field is changed we should also send a RENAME command (requires Dirty tracking)
 5. Validation
 6. Errors
+
+
+h2. Possible Names
+* Snowflake
+* Snowfall

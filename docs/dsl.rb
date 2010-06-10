@@ -5,8 +5,11 @@ class Company
 
  validates_presence_of :name
 
- has n, :leads => :projects
- has n, :friends => :companies
+ # Has 0 - n projects via leads edges. Has many leads that are companies.
+ has n, :leads, :for => :projects
+
+ # Has 0 - n companies via friends edges. Has many friends that are companies.
+ has n, :friends, :for => :companies
 end
 
 class Project
@@ -17,8 +20,14 @@ class Project
   
   validates_presence_of :name
 
-  belongs_to :client => :companies
+  # Is a client of another company 
+  belongs_to :client, :for => :companies
+
+  # Has 0 - n research, via a undecorated edge
   has n, :research
+
+  # Has 0 - n assets, that can be any type of thing
+  has n, :assets, :model => :any
 end
 
 class Research
@@ -32,6 +41,7 @@ class Research
 
   validates_presence_of :name
   
+  # Is a projects research, via a undecorated edge
   belongs_to :project
 end
 
@@ -62,7 +72,12 @@ puts a.leads.first.inspect
 puts b.leads.first.inspect
   => <Lead name='Lead from Bob' likelyhood=10 project=<Project ...>>
 
-# Adding Dynamic Relationships
+b.leads.first.project
+
+# What about the list of projects? Maybe...?
+b.projects  => actually b.leads.collect {|l| l.project }
+
+# Adding Dynamic Relationships?
 #a.has_relationship :friends
 #a.has_relationship :leads
 #b.has_relationship :friends
