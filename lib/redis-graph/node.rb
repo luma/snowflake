@@ -9,7 +9,7 @@ module RedisGraph
 
     def initialize(props = {})
       @_saved = false
-      self.key = props.delete(:key)      
+      self.key = props.delete(:key)
       self.properties = props
     end
 
@@ -27,7 +27,7 @@ module RedisGraph
     def equal?(other)
       object_id === other.object_id
     end
-    
+
     # Indicates whether this Node has been saved yet.
     #
     # @return [Boolean]
@@ -47,17 +47,16 @@ module RedisGraph
     def save
       # Bail, if there's nothing to do anyways
       return true unless dirty?
-      
+
       # Bail, if there's validation errors.
       return false unless valid?
-      
+
       # We shouldn't save the Node if it has not yet been created but a Node with the same key already exists
       if !saved? && self.class.exists?(self.key)
-        #raise NodeKeyAlreadyExistsError, "A #{self.class.to_s} Node with the key of '#{self.key}' already exists, if you wish to overwrite it first get the Node, update it, and then save."
-        # @todo add error
+        errors.add(self.class.key, "A #{self.class.to_s} with a #{self.class.key.to_s} key of #{self.key} already exists, the Node key must be unique.")
         return false
       end
-      
+
       # @todo I'm using MULTI as if it's a transaction, except it isn't, as if one command fails 
       # all commands follow it will execute (http://code.google.com/p/redis/wiki/MultiExecCommand). This
       # is currently an unresolved issue, mainly 'cause I don't know how yet...
@@ -88,12 +87,40 @@ module RedisGraph
             property.store!
           else
             RedisGraph.connection.del( redis_key(name) )
-          end          
+          end
         end
+      end # Multi/Exec
 
-     end
-      
       reset!
+      true
+    end
+    
+    # Deletes the Node
+    #
+    # @return [Boolean]
+    #     True for sucess, false otherise.
+    #
+    # @api public
+    def destroy!
+      # Nothing saved? Nothing to delete, we're done.
+      return true unless saved?
+
+      # Mark it as not saved.
+      @_saved = false
+
+      # Hmmm, if the key has been changed we're gonna assume they mean to delete the new
+      # key, but as the record is dirty, and it always when @_key != self.key, deleting
+      # the new key will do nothing as we haven't saved anything under the new key yet.
+      return true unless @_key == self.key
+
+      RedisGraph.connection.multi do
+        RedisGraph.connection.del( self.class.redis_key( @_key ) )
+
+        self.class.non_hash_properties.each do |name|
+          RedisGraph.connection.del( self.class.redis_key(@_key, name) )
+        end
+      end
+
       true
     end
 
@@ -105,7 +132,17 @@ module RedisGraph
       @_saved = true
       clean!
     end
-    
+
+    # Returns a url path component, handy for Ruby on Rails.
+    #
+    # @return [String]
+    #     The url path component.
+    #
+    # @api public
+    def to_param
+      self.key
+    end
+
     # @api private
     def send_command(path_suffix, command, *args)
       unless path_suffix == nil

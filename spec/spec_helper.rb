@@ -26,7 +26,7 @@ end
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
-  
+
   config.after :each do
     RedisGraph.flush_db
   end

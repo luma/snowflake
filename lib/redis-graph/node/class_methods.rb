@@ -18,7 +18,7 @@ module RedisGraph
         # Deal with extended properties that aren't part of the hash
         non_hash_properties.each do |name|
           property = properties[name]
-          node_properties[name.to_sym] = property.value_for_key(redis_key(key, name))
+          node_properties[name.to_sym] = property.value_for_key( redis_key(key, name))
         end
 
         # We use #allocate, rather than #new, as we use #new to mean a Node that has not yet been
@@ -26,6 +26,7 @@ module RedisGraph
         node = self.allocate
         node.key = key
         node.properties = node_properties
+
         node.reset!
         node
       end
@@ -60,20 +61,28 @@ module RedisGraph
         RedisGraph.connection.exists( redis_key(key) )
       end
 
+      # Creates a new Node using +options+. You can also provide a block to specialise the Node
+      # before it is saved.
+      #
+      # @param [Hash] options
+      #     Optional Hash of options to create the Node with.
+      #
+      # @return [Node]
+      #     The new Node.
       # 
       # @api public
       def create(options = {})
         node = self.new(options)
+        yield node if block_given?
         node.save
         node
       end
 
 #      protected
-
       # @todo I'm not thrilled about this being public, it needs to be public right now as instances of Node use it
       # @api private
       def redis_key(*segments)
-        segments.unshift(self.to_s).join(':')
+        RedisGraph.key( *segments.unshift(self.to_s) )
       end
     end # module Descendants
   end # module Node

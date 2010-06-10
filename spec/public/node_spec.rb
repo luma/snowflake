@@ -72,6 +72,24 @@ describe RedisGraph::Node do
       @test_node.save.should be_false
       @test_node.errors.on(:name).should_not be_blank
     end
+    
+    it "should not save a new Node with a key that's identical to an existing one" do
+      node = TestNode.new(:name => @test_node.name)
+      node.save.should be_false
+      node.errors.on(:name).should_not be_blank
+    end
+  end
+  
+  describe "#destroy!" do
+    it "deletes a saved Node" do
+      @test_node.destroy!.should be_true
+      TestNode.get('rolly').should be_nil
+    end
+
+    it "marks a deleted Node as not saved" do
+      @test_node.destroy!.should be_true
+      @test_node.should_not be_saved
+    end
   end
   
   describe "class" do

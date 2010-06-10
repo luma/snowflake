@@ -26,6 +26,9 @@ module RedisGraph
   class RedisGraphError < StandardError
   end
 
+  class NotImplementedError < RedisGraphError
+  end
+
   class InvalidPropertyError < RedisGraphError
   end
 
@@ -80,6 +83,12 @@ module RedisGraph
   def self.flush_db
     redis.flushdb
   end
+  
+  # @todo I'm not thrilled about this being public. however, too many places need it and at least I can be sure everyone is generating keys of the same form.
+  # @api private
+  def self.key(*segments)
+    segments.join(':')
+  end
 
 #  autoload :IdentityMap, 'redis-graph/identity_map'
   autoload :PropertyPrototype, 'redis-graph/property_prototype'
@@ -90,6 +99,11 @@ module RedisGraph
 #    autoload :Relationships, 'node/relationships'
   end
 end # module RedisGraph
+
+# Convienant place to store this
+unless defined?(Infinity)
+  Infinity = 1.0/0
+end
 
 require dir / 'node'
 require dir / 'node/descendants'
