@@ -27,6 +27,11 @@ module RedisGraph
         node.key = key
         node.properties = node_properties
 
+        # Load Relationships
+        node.raw_relationships.each do |name, relationship|
+          relationship.load!
+        end
+
         node.reset!
         node
       end

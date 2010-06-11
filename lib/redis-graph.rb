@@ -50,6 +50,9 @@ module RedisGraph
   class AliasInUseError < RedisGraphError
   end
 
+  class InvalidRelationshipType < RedisGraphError
+  end
+
   def self.connection
     # @todo fix Redis Namespacing
     #current[:connection] ||= Redis::Namespace.new(namespace, :redis => redis)

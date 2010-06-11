@@ -9,7 +9,7 @@
 
 2. Atomic Operations and Transactions:
 			See Watch: http://code.google.com/p/redis/wiki/MultiExecCommand
-3. Pretty much every time I save a property I assume the save succeeds, but I'm not actually checking. This could be more difficult to workaround as I'm also pipelining the commands.
+3. Pretty much every time I save a property I assume the save succeeds, but I'm not actually checking. This could be more difficult to workaround as I'm also pipelining the commands. More thought needed...
 4. The definition of the schema comes from the Node class, if the Node class is changed in certain ways (say changing a property from a set to a string) it could cause issues with the existing data.
 5. Property and Relationship names can clash, we should assert to avoid clashes
 6. The Relationships and Properties code is very similar, we need to reduce the duplication.
