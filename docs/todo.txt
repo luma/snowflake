@@ -1,9 +1,8 @@
 
 h2. TODO
 
-7. Relationships.
-8. ActiveModel support
-9. Ruby 1.9.2 support
+8. Ruby 1.9.2 support
+9. Relationships.
 10. Search through Sphinx/Xapian: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily customise what gets indexed and how.
 		- Convert word docs: http://linux.die.net/man/1/antiword
 		- Convert PDF: http://en.wikipedia.org/wiki/Pdftotext
@@ -21,6 +20,7 @@ h2. DONE
 4. When the key field is changed we should also send a RENAME command (requires Dirty tracking)
 5. Validation
 6. Errors
+7. ActiveModel support
 
 
 h2. Possible Names

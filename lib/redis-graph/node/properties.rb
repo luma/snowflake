@@ -6,17 +6,17 @@ module RedisGraph
       end
 
       module InstanceMethods
-        # Retrieves all Node properties.
+        # Retrieves all Node attributes.
         #
         # @return [Hash]
         #     The array of properties
         #
         # @api public
-        def properties
+        def attributes
           property_names_to_property_hash( self.class.hash_properties | self.class.non_hash_properties )
         end
 
-        # Mass-assign the Node's Properties.
+        # Mass-assign the Node's attributes.
         #
         # @param [Hash]
         #     The new Node properties.
@@ -25,7 +25,7 @@ module RedisGraph
         #     The Node.
         #
         # @api public
-        def properties=(props)
+        def attributes=(props)
           props.each do |name, value|
             unless self.class.properties.include?(name.to_sym)
               raise NoMethodError, "Undefined property #{name.to_s} for #{inspect}:#{self.class}"
@@ -87,8 +87,8 @@ module RedisGraph
           #dirty_properties.empty?
 
           (self.class.hash_properties | self.class.non_hash_properties).each do |name|
-            property = read_raw_property(name)
-            if property != nil && read_raw_property(name).dirty?
+            property = read_proxy_property(name)
+            if property != nil && read_proxy_property(name).dirty?
               return true
             end
           end
@@ -130,10 +130,7 @@ module RedisGraph
         #
         # @return [Any]
         def read_property(name)
-          #property = instance_variable_get(Property.instance_variable_name(name))
-          #return nil if property == nil
-
-          property = read_raw_property(name)
+          property = read_proxy_property(name)
 
           if property == nil
             property = self.class.properties[name.to_sym].to_property(self)
@@ -149,7 +146,7 @@ module RedisGraph
         #     The name of the Property value to read
         #
         # @return [Property]
-        def read_raw_property(name)
+        def read_proxy_property(name)
           instance_variable_get(Property.instance_variable_name(name))
         end
 
@@ -168,7 +165,7 @@ module RedisGraph
         #
         # @return [Any]
         def write_property(name, value, make_dirty = true)
-          property = read_raw_property(name)
+          property = read_proxy_property(name)
           
           # Don't instantiate the property object until we need it
           if property == nil
@@ -185,7 +182,7 @@ module RedisGraph
           end
           
           #instance_variable_set(Property.instance_variable_name(name), property)
-          write_raw_property(name, property)
+          write_proxy_property(name, property)
         end
         
         # Assigns the Property Object of the Property called +name+ with +value+.
@@ -199,7 +196,7 @@ module RedisGraph
         # @todo Handle Typecasting
         #
         # @return [Any]
-        def write_raw_property(name, property)
+        def write_proxy_property(name, property)
           instance_variable_set(Property.instance_variable_name(name), property)
         end
 
@@ -210,7 +207,7 @@ module RedisGraph
         #     The array of properties
         #
         # @api private
-        def raw_properties
+        def property_proxies
           property_names_to_raw_property_hash( self.class.hash_properties | self.class.non_hash_properties )
         end
         
@@ -223,7 +220,7 @@ module RedisGraph
         #     The array of properties
         #
         # @api private
-        def non_hash_raw_properties
+        def non_hash_property_proxies
           property_names_to_raw_property_hash(self.class.non_hash_properties) do |property|
             [property.name, property]
           end
@@ -281,7 +278,7 @@ module RedisGraph
         
         def property_names_to_raw_property_hash(property_names)
           Hash[*property_names.collect do |name|
-            property = read_raw_property(name)
+            property = read_proxy_property(name)
             unless property == nil
               unless block_given?
                 [name, property] 

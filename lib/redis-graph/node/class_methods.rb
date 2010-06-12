@@ -25,7 +25,7 @@ module RedisGraph
         # saved in the DB.
         node = self.allocate
         node.key = key
-        node.properties = node_properties
+        node.attributes = node_properties
 
         node.reset!
         node

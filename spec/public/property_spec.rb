@@ -156,13 +156,7 @@ describe RedisGraph::Property do
   describe "class" do
     describe "#aliases" do
       it "returns all the Property aliases for all Properties" do
-        RedisGraph::Property.aliases.should == {
-          "TestPrimitive"=>"RedisGraph::Properties::TestPrimitive", 
-          "Integer"=>"RedisGraph::Properties::Integer", 
-          "Hash"=>"RedisGraph::Properties::Hash", 
-          "String"=>"RedisGraph::Properties::String", 
-          "TrueClass"=>"RedisGraph::Properties::Boolean"
-        }
+        RedisGraph::Property.aliases.should == {"TestPrimitive"=>"TestPrimitive", "Integer"=>"Integer", "Hash"=>"Hash", "TrueClass"=>"Boolean", "String"=>"String"}
       end
     end
   end

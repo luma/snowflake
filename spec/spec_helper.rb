@@ -20,14 +20,12 @@ class TestNode
   # @TODO: Hash
 
   validates_presence_of :name
-
-  #edge :
 end
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
 
-  config.after :each do
+  config.after :each do 
     RedisGraph.flush_db
   end
 end

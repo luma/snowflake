@@ -12,6 +12,8 @@ lib/redis-graph/node.rb
 lib/redis-graph/node/descendants.rb
 lib/redis-graph/node/properties.rb
 lib/redis-graph/node/class_methods.rb
+lib/redis-graph/node/active_model_compatability/base.rb
+lib/redis-graph/node/active_model_compatability/validations.rb
 lib/redis-graph/properties/boolean.rb
 lib/redis-graph/properties/counter.rb
 lib/redis-graph/properties/hash.rb
@@ -23,9 +25,12 @@ lib/redis-graph/properties/guid.rb
 script/console
 script/destroy
 script/generate
+spec/active_model/lint_spec.rb
 spec/public/property_prototype_spec.rb
 spec/public/property_spec.rb
 spec/public/node_spec.rb
+spec/public/node_callbacks_spec.rb
+spec/public/node_observers_spec.rb
 spec/semi-public/property_prototype_spec.rb
 spec/semi-public/property_spec.rb
 spec/spec.opts
