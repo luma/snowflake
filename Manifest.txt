@@ -1,9 +1,11 @@
+.gitignore
 History.txt
 Manifest.txt
 README.rdoc
 docs/data-layout.txt
 docs/problems.txt
 docs/todo.txt
+docs/dsl.rb
 Rakefile
 lib/redis-graph.rb
 lib/redis-graph/property.rb
