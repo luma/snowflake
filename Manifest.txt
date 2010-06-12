@@ -9,7 +9,7 @@ docs/dsl.rb
 Rakefile
 lib/redis-graph.rb
 lib/redis-graph/property.rb
-lib/redis-graph/property_prototype_.rb
+lib/redis-graph/property_prototype.rb
 lib/redis-graph/node.rb
 lib/redis-graph/node/descendants.rb
 lib/redis-graph/node/properties.rb
