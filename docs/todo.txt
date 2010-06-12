@@ -1,7 +1,6 @@
 
 h2. TODO
 
-8. Ruby 1.9.2 support
 9. Relationships.
 10. Search through Sphinx/Xapian: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily customise what gets indexed and how.
 		- Convert word docs: http://linux.die.net/man/1/antiword
@@ -21,6 +20,7 @@ h2. DONE
 5. Validation
 6. Errors
 7. ActiveModel support
+8. Ruby 1.9.2 support (well my tests pass anyways)
 
 
 h2. Possible Names

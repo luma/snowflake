@@ -147,8 +147,16 @@ describe RedisGraph::Node do
   end
   
   describe "Serialisation" do
-    it "should serialise to a hash"
-    it "should serialise to JSON"
-    it "should serialise to XML"
+    it "should serialise to a hash" do
+      pending
+    end
+
+    it "should serialise to JSON" do
+      pending
+    end
+
+    it "should serialise to XML" do
+      pending
+    end
   end
 end
