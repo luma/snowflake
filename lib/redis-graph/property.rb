@@ -51,14 +51,14 @@ module RedisGraph
     end
 
     # Indicates whether this Property's raw value exists in Redis. This is different from #dirty? as
-    # #dirty? indicates whether a new raw value has been assigned, whereas if #saved? is false then
+    # #dirty? indicates whether a new raw value has been assigned, whereas if #persisted? is false then
     # if you peeked at the value for this Property in Redis you would get nil.
     #
     # @return [Boolean]
     #     True if the raw value exists in Redis, false otherwise.
     #
     # @api public
-    def saved?
+    def persisted?
       @saved
     end
     
@@ -142,10 +142,11 @@ module RedisGraph
     #
     # @api semi-public
     def self.get(type)
-      non_primitive_name = aliases[type.to_s] || type.to_s
+      demodulised_type = type.to_s.demodulize
+      non_primitive_name = aliases[demodulised_type] || demodulised_type
 
       begin
-        Properties.find_const(non_primitive_name)
+        Properties.const_get(non_primitive_name)
       rescue NameError => e
         nil
       end
@@ -197,7 +198,7 @@ module RedisGraph
 
         # Register these aliases as belonging to this Property Type
         aliases.each do |a|
-          Property.aliases[a.to_s] = self.to_s
+          Property.aliases[a.to_s] = self.name.demodulize
         end
 
         self.aliases.merge(aliases)

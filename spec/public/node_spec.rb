@@ -5,13 +5,13 @@ describe RedisGraph::Node do
     @test_node = TestNode.create(:name => 'rolly', :mood => 'Awesome')
   end
 
-  describe "#saved?" do
+  describe "#persisted?" do
     it "indicates when a Node has been saved" do
-      @test_node.should be_saved
+      @test_node.should be_persisted
     end
     
     it "indicates when a Node has not been saved" do
-      TestNode.new.should_not be_saved
+      TestNode.new.should_not be_persisted
     end
   end
   
@@ -70,13 +70,13 @@ describe RedisGraph::Node do
     it "should not save when validation fails" do
       @test_node.name = nil
       @test_node.save.should be_false
-      @test_node.errors.on(:name).should_not be_blank
+      @test_node.errors[:name].should_not be_blank
     end
     
     it "should not save a new Node with a key that's identical to an existing one" do
       node = TestNode.new(:name => @test_node.name)
       node.save.should be_false
-      node.errors.on(:name).should_not be_blank
+      node.errors[:name].should_not be_blank
     end
   end
   
@@ -88,7 +88,7 @@ describe RedisGraph::Node do
 
     it "marks a deleted Node as not saved" do
       @test_node.destroy!.should be_true
-      @test_node.should_not be_saved
+      @test_node.should_not be_persisted
     end
   end
   
@@ -145,5 +145,18 @@ describe RedisGraph::Node do
       end
     end
   end
+  
+  describe "Serialisation" do
+    it "should serialise to a hash" do
+      pending
+    end
 
+    it "should serialise to JSON" do
+      pending
+    end
+
+    it "should serialise to XML" do
+      pending
+    end
+  end
 end
