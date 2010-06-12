@@ -3,7 +3,6 @@ unless $:.include?( File.dirname(__FILE__) ) || $:.include?( File.expand_path( F
 end
 
 require 'set'
-#require 'extlib'
 require 'pathname'
 require 'json'
 
@@ -14,7 +13,6 @@ require 'active_model'
 require 'redis'
 #require 'redis/namespace'
 require 'uuidtools'
-#require 'validatable'
 
 # Speed boost, and reduced memory leaks from standard ruby threading, if it's available: use it.
 begin
