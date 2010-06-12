@@ -14,7 +14,6 @@ describe RedisGraph::Node do
       validates_presence_of :name
       
       after_save do
-        debugger
         notify_observers(:after_save)
       end
       
