@@ -145,6 +145,10 @@ describe RedisGraph::Node do
       end
     end
   end
+
+  describe "Inheritance" do
+    it "should have specs"
+  end
   
   describe "Serialisation" do
     it "should serialise to a hash" do

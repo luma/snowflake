@@ -25,12 +25,13 @@ module RedisGraph
     # @param [Node] node
     #     The Node that the new Property will be instanciated for.
     #
-    # @return [Property]
-    #     A Property, based on this PropertyPrototype, for +node+.
+    # @return [Property, nil]
+    #     A Property, based on this PropertyPrototype, for +node+ and +type+, or nil if +type+ was invalid.
     #
     # @api semi-public
     def to_property(node)
-      property_class_for_type.new(node, @name, nil, @options)
+      klass = property_class_for_type
+      klass != nil klass.new(node, @name, nil, @options) : nil
     end
 
     # Retrieves the Property class represented by this PropertyPrototype type attribute.
