@@ -8,7 +8,7 @@ module RedisGraph
         @options = options
         @raw = raw
       end
-      
+
       def enumerable?
         true
       end

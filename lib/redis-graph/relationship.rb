@@ -31,8 +31,18 @@ module RedisGraph
       "@#{name}".freeze
     end
 
+    # Retrieve this relationship for +node+
+    #
+    # @param [Node] node
+    #   The Node that we want to retrieve the Relationship for.
+    #
+    # @return [Relationships::Base, nil]
+    #   The Relationship, or nil if non exists
+    #
+    # @api public
     def get(node)
-      class_for_type.new(node, @name, nil, @options)
+      klass = class_for_type
+      klass != nil ? klass.new(node, @name, nil, @options) : nil
     end
 
     # Retrieves a value from Redis by it's Key, the retrieval method used depends on the
@@ -43,19 +53,20 @@ module RedisGraph
     # @param [#to_s] key
     #     The Relationship key to retrieve
     #
-    # @return [Various]
+    # @return [Various, nil]
     #     The Property value
     #
     # @api semi public
     def value_for_key( node_key )
-      class_for_type.get( node_key, @name )
+      klass = class_for_type
+      klass != nil ? klass.get( node_key, @name ) : nil
     end
 
     private
 
     def class_for_type
       begin
-        Relationships.find_const(@type)
+        Relationships.const_get(@type)
       rescue NameError => e
         nil
       end
