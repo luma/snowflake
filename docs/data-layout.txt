@@ -28,3 +28,4 @@ For a relationship:
 	If a relationship has no metadata then it will be model with a set of keys of other nodes. (has n, :users)
 	If a relationship has metadata, then each relationship will have it's own has of metadata and a pointer to the other node. (has n, :leads, :for => :companies)
 	If a relationship can have any type of Node, then the syntax will be (has n, :assets, :model => :any or has n, :assets, :for => :meta, :model => :any) 
+	
