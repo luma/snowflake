@@ -5,10 +5,10 @@ describe RedisGraph::Node do
     class TestNodeWithCallbacks
       include RedisGraph::Node
 
-      property :name,         String, :key => true
-      property :age,          Integer
-      property :mood,         String
-      property :description,  String
+      attribute :name,         String, :key => true
+      attribute :age,          Integer
+      attribute :mood,         String
+      attribute :description,  String
 
       validates_presence_of :name
       
@@ -30,6 +30,9 @@ describe RedisGraph::Node do
 
       before_destroy "@callbacks << :before_destroy"
       after_destroy "@callbacks << :after_destroy"
+      
+      before_rename "@callbacks << :before_rename"
+      after_rename "@callbacks << :after_rename"
     end
     
     before(:all) do
@@ -68,6 +71,21 @@ describe RedisGraph::Node do
 
       it "triggers the after_update callback" do
         @test_callback_node.callbacks.should include(:after_update)
+      end
+    end
+
+    describe "Rename" do
+      before :all do
+        @test_callback_node.key = 'bob'
+        @test_callback_node.save.should be_true
+      end
+
+      it "triggers the before_rename callback" do
+        @test_callback_node.callbacks.should include(:before_rename)
+      end
+
+      it "triggers the after_rename callback" do
+        @test_callback_node.callbacks.should include(:after_rename)
       end
     end
 

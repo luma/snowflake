@@ -8,15 +8,15 @@ require 'redis-graph'
 class TestNode
   include RedisGraph::Node
 
-  property :name,         String, :key => true
-  property :age,          Integer
-  property :mood,         String
-  property :description,  String
-  property :enabled,      ::RedisGraph::Properties::Boolean
+  attribute :name,         String, :key => true
+  attribute :age,          Integer
+  attribute :mood,         String
+  attribute :description,  String
+  attribute :enabled,      ::RedisGraph::Attributes::Boolean
 
-  property :visits,       ::RedisGraph::Properties::Counter       # <-- native Redis Counter
-  property :tags,         ::RedisGraph::Properties::Set           # <-- native Redis Set
-  property :awards,       ::RedisGraph::Properties::List          # <-- native Redis List
+#  counter :visits      # <-- native Redis Counter
+#  set :tags            # <-- native Redis Set
+#  list :awards         # <-- native Redis List
   # @TODO: Hash
 
   validates_presence_of :name

@@ -64,6 +64,7 @@ module RedisGraph
             @node.send_command( @name, :sadd, v )
           end
         end
+        
       end
     end
   end # module Properties

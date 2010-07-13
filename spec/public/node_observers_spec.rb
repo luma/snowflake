@@ -6,18 +6,20 @@ describe RedisGraph::Node do
       include RedisGraph::Node
       include ActiveModel::Observing
 
-      property :name,         String, :key => true
-      property :age,          Integer
-      property :mood,         String
-      property :description,  String
+      attribute :name,         String, :key => true
+      attribute :age,          Integer
+      attribute :mood,         String
+      attribute :description,  String
 
       validates_presence_of :name
-      
+
       after_save do
         notify_observers(:after_save)
       end
-      
-      attr_reader :observed_callbacks
+
+      def self.observed_callbacks
+        @observed_callbacks ||= []
+      end
 
       def initialize(attributes = {})
         super(attributes)
@@ -29,19 +31,20 @@ describe RedisGraph::Node do
       observe FooNode
       
       def after_save(foo_node)
-        debugger
-        puts "AFTER SAVE CALLBACK"
-        foo_node.observed_callbacks << :foo_observer
+        FooNode.observed_callbacks << :foo_observer
       end
+      
     end
     FooNode.observers = :foo_observer
+    FooNode.instantiate_observers
+    
 
     before(:all) do
       @test_foo = FooNode.create(:name => 'rolly', :mood => 'Awesome')
     end
     
     it "triggers an observer" do
-      @test_foo.observed_callbacks.should include(:foo_observer)
+      FooNode.observed_callbacks.should include(:foo_observer)
     end
 
   end

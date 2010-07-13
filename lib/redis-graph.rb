@@ -14,7 +14,7 @@ require 'redis'
 #require 'redis/namespace'
 require 'uuidtools'
 
-# Speed boost, and reduced memory leaks from standard ruby threading, if it's available: use it.
+# Speed boost, and reduced memory leaks from standard ruby threading (on Ruby < 1.9), if it's available: use it.
 begin
   require 'fastthread'
 rescue LoadError
@@ -30,10 +30,16 @@ module RedisGraph
   class NotImplementedError < RedisGraphError
   end
 
-  class InvalidPropertyError < RedisGraphError
+  class InvalidAttributeError < RedisGraphError
   end
 
-  class PropertyNameInUseError < InvalidPropertyError
+  class DynamicAttributeError < RedisGraphError
+  end
+
+  class NameInUseError < InvalidAttributeError
+  end
+
+  class NotPersisted < RedisGraphError
   end
 
   class MissingPropertyError < RedisGraphError
@@ -42,7 +48,7 @@ module RedisGraph
   class MissingKeyPropertyError < RedisGraphError
   end
 
-  class NodeNotFoundError < RedisGraphError
+  class NotFoundError < RedisGraphError
   end
 
   class NodeKeyAlreadyExistsError < RedisGraphError
@@ -91,31 +97,17 @@ module RedisGraph
     segments.join(':')
   end
   
-#  autoload :Node
+  autoload :Attribute, 'redis-graph/element/attribute'
 
-#  autoload :IdentityMap, 'redis-graph/identity_map'
-  autoload :PropertyPrototype, 'redis-graph/property_prototype'
-  autoload :Property, 'redis-graph/property'
-
-  module Node
-#    autoload :Descentants, 'node/descendants'
-#    autoload :Properties, 'node/properties'
-#    autoload :ClassMethods, 'node/class_methods'
-#    autoload :Relationships, 'node/relationships'
-  end
-  
-  module Properties
-    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'redis-graph/properties/')
+  module Attributes
+    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'redis-graph/element/attributes/')
 
     # Make our custom types available in a more convienant way
-    autoload :Boolean,         dir + 'boolean'
-    autoload :Counter,         dir + 'counter'
-    autoload :Guid,            dir + 'guid'
-    autoload :Hash,            dir + 'hash'
-    autoload :Integer,         dir + 'integer'
-    autoload :List,            dir + 'list'
-    autoload :Set,             dir + 'set'
-    autoload :String,          dir + 'string'
+    autoload :Boolean,  dir + 'boolean'
+    autoload :Dynamic,  dir + 'dynamic'
+    autoload :Guid,     dir + 'guid'
+    autoload :Integer,  dir + 'integer'
+    autoload :String,   dir + 'string'
   end
 end # module RedisGraph
 
@@ -124,23 +116,27 @@ unless defined?(Infinity)
   Infinity = 1.0/0
 end
 
-
 dir = File.join(Pathname(__FILE__).dirname.expand_path + 'redis-graph/')
 
+require dir + 'element'
+require dir + 'element/model'
+require dir + 'element/attributes'
+require dir + 'element/plugins/attributes'
+require dir + 'element/plugins/class_methods'
+require dir + 'element/plugins/hooks'
+require dir + 'element/plugins/naming'
+require dir + 'element/plugins/serialisers'
+require dir + 'element/plugins/validations'
+
+require dir + 'element/plugins/counters'
+require dir + 'element/plugins/sets'
+
 require dir + 'node'
-require dir + 'node/descendants'
-require dir + 'node/properties'
-require dir + 'node/class_methods'
+# require dir + 'node/descendants'
+# require dir + 'node/properties'
+# require dir + 'node/class_methods'
 
 # ActiveModel Compatability
-require dir + 'node/active_model_compatability/base'
-require dir + 'node/active_model_compatability/validations'
+# require dir + 'node/active_model_compatability/base'
+# require dir + 'node/active_model_compatability/validations'
 
-#require dir + 'properties/boolean'
-#require dir + 'properties/counter'
-#require dir + 'properties/hash'
-#require dir + 'properties/list'
-#require dir + 'properties/set'
-#require dir + 'properties/string'
-#require dir + 'properties/integer'
-#require dir + 'properties/guid'

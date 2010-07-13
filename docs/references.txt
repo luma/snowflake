@@ -1,0 +1,9 @@
+http://www.itl.nist.gov/div897/sqg/dads/HTML/graph.html
+http://www.boost.org/doc/libs/1_43_0/libs/graph/doc/IncidenceGraph.html
+http://www.boost.org/doc/libs/1_43_0/libs/graph/doc/graph_concepts.html
+
+http://techportal.ibuildings.com/2009/09/07/graphs-in-the-database-sql-meets-social-networks/
+http://wiki.github.com/tinkerpop/gremlin/
+http://jung.sourceforge.net/doc/api/edu/uci/ics/jung/algorithms/importance/BetweennessCentrality.html
+
+http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/content/pagerank.html

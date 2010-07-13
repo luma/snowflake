@@ -139,7 +139,7 @@ module RedisGraph
 
           property.primitive?? property.raw : property
         end
-        
+
         # Reads the raw Property object of the Property called +name+.
         #
         # @param [#to_sym] name

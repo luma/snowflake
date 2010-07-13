@@ -113,15 +113,20 @@ describe RedisGraph::Node do
       end
     end
 
+    it "deletes an existing Node" do
+      TestNode.destroy!('rolly').should be_true
+      TestNode.get('rolly').should be_nil
+    end
+
     describe "#get!" do
       it "returns a Node by it's key" do
         TestNode.get('rolly').should_not be_nil
       end
 
-      it "raises an RedisGraph::NodeNotFoundError exception when getting a Node that doesn't exist" do
+      it "raises an RedisGraph::NotFoundError exception when getting a Node that doesn't exist" do
         lambda {
           TestNode.get!('figs!')
-        }.should raise_error(RedisGraph::NodeNotFoundError)
+        }.should raise_error(RedisGraph::NotFoundError)
       end
     end
 
@@ -135,9 +140,9 @@ describe RedisGraph::Node do
         class TestNode2
           include RedisGraph::Node
 
-          property :name,         String
-          property :age,          Integer
-          property :mood,         String
+          attribute :name,         String
+          attribute :age,          Integer
+          attribute :mood,         String
         end
         
         test = TestNode2.new :name => 'bob'
@@ -145,7 +150,37 @@ describe RedisGraph::Node do
       end
     end
   end
-  
+
+  describe "Dynamic Attributes" do
+    it "can disable dynamic attributes for the entire model" do
+      pending
+    end
+
+    it "can dynamically create attributes using #attributes=" do
+      pending
+    end
+
+    it "can register dynamic attributes using #add_dynamic_attribute" do
+      pending
+    end
+
+    describe "#dynamic_attribute?" do
+      it "can indicate if an attribute is dynamic" do
+        pending
+      end
+      
+      it "can indicate if an attribute is not dynamic" do
+        pending
+      end
+    end
+  end
+
+  describe "Inheritance" do
+    it "should have specs" do
+      pending
+    end
+  end
+
   describe "Serialisation" do
     it "should serialise to a hash" do
       pending

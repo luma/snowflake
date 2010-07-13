@@ -1,0 +1,35 @@
+
+
+# A piece of content with a key of 1
+hmset Content:1 name bob description "bob's fancy stuff " mood "Feelin' Fine"
+
+# Versions, keys 1 - 4
+hmset Version:1 name bob description "bob's stuff" timestamp 1278461960 
+hmset Version:2 name bob description "bob's stuff" mood awesome timestamp 1278548360
+hmset Version:3 name bob description "bob's fancy stuff" mood awesome timestamp 1278634760
+hmset Version:4 name bob description "bob's fancy stuff " mood "Feelin' Fine" timestamp 1278721160
+
+# A sorted set of all version for the content with a key of 1. The set is sorted by the version timestamp
+ZADD content:1:versions 1278461960 "1"
+ZADD content:1:versions 1278548360 "2"
+ZADD content:1:versions 1278634760 "3"
+ZADD content:1:versions 1278721160 "4"
+
+# A sorted set of all versions. The set is sorted by the version timestamp
+ZADD versions:all 1278461960 "1"
+ZADD versions:all 1278548360 "2"
+ZADD versions:all 1278634760 "3"
+ZADD versions:all 1278721160 "4"
+
+
+1. Retrieve all versions between a date range
+
+ZRANGEBYSCORE versions:all 1278375891 1279326334
+
+2. Retrieve all versions, for a specific piece of content
+
+ZRANGEBYSCORE content:1:versions -inf +inf
+
+3. Retrieve all versions between a date range, for a specific piece of content
+
+ZRANGEBYSCORE content:1:versions 1278375891 1279326334

@@ -1,15 +1,37 @@
 
 h2. TODO
 
-9. Relationships.
-10. Search through Sphinx/Xapian: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily customise what gets indexed and how.
+11. The hash properties are never saved a property as a time, the entire hash is saved as once. All other properties can be modified using atomic operations. 
+I should split the dsl into hash properties and non-hash properties. Hash properties use the normal modify and bulk save workflow as Datamapper. Non-hash properties
+allow operations to be performed and serialised immediately.
+12. Some way for plugins to register registered attribute names
+13. Migrations. Just because we are schemaless on the DB side doesn't mean schema changes wont affect us. Create a Schema model, each element should have one. We store at least:
+	In %element_class_name%::schema::%guid% (SORTED SET)	=>
+		ZADD element_class_name::schema %timestamp% "%guid%"
+		ZADD element_class_name::schema %timestamp% "%guid%"
+		ZADD element_class_name::schema %timestamp% "%guid%"
+		ZADD element_class_name::schema %timestamp% "%guid%"
+
+  In %element_class_name%::schema::%guid%	{id: %guid%, timestamp:%timestamp%, title:%title%, description:%description%}
+
+	e.g. Company.schema.first => {id: %guid%, timestamp:%timestamp%, title:%title%, description:%description%, up:%up%, down:%down%}
+			 Copmany.schema.automigrate
+
+		Then rake scripts to do commone migration and a dsl to write the actual migrations
+
+14. Tasks, Generators, and connection handling for Rails 3. http://railsdispatch.com/posts/how-rails-3-enables-more-choices-part-1
+15. Indices: sorted sets of ids?
+16. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
+17. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
+18. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.
 		- Convert word docs: http://linux.die.net/man/1/antiword
 		- Convert PDF: http://en.wikipedia.org/wiki/Pdftotext
 		- http://moinmo.in/HelpOnXapian
-11. Indices
-12. auto-populated created_at and updated_at.
-13. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
-
+19. auto-populated created_at and updated_at.
+20. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
+21. after update hooks should be passed the fields that have been updated and the original values.
+22. Observer classes
+23. Can we defined types on non-predefined?
 
 h2. DONE 
 
@@ -21,6 +43,10 @@ h2. DONE
 6. Errors
 7. ActiveModel support
 8. Ruby 1.9.2 support (well my tests pass anyways)
+9.  DONE Create an Element object, it's the common functionality that both Node and Edge require.
+12. DONE We need to allow dynamic hash fields, i.e. ones that were not predefined using the property method. The use cases for both are:
+		* Predefined: expected fields, can defined validation/etc
+		* Non-predefined: unexpected fields. Dynamically created.
 
 
 h2. Possible Names

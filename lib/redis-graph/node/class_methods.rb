@@ -40,12 +40,12 @@ module RedisGraph
       # @return [Node]
       #   A Node with the key of +key+
       #
-      # @raise [NodeNotFoundError]
+      # @raise [NotFoundError]
       #   The Node was not found
       # 
       # @api public
       def get!(key)
-        get(key) || raise(NodeNotFoundError, "A #{self.to_s} with the key of \"#{key.to_s}\" could not be found.")
+        get(key) || raise(NotFoundError, "A #{self.to_s} with the key of \"#{key.to_s}\" could not be found.")
       end
       
       # Indicates whether a Node exists for key +key+.

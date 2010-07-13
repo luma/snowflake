@@ -18,13 +18,13 @@ $hoe = Hoe.spec 'redis-graph' do
     ['extlib','>= 0.9.10'],
     ['redis','>= 2.0.0'],
     ['redis-namespace','>= 0.5.0'],
-    ['uuidtools', '>= 2.1.1'],
-    ['jnunemaker-validatable', '>= 1.8.4']
+    ['uuidtools', '>= 2.1.1']
   ]
 
 end
 
 require 'newgem/tasks'
+RAILS_ROOT = File.join(Pathname(__FILE__).dirname.expand_path)
 Dir['tasks/**/*.rake'].each { |t| load t }
 
 # TODO - want other tests/tasks run by default? Add them to the list
