@@ -1,7 +1,7 @@
 
 
 # A piece of content with a key of 1
-hmset Content:1 name bob description "bob's fancy stuff " mood "Feelin' Fine"
+hmset Content:1 name bob description "bob's fancy stuff" mood "Feelin' Fine"
 
 # Versions, keys 1 - 4
 hmset Version:1 name bob description "bob's stuff" timestamp 1278461960 

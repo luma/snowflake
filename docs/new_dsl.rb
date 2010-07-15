@@ -39,8 +39,9 @@ class Research
 
   set :tags
 
-  set :data, ResearchData
   counter :version
+
+  has n, :research_data
 
   validates_presence_of :name
 end
@@ -199,6 +200,7 @@ class Category
   protected
 
   # Validate to ensure we never end up in a situation where a Category is the ancester of itself
+  # This is basically cycle detection, and this implmentation is probably bullshit.
   def ensure_valid_parents
     # @todo we should only do this if the Category has been reparented
     self.parents.each do |parent|

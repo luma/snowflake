@@ -1,25 +1,10 @@
 
-1. We're not really making best use of Redis.
-		Redis can perform many data structure type operations directly on values, yet our code is
-		written mostly in a traditional ORM fashion: We retrieve data, operate on it, then save it.
-		Once we really start making use of Redis we can skip the first step (unless the user actually
-		wants to retrieve the data), and perform the last two as a single atomic operation.
-		
-		1.1. When changed fields we could save the changes immediately, rather than waiting for a save? That could be annoying, though. As many collections of operations are supposed to be Atomic.
-
 2. Atomic Operations and Transactions:
 			See Watch: http://code.google.com/p/redis/wiki/MultiExecCommand
 3. Pretty much every time I save a property I assume the save succeeds, but I'm not actually checking. This could be more difficult to workaround as I'm also pipelining the commands. Relates to 1 and 7. More thought needed...
 4. The definition of the schema comes from the Node class, if the Node class is changed in certain ways (say changing a property from a set to a string) it could cause issues with the existing data.
 5. Property and Relationship names can clash, we should assert to avoid clashes
 6. The Relationships and Properties code is very similar, we need to reduce the duplication.
-7. The hash properties are never saved a property as a time, the entire hash is saved as once. All other properties can be modified using atomic operations. 
-I should split the dsl into hash properties and non-hash properties. Hash properties use the normal modify and bulk save workflow as Datamapper. Non-hash properties
-allow operations to be performed and serialised immediately.
-8. We need to allow dynamic hash fields, i.e. ones that were not predefined using the property method. The use cases for both are:
-		* Predefined: expected fields, can defined validation/etc
-		* Non-predefined: unexpected fields. Dynamically created.
-		Can we defined types on non-predefined?
 9. Assuming:
 		class Product
 			include RedisGraph::Node
@@ -36,3 +21,32 @@ allow operations to be performed and serialised immediately.
 	OR perhaps it should be in Tag.dostuff, or a before/after filter in an instance of Tag
 	
 	ASIDE: Tag creation will also need to append to tags:all
+	
+	All of these problems could be fixed by using has n, :tags, it would be nice to have before/after filters for custom attributes.
+	
+	If using has  n, :tags, how would we do fid all products tagged with %name%?
+		1. Find the tag: use index tag name => tag key
+		2. Find products with that tag: use index product::indices::tag::%tag_key% => set of %product_key%
+		3. Grab all those products using their product keys: product:%product_key% => hash
+
+10. How can we assign before/after filters to custom attributes.
+11. If I wanted tags to just be a set of names, but I still wanted to be able to do Tag.all, and Product.get(:tag.includes => %tag_name%)
+12. How could I store a tag cloud structure? we need the popularity of each tag name. Sorted set of tag names, sorted by popularity.
+		Could be an index on a Tag model: attribute :popularity, Integer, :index => true, creates an index of
+		tag::indices::popularity => sorted set of tag names, sorted by popularity
+
+FIXED
+1. We're not really making best use of Redis.
+		Redis can perform many data structure type operations directly on values, yet our code is
+		written mostly in a traditional ORM fashion: We retrieve data, operate on it, then save it.
+		Once we really start making use of Redis we can skip the first step (unless the user actually
+		wants to retrieve the data), and perform the last two as a single atomic operation.
+		
+		1.1. When changed fields we could save the changes immediately, rather than waiting for a save? That could be annoying, though. As many collections of operations are supposed to be Atomic.
+7. The hash properties are never saved a property at a time, the entire hash is saved at once. All other properties can be modified using atomic operations. 
+I should split the dsl into hash properties and non-hash properties. Hash properties use the normal modify and bulk save workflow as Datamapper. Non-hash properties
+allow operations to be performed and serialised immediately.
+8. We need to allow dynamic hash fields, i.e. ones that were not predefined using the property method. The use cases for both are:
+		* Predefined: expected fields, can defined validation/etc
+		* Non-predefined: unexpected fields. Dynamically created.
+		Can we defined types on non-predefined?
