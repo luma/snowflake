@@ -3,16 +3,16 @@ require 'spec'
 require 'ruby-debug'
 
 $:.unshift(File.dirname(__FILE__) + '/../lib')
-require 'redis-graph'
+require 'snowflake'
 
 class TestNode
-  include RedisGraph::Node
+  include Snowflake::Node
 
   attribute :name,         String, :key => true
   attribute :age,          Integer
   attribute :mood,         String
   attribute :description,  String
-  attribute :enabled,      ::RedisGraph::Attributes::Boolean
+  attribute :enabled,      ::Snowflake::Attributes::Boolean
 
 #  counter :visits      # <-- native Redis Counter
 #  set :tags            # <-- native Redis Set
@@ -26,7 +26,7 @@ Spec::Runner.configure do |config|
   config.mock_with :mocha
 
   config.after :each do
-    RedisGraph.connect
-    RedisGraph.flush_db
+    Snowflake.connect
+    Snowflake.flush_db
   end
 end

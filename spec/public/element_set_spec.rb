@@ -1,12 +1,12 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::Element do
+describe Snowflake::Element do
   describe "Sets" do
   #  before(:all) do
   #  end
 
     class TestNodeWithSet
-      include RedisGraph::Node
+      include Snowflake::Node
 
       attribute :name,         String, :key => true
       attribute :age,          Integer
@@ -18,7 +18,7 @@ describe RedisGraph::Element do
 
     it "reads the set instance" do
       @node = TestNodeWithSet.new(:name => 'bob')
-      @node.set.should be_an_instance_of RedisGraph::CustomAttributes::Set
+      @node.set.should be_an_instance_of Snowflake::CustomAttributes::Set
     end
 
     it "writes to the set instance" do
@@ -37,7 +37,7 @@ describe RedisGraph::Element do
     
       lambda {
         @node.set = ::Set.new(['foo', 'bar', 'baz'])
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
 
   end

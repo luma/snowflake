@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::CustomAttributes::List do
-  class RedisGraph::CustomAttributes::List
+describe Snowflake::CustomAttributes::List do
+  class Snowflake::CustomAttributes::List
     attr_reader :raw
   end
   
@@ -12,37 +12,37 @@ describe RedisGraph::CustomAttributes::List do
   describe "#get" do
     it "retrieves a list by name" do
       resp = @test_node.send_command( 'list', :lpush, 'bob' )
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.should == ['bob']
     end
 
     it "retrieves a list with the default value (an empty list) if no list exists for a specific name" do
-      RedisGraph::CustomAttributes::List.get(@test_node, 'bob').raw.should == []
+      Snowflake::CustomAttributes::List.get(@test_node, 'bob').raw.should == []
     end
   end
   
   describe "#set" do
     it "adds a value to the list in Redis" do
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.should == []
       list.replace(['foo', 'bar'])
 
-      RedisGraph::CustomAttributes::List.get(@test_node, 'list').should == ['foo', 'bar']
+      Snowflake::CustomAttributes::List.get(@test_node, 'list').should == ['foo', 'bar']
     end
     
     it "fails to adds a value to the list in Redis when the element is not persisted" do
       @test_node2 = TestNode.new(:name => 'bob', :mood => 'Awesome')
-      list = RedisGraph::CustomAttributes::List.get(@test_node2, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node2, 'list')
       
       lambda {
         list.replace(['foo', 'bar'])
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end
 
   describe "#reload" do
     it "can be reloaded from the Data Store" do
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.replace(['foo', 'bar'])
 
       @test_node.send_command( 'list', :rpush, 'baz' )
@@ -56,12 +56,12 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.length.should == 2
     end
 
     it "retrieves the length of a non-existant list" do
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.length.should == 0
     end
 
@@ -69,7 +69,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.length.should == 2
 
       @test_node.send_command( 'list', :rpush, 'baz' )
@@ -83,12 +83,12 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.should_not be_empty
     end
 
     it "returns true for a non-existant list" do
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.should be_empty
     end
   end # #empty?
@@ -98,14 +98,14 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.should include('foo')
       list.should include('bar')
     end
 
     it "returns false when the search element is not in the list" do
       @test_node.send_command( 'list', :lpush, 'bar' )
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.should_not include('foo')
     end
   end # #include?
@@ -115,7 +115,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.push 'baz'
       list.reload
       list.should include('baz')
@@ -125,7 +125,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list << 'baz'
       list.reload
       list.should include('baz')
@@ -135,7 +135,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.push 'baz'
       list.reload
       list.length.should == 3
@@ -144,7 +144,7 @@ describe RedisGraph::CustomAttributes::List do
 
     it "adds an element to an non-existant list" do
       @test_node.send_command( 'list', :exists ).should be_false
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.should be_empty
       list.push 'baz'
       list.reload
@@ -157,11 +157,11 @@ describe RedisGraph::CustomAttributes::List do
 
       @test_node2.send_command( 'list', :lpush, 'bar' )
       @test_node2.send_command( 'list', :lpush, 'foo' )
-      list = RedisGraph::CustomAttributes::List.get(@test_node2, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node2, 'list')
       
       lambda {
         list.push 'baz'
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #add
 
@@ -170,7 +170,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.delete 'bar'
       list.reload
       list.should_not include('bar')
@@ -181,7 +181,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.delete 'bar'
       list.reload
       list.length.should == 1
@@ -192,7 +192,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.delete 'baz'
       list.reload
       list.length.should == 2
@@ -201,7 +201,7 @@ describe RedisGraph::CustomAttributes::List do
 
     it "deletes the list in the data store when deleting the last element" do
       @test_node.send_command( 'list', :lpush, 'foo' )
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.delete 'foo'
       list.reload
       list.should be_empty
@@ -213,11 +213,11 @@ describe RedisGraph::CustomAttributes::List do
 
       @test_node2.send_command( 'list', :lpush, 'bar' )
       @test_node2.send_command( 'list', :lpush, 'foo' )
-      list = RedisGraph::CustomAttributes::List.get(@test_node2, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node2, 'list')
       
       lambda {
         list.delete 'bar'
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #delete
   
@@ -228,7 +228,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node2.send_command( 'list', :lpush, 'baz' )
       @test_node2.send_command( 'list', :lpush, 'bar' )
       @test_node2.send_command( 'list', :lpush, 'foo' )
-      @list = RedisGraph::CustomAttributes::List.get(@test_node2, 'list')      
+      @list = Snowflake::CustomAttributes::List.get(@test_node2, 'list')      
     end
 
     it "deletes every element of the list for which block evaluates to true." do
@@ -245,7 +245,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'baz' )
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
-      @list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')      
+      @list = Snowflake::CustomAttributes::List.get(@test_node, 'list')      
     end
 
     it "Calls the given block once for each element in the set, passing the element as parameter. (collect)" do
@@ -262,7 +262,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'baz' )
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
-      @list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')      
+      @list = Snowflake::CustomAttributes::List.get(@test_node, 'list')      
     end
     
     it "Invokes the block once for each element of self, replacing the element with the value returned by block. (collect!)" do
@@ -285,7 +285,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, nil )
       @test_node.send_command( 'list', :lpush, nil )
       @test_node.send_command( 'list', :lpush, 'foo' )
-      @list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')      
+      @list = Snowflake::CustomAttributes::List.get(@test_node, 'list')      
     end
 
     it "Returns a copy of self with all nil elements removed." do
@@ -304,7 +304,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'baz' )
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
-      @list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')      
+      @list = Snowflake::CustomAttributes::List.get(@test_node, 'list')      
     end
 
     it "retrieves a single element by its index" do
@@ -338,13 +338,13 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'baz' )
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
-      @list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')      
+      @list = Snowflake::CustomAttributes::List.get(@test_node, 'list')      
     end
 
     it "retrieves a single element by its index" do
       @list[0].should == 'foo'
       @list[0] = 'bob'
-      @list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')      
+      @list = Snowflake::CustomAttributes::List.get(@test_node, 'list')      
       @list[0].should == 'bob'
     end
 
@@ -383,14 +383,14 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.clear
       list.reload
       list.should be_empty
     end
 
     it "does nothing when clearing multiple elements from a nonexistant list" do
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
       list.clear
       list.reload
       list.should be_empty
@@ -403,11 +403,11 @@ describe RedisGraph::CustomAttributes::List do
       @test_node2.send_command( 'list', :lpush, 'baz' )
       @test_node2.send_command( 'list', :lpush, 'bar' )
       @test_node2.send_command( 'list', :lpush, 'foo' )
-      list = RedisGraph::CustomAttributes::List.get(@test_node2, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node2, 'list')
       
       lambda {
         list.clear
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #clear
 
@@ -420,8 +420,8 @@ describe RedisGraph::CustomAttributes::List do
         @test_node.send_command( 'list2', :lpush, 'bar' )
         @test_node.send_command( 'list2', :lpush, 'foo' )
 
-        list1 = RedisGraph::CustomAttributes::List.get(@test_node, 'list1')
-        list2 = RedisGraph::CustomAttributes::List.get(@test_node, 'list2')
+        list1 = Snowflake::CustomAttributes::List.get(@test_node, 'list1')
+        list2 = Snowflake::CustomAttributes::List.get(@test_node, 'list2')
         list1.should == list2
       end
 
@@ -429,7 +429,7 @@ describe RedisGraph::CustomAttributes::List do
         @test_node.send_command( 'list1', :lpush, 'bar' )
         @test_node.send_command( 'list1', :lpush, 'foo' )
 
-        list = RedisGraph::CustomAttributes::List.get(@test_node, 'list1')
+        list = Snowflake::CustomAttributes::List.get(@test_node, 'list1')
         list.should == ['foo', 'bar']
       end
     end # A == B
@@ -441,8 +441,8 @@ describe RedisGraph::CustomAttributes::List do
 
         @test_node.send_command( 'list2', :lpush, 'foo' )
 
-        list1 = RedisGraph::CustomAttributes::List.get(@test_node, 'list1')
-        list2 = RedisGraph::CustomAttributes::List.get(@test_node, 'list2')
+        list1 = Snowflake::CustomAttributes::List.get(@test_node, 'list1')
+        list2 = Snowflake::CustomAttributes::List.get(@test_node, 'list2')
         list1.should_not == list2
       end
 
@@ -450,7 +450,7 @@ describe RedisGraph::CustomAttributes::List do
         @test_node.send_command( 'list1', :lpush, 'bar' )
         @test_node.send_command( 'list1', :lpush, 'foo' )
 
-        list = RedisGraph::CustomAttributes::List.get(@test_node, 'list1')
+        list = Snowflake::CustomAttributes::List.get(@test_node, 'list1')
         list.should_not == ['foo']
       end
     end # A != B
@@ -463,7 +463,7 @@ describe RedisGraph::CustomAttributes::List do
       @test_node.send_command( 'list', :lpush, 'bar' )
       @test_node.send_command( 'list', :lpush, 'foo' )
 
-      list = RedisGraph::CustomAttributes::List.get(@test_node, 'list')
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
 
       values = []
       list.each do |value|

@@ -10,7 +10,7 @@ class TestPrimitive
   end
 end
 
-module RedisGraph
+module Snowflake
   module Attributes
     class TestNonPrimitive < Attribute
       primitive false
@@ -73,18 +73,18 @@ module RedisGraph
   end
 end
 
-describe RedisGraph::Attribute do
+describe Snowflake::Attribute do
   describe "Aliases" do
     describe "#aliases" do
       it "returns all the Attribute aliases" do
-        RedisGraph::Attributes::TestPrimitive.aliases.should == Set.new([::TestPrimitive])
-        RedisGraph::Attributes::TestNonPrimitive.aliases.should == Set.new
+        Snowflake::Attributes::TestPrimitive.aliases.should == Set.new([::TestPrimitive])
+        Snowflake::Attributes::TestNonPrimitive.aliases.should == Set.new
       end
       
       describe "#aliases" do
         it "returns all the Property aliases for all Properties" do
-          RedisGraph::Attribute.aliases.should include("TestPrimitive")
-          RedisGraph::Attribute.aliases['TestPrimitive'].should == 'TestPrimitive'
+          Snowflake::Attribute.aliases.should include("TestPrimitive")
+          Snowflake::Attribute.aliases['TestPrimitive'].should == 'TestPrimitive'
         end
       end
     end

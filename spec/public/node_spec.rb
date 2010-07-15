@@ -1,6 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::Node do
+describe Snowflake::Node do
   before(:each) do
     @test_node = TestNode.create(:name => 'rolly', :mood => 'Awesome')
   end
@@ -123,10 +123,10 @@ describe RedisGraph::Node do
         TestNode.get('rolly').should_not be_nil
       end
 
-      it "raises an RedisGraph::NotFoundError exception when getting a Node that doesn't exist" do
+      it "raises an Snowflake::NotFoundError exception when getting a Node that doesn't exist" do
         lambda {
           TestNode.get!('figs!')
-        }.should raise_error(RedisGraph::NotFoundError)
+        }.should raise_error(Snowflake::NotFoundError)
       end
     end
 
@@ -138,7 +138,7 @@ describe RedisGraph::Node do
 
       it "should automagically create an key property when one is not defined" do
         class TestNode2
-          include RedisGraph::Node
+          include Snowflake::Node
 
           attribute :name,         String
           attribute :age,          Integer

@@ -7,7 +7,7 @@
 6. The Relationships and Properties code is very similar, we need to reduce the duplication.
 9. Assuming:
 		class Product
-			include RedisGraph::Node
+			include Snowflake::Node
 			attribute name, String
 			set :tags
 		end

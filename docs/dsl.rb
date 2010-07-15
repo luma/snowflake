@@ -1,5 +1,5 @@
 class Company
- include RedisGraph::Node
+ include Snowflake::Node
 
  property :name, String, :id => true
 
@@ -13,7 +13,7 @@ class Company
 end
 
 class Project
-  include RedisGraph::Node
+  include Snowflake::Node
 
   property :name,         String
   property :description,  String
@@ -31,7 +31,7 @@ class Project
 end
 
 class Research
-  include RedisGraph::Node
+  include Snowflake::Node
 
   property :name,         String
   property :data,         Binary
@@ -46,7 +46,7 @@ class Research
 end
 
 class Lead
-  include RedisGraph::Edge
+  include Snowflake::Edge
   
   property :name,         String
   property :likelyhood,   Integer, :default => 5

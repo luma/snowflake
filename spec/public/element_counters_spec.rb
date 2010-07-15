@@ -1,12 +1,12 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::Element do
+describe Snowflake::Element do
   describe "Counters" do
   #  before(:all) do
   #  end
 
     class TestNodeWithCounter
-      include RedisGraph::Node
+      include Snowflake::Node
 
       attribute :name,         String, :key => true
       attribute :age,          Integer
@@ -18,7 +18,7 @@ describe RedisGraph::Element do
   
     it "reads the counter instance" do
       @node = TestNodeWithCounter.new(:name => 'bob')
-      @node.counter.should be_an_instance_of RedisGraph::CustomAttributes::Counter
+      @node.counter.should be_an_instance_of Snowflake::CustomAttributes::Counter
     end
 
     it "writes to the counter instance" do
@@ -37,7 +37,7 @@ describe RedisGraph::Element do
     
       lambda {
         @node.counter = 10
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
 
   end

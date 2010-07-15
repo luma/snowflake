@@ -1,6 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::CustomAttributes::Counter do
+describe Snowflake::CustomAttributes::Counter do
   before(:all) do
     @test_node = TestNode.create(:name => 'rolly', :mood => 'Awesome')
   end
@@ -8,110 +8,110 @@ describe RedisGraph::CustomAttributes::Counter do
   describe "#get" do
     it "retrieves a counter by name" do
       @test_node.send_command( 'counter', :set, 5 )
-      counter = RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter')
+      counter = Snowflake::CustomAttributes::Counter.get(@test_node, 'counter')
       puts counter.to_i
       counter.to_i.should == 5
     end
 
     it "retrieves a counter with the default value of 0 if no counter exists for a specific name" do
-      counter = RedisGraph::CustomAttributes::Counter.get(@test_node, 'bob').to_i.should == 0
+      counter = Snowflake::CustomAttributes::Counter.get(@test_node, 'bob').to_i.should == 0
     end
   end
   
   describe "#set" do
     it "sets the counter's value in Redis" do
-      counter = RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter')
+      counter = Snowflake::CustomAttributes::Counter.get(@test_node, 'counter')
       counter.to_i.should == 0
       counter.replace(5)
 
-      RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 5
+      Snowflake::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 5
     end
 
     it "fails to sets the counter's value in Redis when the element is not persisted" do
       @test_node2 = TestNode.new(:name => 'bob', :mood => 'Awesome')
 
-      counter = RedisGraph::CustomAttributes::Counter.get(@test_node2, 'counter')
+      counter = Snowflake::CustomAttributes::Counter.get(@test_node2, 'counter')
 
       lambda {
         counter.replace(5)
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end
 
   describe "incriments atomically" do
     before(:each) do
-      @counter = RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter')
+      @counter = Snowflake::CustomAttributes::Counter.get(@test_node, 'counter')
       @counter.to_i.should == 0
     end
 
     it "incriments (#incriment) the counter by 1" do
       @counter.incriment
 
-      RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 1
+      Snowflake::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 1
     end
 
     it "incriments (#incr) the counter by 1" do
       @counter.incr
 
-      RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 1
+      Snowflake::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 1
     end
 
     it "incriments the counter by n" do
       @counter.incriment(13)
 
-      RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 13
+      Snowflake::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == 13
     end
 
     it "fails to incriments (#incriment) the counter by 1 when the element is not persisted" do
       @test_node2 = TestNode.new(:name => 'bob', :mood => 'Awesome')
 
-      counter = RedisGraph::CustomAttributes::Counter.get(@test_node2, 'counter')
+      counter = Snowflake::CustomAttributes::Counter.get(@test_node2, 'counter')
       
       lambda {
         counter.incriment
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end
   
   describe "decriments atomically" do
     before(:each) do
-      @counter = RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter')
+      @counter = Snowflake::CustomAttributes::Counter.get(@test_node, 'counter')
       @counter.to_i.should == 0
     end
 
     it "decriment (#decriment) the counter by 1" do
       @counter.decriment
 
-      RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == -1
+      Snowflake::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == -1
     end
 
     it "decriment (#decr) the counter by 1" do
       @counter.decr
 
-      RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == -1
+      Snowflake::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == -1
     end
 
     it "decriment (#decriment) the counter by n" do
       @counter.decriment(13)
 
-      RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == -13
+      Snowflake::CustomAttributes::Counter.get(@test_node, 'counter').to_i.should == -13
     end
 
     it "fails to decriment (#decriment) the counter by 1 when the element is not persisted" do
       @test_node2 = TestNode.new(:name => 'bob', :mood => 'Awesome')
 
-      counter = RedisGraph::CustomAttributes::Counter.get(@test_node2, 'counter')
+      counter = Snowflake::CustomAttributes::Counter.get(@test_node2, 'counter')
       
       lambda {
         counter.decriment
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end
   
   # Mimic an integer
   describe "Behaves like an Integer" do
     before(:each) do
-      @counter = RedisGraph::CustomAttributes::Counter.get(@test_node, 'counter')
+      @counter = Snowflake::CustomAttributes::Counter.get(@test_node, 'counter')
       @counter.replace(10)
       @counter.to_i.should == 10
     end

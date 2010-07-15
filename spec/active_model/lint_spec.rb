@@ -2,9 +2,9 @@ require 'rubygems'
 require 'spec'
 
 $:.unshift(File.dirname(__FILE__) + '/../lib')
-require 'redis-graph'
+require 'snowflake'
 
-describe RedisGraph::Node do
+describe Snowflake::Node do
   describe "ActiveModel Compatability" do
     
     it "responds to to_model" do

@@ -1,9 +1,9 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::Node do
+describe Snowflake::Node do
   describe "callbacks" do
     class TestNodeWithCallbacks
-      include RedisGraph::Node
+      include Snowflake::Node
 
       attribute :name,         String, :key => true
       attribute :age,          Integer

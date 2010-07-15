@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::CustomAttributes::Set do
-  class RedisGraph::CustomAttributes::Set
+describe Snowflake::CustomAttributes::Set do
+  class Snowflake::CustomAttributes::Set
     attr_reader :raw
   end
   
@@ -12,37 +12,37 @@ describe RedisGraph::CustomAttributes::Set do
   describe "#get" do
     it "retrieves a set by name" do
       @test_node.send_command( 'set', :sadd, 'bob' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.to_a.should == ['bob']
     end
 
     it "retrieves a set with the default value (an empty set) if no set exists for a specific name" do
-      RedisGraph::CustomAttributes::Set.get(@test_node, 'bob').raw.should == ::Set.new
+      Snowflake::CustomAttributes::Set.get(@test_node, 'bob').raw.should == ::Set.new
     end
   end
   
   describe "#set" do
     it "adds a value to the set in Redis" do
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.should == ::Set.new
       set.replace(['foo', 'bar'])
 
-      RedisGraph::CustomAttributes::Set.get(@test_node, 'set').should == ::Set.new(['foo', 'bar'])
+      Snowflake::CustomAttributes::Set.get(@test_node, 'set').should == ::Set.new(['foo', 'bar'])
     end
     
     it "fails to adds a value to the set in Redis when the element is not persisted" do
       @test_node2 = TestNode.new(:name => 'bob', :mood => 'Awesome')
-      set = RedisGraph::CustomAttributes::Set.get(@test_node2, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node2, 'set')
       
       lambda {
         set.replace(['foo', 'bar'])
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end
 
   describe "#reload" do
     it "can be reloaded from the Data Store" do
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.replace(['foo', 'bar'])
 
       @test_node.send_command( 'set', :sadd, 'baz' )
@@ -56,12 +56,12 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )      
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.size.should == 2
     end
 
     it "retrieves the size of a non-existant set" do
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.size.should == 0
     end
 
@@ -69,7 +69,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )      
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.length.should == 2
     end
 
@@ -77,7 +77,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )      
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.size.should == 2
 
       @test_node.send_command( 'set', :sadd, 'baz' )
@@ -91,12 +91,12 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )      
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.should_not be_empty
     end
 
     it "returns true for a non-existant set" do
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.should be_empty
     end
   end # #empty?
@@ -106,14 +106,14 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.should include('foo')
       set.should include('bar')
     end
 
     it "returns false when the search element is not in the set" do
       @test_node.send_command( 'set', :sadd, 'bar' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.should_not include('foo')
     end
   end # #include?
@@ -123,7 +123,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.add 'baz'
       set.reload
       set.should include('baz')
@@ -133,7 +133,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.add 'baz'
       set.reload
       set.size.should == 3
@@ -142,7 +142,7 @@ describe RedisGraph::CustomAttributes::Set do
 
     it "adds an element to an non-existant set" do
       @test_node.send_command( 'set', :exists ).should be_false
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.should be_empty
       set.add 'baz'
       set.reload
@@ -155,11 +155,11 @@ describe RedisGraph::CustomAttributes::Set do
 
       @test_node2.send_command( 'set', :sadd, 'foo' )
       @test_node2.send_command( 'set', :sadd, 'bar' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node2, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node2, 'set')
       
       lambda {
         set.add 'baz'
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #add
 
@@ -168,7 +168,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.delete 'bar'
       set.reload
       set.should_not include('bar')
@@ -179,7 +179,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.delete 'bar'
       set.reload
       set.size.should == 1
@@ -190,7 +190,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'foo' )
       @test_node.send_command( 'set', :sadd, 'bar' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.delete 'baz'
       set.reload
       set.size.should == 2
@@ -199,7 +199,7 @@ describe RedisGraph::CustomAttributes::Set do
 
     it "deletes the set in the data store when deleting the last element" do
       @test_node.send_command( 'set', :sadd, 'foo' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.delete 'foo'
       set.reload
       set.should be_empty
@@ -211,11 +211,11 @@ describe RedisGraph::CustomAttributes::Set do
 
       @test_node2.send_command( 'set', :sadd, 'foo' )
       @test_node2.send_command( 'set', :sadd, 'bar' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node2, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node2, 'set')
       
       lambda {
         set.delete 'bar'
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #delete
 
@@ -223,7 +223,7 @@ describe RedisGraph::CustomAttributes::Set do
     it "adds multiple elements to an existing set" do
       @test_node.send_command( 'set', :sadd, 'foo' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.merge ['bar', 'baz']
       set.reload
       set.should include('foo')
@@ -232,7 +232,7 @@ describe RedisGraph::CustomAttributes::Set do
     end
 
     it "adds multiple elements to a nonexistant set" do
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.merge ['bar', 'baz']
       set.reload
       set.should include('bar')
@@ -243,11 +243,11 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node2 = TestNode.new(:name => 'bob', :mood => 'Awesome')
 
       @test_node2.send_command( 'set', :sadd, 'foo' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node2, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node2, 'set')
       
       lambda {
         set.merge ['bar', 'baz']
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #merge
 
@@ -257,7 +257,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'bar' )
       @test_node.send_command( 'set', :sadd, 'baz' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.subtract ['bar', 'baz']
       set.reload
       set.should include('foo')
@@ -266,7 +266,7 @@ describe RedisGraph::CustomAttributes::Set do
     end
 
     it "does nothing when removing multiple elements from a nonexistant set" do
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.subtract ['bar', 'baz']
       set.reload
       set.should be_empty
@@ -279,11 +279,11 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node2.send_command( 'set', :sadd, 'foo' )
       @test_node2.send_command( 'set', :sadd, 'bar' )
       @test_node2.send_command( 'set', :sadd, 'baz' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node2, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node2, 'set')
       
       lambda {
         set.subtract ['bar', 'baz']
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #merge
 
@@ -293,14 +293,14 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'bar' )
       @test_node.send_command( 'set', :sadd, 'baz' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.clear
       set.reload
       set.should be_empty
     end
 
     it "does nothing when clearing multiple elements from a nonexistant set" do
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
       set.clear
       set.reload
       set.should be_empty
@@ -313,11 +313,11 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node2.send_command( 'set', :sadd, 'foo' )
       @test_node2.send_command( 'set', :sadd, 'bar' )
       @test_node2.send_command( 'set', :sadd, 'baz' )
-      set = RedisGraph::CustomAttributes::Set.get(@test_node2, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node2, 'set')
       
       lambda {
         set.clear
-      }.should raise_error(RedisGraph::NotPersisted)
+      }.should raise_error(Snowflake::NotPersisted)
     end
   end # #clear
 
@@ -330,8 +330,8 @@ describe RedisGraph::CustomAttributes::Set do
         @test_node.send_command( 'set2', :sadd, 'foo' )
         @test_node.send_command( 'set2', :sadd, 'bar' )
 
-        set1 = RedisGraph::CustomAttributes::Set.get(@test_node, 'set1')
-        set2 = RedisGraph::CustomAttributes::Set.get(@test_node, 'set2')
+        set1 = Snowflake::CustomAttributes::Set.get(@test_node, 'set1')
+        set2 = Snowflake::CustomAttributes::Set.get(@test_node, 'set2')
         set1.should == set2
       end
 
@@ -339,7 +339,7 @@ describe RedisGraph::CustomAttributes::Set do
         @test_node.send_command( 'set1', :sadd, 'foo' )
         @test_node.send_command( 'set1', :sadd, 'bar' )
 
-        set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set1')
+        set = Snowflake::CustomAttributes::Set.get(@test_node, 'set1')
         set.should == ::Set.new(['foo', 'bar'])
       end
     end # A == B
@@ -351,8 +351,8 @@ describe RedisGraph::CustomAttributes::Set do
 
         @test_node.send_command( 'set2', :sadd, 'foo' )
 
-        set1 = RedisGraph::CustomAttributes::Set.get(@test_node, 'set1')
-        set2 = RedisGraph::CustomAttributes::Set.get(@test_node, 'set2')
+        set1 = Snowflake::CustomAttributes::Set.get(@test_node, 'set1')
+        set2 = Snowflake::CustomAttributes::Set.get(@test_node, 'set2')
         set1.should_not == set2
       end
 
@@ -360,7 +360,7 @@ describe RedisGraph::CustomAttributes::Set do
         @test_node.send_command( 'set1', :sadd, 'foo' )
         @test_node.send_command( 'set1', :sadd, 'bar' )
 
-        set1 = RedisGraph::CustomAttributes::Set.get(@test_node, 'set1')
+        set1 = Snowflake::CustomAttributes::Set.get(@test_node, 'set1')
         set2 = ::Set.new(['foo'])
         set1.should_not == set2
       end
@@ -369,7 +369,7 @@ describe RedisGraph::CustomAttributes::Set do
         @test_node.send_command( 'set1', :sadd, 'foo' )
         @test_node.send_command( 'set1', :sadd, 'bar' )
 
-        set1 = RedisGraph::CustomAttributes::Set.get(@test_node, 'set1')
+        set1 = Snowflake::CustomAttributes::Set.get(@test_node, 'set1')
         set2 = ['foo']
         set1.should_not == set2
       end
@@ -383,7 +383,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'bar' )
       @test_node.send_command( 'set', :sadd, 'baz' )
 
-      set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
 
       values = []
       set.each do |value|
@@ -400,7 +400,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'bar' )
       @test_node.send_command( 'set', :sadd, 'baz' )
 
-      @set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      @set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
     end
 
     it "returns the intersection between two sets" do
@@ -418,7 +418,7 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'bar' )
       @test_node.send_command( 'set', :sadd, 'baz' )
 
-      @set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      @set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
     end
 
     it "returns the union between two sets" do
@@ -436,13 +436,13 @@ describe RedisGraph::CustomAttributes::Set do
       @test_node.send_command( 'set', :sadd, 'bar' )
       @test_node.send_command( 'set', :sadd, 'baz' )
 
-      @set = RedisGraph::CustomAttributes::Set.get(@test_node, 'set')
+      @set = Snowflake::CustomAttributes::Set.get(@test_node, 'set')
 
       @test_node.send_command( 'set2', :sadd, 'foo' )
       @test_node.send_command( 'set2', :sadd, 'baz' )
       @test_node.send_command( 'set2', :sadd, 'bob' )
 
-      @set2 = RedisGraph::CustomAttributes::Set.get(@test_node, 'set2')
+      @set2 = Snowflake::CustomAttributes::Set.get(@test_node, 'set2')
     end
 
     it "returns the union between two sets" do

@@ -1,6 +1,6 @@
-= redis-graph
+= snowflake
 
-* http://github.com/luma/redis-graph
+* http://github.com/luma/snowflake
 
 == DESCRIPTION:
 

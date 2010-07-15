@@ -1,6 +1,6 @@
 
 class Company
- include RedisGraph::Node
+ include Snowflake::Node
 
  attribute :name, String, :id => true
  
@@ -10,7 +10,7 @@ class Company
 end
 
 class Project
-  include RedisGraph::Node
+  include Snowflake::Node
 
   attribute :name,         String
   attribute :description,  String
@@ -28,7 +28,7 @@ class Project
 end
 
 class Research
-  include RedisGraph::Node
+  include Snowflake::Node
 
   attribute :name,         String
   attribute :data,         Binary
@@ -47,7 +47,7 @@ class Research
 end
 
 class ResearchData
-  include RedisGraph::Node
+  include Snowflake::Node
 
   attribute :data,         Binary
   attribute :mime_type,    String
@@ -58,7 +58,7 @@ class ResearchData
 end
 
 class Category
-  include RedisGraph::Node
+  include Snowflake::Node
 
   attribute :name,         String, :index => true
   attribute :description,  Text
@@ -150,7 +150,7 @@ puts cat.parent.name  # => 'iPad'
 
 # This version supports multiple parent Categories
 class Category
-  include RedisGraph::Node
+  include Snowflake::Node
 
   attribute :name,         String, :index => true
   attribute :description,  Text
