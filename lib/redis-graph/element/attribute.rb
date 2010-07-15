@@ -102,11 +102,30 @@ module RedisGraph
     #
     # @api semi-public
     def self.restricted_names
-      [:key, :class, :send, :inspect].freeze
+      @restricted_names ||= [:key, :class, :send, :inspect]
     end
-    
+
+    # Indicates whether +name+ is a restricted Attribute name
+    #
+    # @param [Symbol, #to_sym] name
+    #   The Attribute name to test.
+    #
+    # @return [Boolean]
+    #   True if +name+ is a restricted Attribute name, false otherwise.
+    #
+    # @api semi-public
     def self.restricted_name?(name)
       restricted_names.include?(name.to_sym)
+    end
+
+    # Add a name to the list of restricted Attribute names.
+    #
+    # @param [Symbol, #to_sym] name
+    #   The name to add.
+    #
+    # @api semi-public
+    def self.register_restricted_name(name)
+      restricted_names << name.to_sym
     end
 
     # Retrieves a Attribute by it's +type+. This also handles Attribute primitive names, so

@@ -30,6 +30,9 @@ module RedisGraph
   class NotImplementedError < RedisGraphError
   end
 
+  class InvalidTypeError < RedisGraphError
+  end
+
   class InvalidAttributeError < RedisGraphError
   end
 
@@ -57,38 +60,43 @@ module RedisGraph
   class AliasInUseError < RedisGraphError
   end
 
+  def self.connect(*args)
+    options = args
+    connection = nil
+  end
+
   def self.connection
     # @todo fix Redis Namespacing
-    #current[:connection] ||= Redis::Namespace.new(namespace, :redis => redis)
-    current[:connection] ||= redis
+    #thread[:connection] ||= Redis::Namespace.new(namespace, :redis => redis)
+    thread[:connection] ||= Redis.new(*options)
   end
 
   def self.connection=(redis)
-    current[:connection] = redis
+    thread[:connection] = redis
   end
 
   def self.namespace
-    current[:namespace] ||= :redis_graph
+    thread[:namespace] ||= :redis_graph
   end
 
   def self.namespace=(n)
-    current[:namespace] = n
+    thread[:namespace] = n
   end
 
-  def self.redis
-    current[:redis] ||= Redis.new
+  def self.options
+    @options ||= []
   end
 
-  def self.redis=(redis)
-    current[:redis] = redis
-  end
-
-  def self.current
-    Thread.current[:redis_graph] ||= {}
+  def self.options=(options)
+    @options = options
   end
 
   def self.flush_db
-    redis.flushdb
+    connection.flushdb
+  end
+
+  def self.thread
+    Thread.current[:redis_graph] ||= {}
   end
   
   # @todo I'm not thrilled about this being public. however, too many places need it and at least I can be sure everyone is generating keys of the same form.
@@ -109,6 +117,17 @@ module RedisGraph
     autoload :Integer,  dir + 'integer'
     autoload :String,   dir + 'string'
   end
+  
+  autoload :CustomAttribute,  'redis-graph/element/custom_attribute'
+  
+  module CustomAttributes
+    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'redis-graph/element/custom_attributes/')
+
+    # Make our custom types available in a more convienant way
+    autoload :Counter,  dir + 'counter'
+    autoload :Set,      dir + 'set'
+    autoload :List,     dir + 'list'
+  end
 end # module RedisGraph
 
 # Convienant place to store this
@@ -128,8 +147,9 @@ require dir + 'element/plugins/naming'
 require dir + 'element/plugins/serialisers'
 require dir + 'element/plugins/validations'
 
-require dir + 'element/plugins/counters'
-require dir + 'element/plugins/sets'
+require dir + 'element/plugins/custom_attributes'
+#require dir + 'element/plugins/counters'
+#require dir + 'element/plugins/sets'
 
 require dir + 'node'
 # require dir + 'node/descendants'

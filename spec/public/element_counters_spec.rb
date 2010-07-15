@@ -1,51 +1,44 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe RedisGraph::Element::Plugins::Counters do
-#  before(:all) do
-#  end
+describe RedisGraph::Element do
+  describe "Counters" do
+  #  before(:all) do
+  #  end
 
-  class TestNodeWithCounter
-    include RedisGraph::Node
+    class TestNodeWithCounter
+      include RedisGraph::Node
 
-    attribute :name,         String, :key => true
-    attribute :age,          Integer
-    attribute :mood,         String
-    attribute :description,  String
+      attribute :name,         String, :key => true
+      attribute :age,          Integer
+      attribute :mood,         String
+      attribute :description,  String
     
-    counter :counter
-  end
-
-  describe "#class" do
-    it "has a list of it's counters" do
-      TestNodeWithCounter.counters == [:counter]
+      counter :counter
     end
-  end
   
-  it "reads the counter instance" do
-    @node = TestNodeWithCounter.new(:name => 'bob')
-    @node.counter.should be_an_instance_of RedisGraph::Counter
-  end
+    it "reads the counter instance" do
+      @node = TestNodeWithCounter.new(:name => 'bob')
+      @node.counter.should be_an_instance_of RedisGraph::CustomAttributes::Counter
+    end
 
-  it "writes to the counter instance" do
-    @node = TestNodeWithCounter.create(:name => 'bob')
-    @node.counter.should == 0
-    @node.counter = 10
-    @node.counter.should == 10
-
-    @node = TestNodeWithCounter.new(:name => 'bob')
-    @node.counter.should == 10
-  end
-
-  it "refuses to write to the counter instance until the element is persisted" do
-    @node = TestNodeWithCounter.new(:name => 'bob')
-    @node.counter.should == 0
-    
-    lambda {
+    it "writes to the counter instance" do
+      @node = TestNodeWithCounter.create(:name => 'bob')
+      @node.counter.should == 0
       @node.counter = 10
-    }.should raise_error(RedisGraph::NotPersisted)
+      @node.counter.should == 10
+
+      @node = TestNodeWithCounter.new(:name => 'bob')
+      @node.counter.should == 10
+    end
+
+    it "refuses to write to the counter instance until the element is persisted" do
+      @node = TestNodeWithCounter.new(:name => 'bob')
+      @node.counter.should == 0
+    
+      lambda {
+        @node.counter = 10
+      }.should raise_error(RedisGraph::NotPersisted)
+    end
+
   end
-
-
-
-
 end

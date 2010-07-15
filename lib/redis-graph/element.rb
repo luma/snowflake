@@ -139,11 +139,11 @@ module RedisGraph
     end
 
     # @api private
-    def send_command(path_suffix, command, *args)
+    def send_command(path_suffix, command, *args, &block)
       unless path_suffix == nil
-        RedisGraph.connection.send(command.to_sym, *args.unshift( redis_key(path_suffix.to_s) ) )
+        RedisGraph.connection.send(command.to_sym, *args.dup.unshift( redis_key(path_suffix.to_s) ), &block)
       else
-        RedisGraph.connection.send(command.to_sym, *args.unshift( redis_key ) )
+        RedisGraph.connection.send(command.to_sym, *args.dup.unshift( redis_key ), &block)
       end
     end
 
