@@ -32,6 +32,7 @@ lib/snowflake/element/attributes/guid.rb
 lib/snowflake/element/custom_attributes/counter.rb
 lib/snowflake/element/custom_attributes/list.rb
 lib/snowflake/element/custom_attributes/set.rb
+lib/snowflake/node.rb
 script/console
 script/destroy
 script/generate
