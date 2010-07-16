@@ -61,6 +61,7 @@ module Snowflake
   end
 
   def self.connect(*args)
+    handle_passenger_forking
     options = args
     connection = nil
   end
@@ -127,6 +128,22 @@ module Snowflake
     autoload :Counter,  dir + 'counter'
     autoload :Set,      dir + 'set'
     autoload :List,     dir + 'list'
+  end
+  
+  protected
+  
+  # http://www.modrails.com/documentation/Users%20guide%20Nginx.html#_smart_spawning_gotcha_1_unintential_file_descriptor_sharing
+  def self.handle_passenger_forking
+    if defined?(PhusionPassenger)
+      PhusionPassenger.on_event(:starting_worker_process) do |forked|
+        if forked
+          # We're in smart spawning mode.
+          thread[:connection] = Redis.new(*options)
+        else
+          # We're in conservative spawning mode. We don't need to do anything.
+        end
+      end
+    end
   end
 end # module Snowflake
 
