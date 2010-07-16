@@ -1,9 +1,10 @@
 
 h2. TODO
 
-13. Rename the project
-14. Tasks, Generators, and connection handling for Rails 3. http://railsdispatch.com/posts/how-rails-3-enables-more-choices-part-1
-15. Migrations. Just because we are schemaless on the DB side doesn't mean evolving data needs won't affect us. Create a Schema model, each element should have one.
+16. Add explicit validation and initialize hooks
+			define_model_callbacks :validation, :save, :create, :update, :destroy, :only => [ :before, :after ]
+			define_model_callbacks :initialize, :find, :only => :after
+17. Migrations. Just because we are schemaless on the DB side doesn't mean evolving data needs won't affect us. Create a Schema model, each element should have one.
 		We store at least:
 			In %element_class_name%::schema::%guid% (SORTED SET)	=>
 				ZADD element_class_name::schema %timestamp% "%guid%"
@@ -19,24 +20,24 @@ h2. TODO
    		 Company.schema.difference(%guid1%, %guid2%)
 
 		Then rake scripts to do common migration tasks and a dsl to write the actual migrations. Add "schema" as a restricted Attribute name.
-17. Indices: sorted sets of ids?
-	17.1. All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
-	17.2. Marking attributes as indices: attribute :name, String, :index => true, or attribute :name, String, :index => :unique. both would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
-	17.3. key indices (for relationships)
-	17.4. Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
-	17.5. Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
-18. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
-19. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
-20. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.
+18. Indices: sorted sets of ids?
+	18.1. All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
+	18.2. Marking attributes as indices: attribute :name, String, :index => true, or attribute :name, String, :index => :unique. both would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
+	18.3. key indices (for relationships)
+	18.4. Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
+	18.5. Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
+19. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
+20. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
+21. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.
 		- Convert word docs: http://linux.die.net/man/1/antiword
 		- Convert PDF: http://en.wikipedia.org/wiki/Pdftotext
 		- http://moinmo.in/HelpOnXapian
-21. auto-populated created_at and updated_at.
-22. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
-23. after update hooks should be passed the fields that have been updated and the original values.
-24. Observer classes
-25. Can we defined types on non-predefined?
-26. after filters (and before?) using pub/sub?
+22. auto-populated created_at and updated_at.
+23. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
+24. after update hooks should be passed the fields that have been updated and the original values.
+25. Observer classes
+26. Can we defined types on non-predefined?
+27. after filters (and before?) using pub/sub?
 
 h2. DONE 
 
@@ -48,14 +49,16 @@ h2. DONE
 6. Errors
 7. ActiveModel support
 8. Ruby 1.9.2 support (well my tests pass anyways)
-9.  DONE Create an Element object, it's the common functionality that both Node and Edge require.
-11. DONE The hash properties are never saved a property as a time, the entire hash is saved as once. All other properties can be modified using atomic operations. 
+9.  Create an Element object, it's the common functionality that both Node and Edge require.
+11. The hash properties are never saved a property as a time, the entire hash is saved as once. All other properties can be modified using atomic operations. 
 					I should split the dsl into hash properties and non-hash properties. Hash properties use the normal modify and bulk save workflow as Datamapper. Non-hash properties
 					allow operations to be performed and serialised immediately.
-12. DONE We need to allow dynamic hash fields, i.e. ones that were not predefined using the property method. The use cases for both are:
+12. We need to allow dynamic hash fields, i.e. ones that were not predefined using the property method. The use cases for both are:
 		* Predefined: expected fields, can defined validation/etc
 		* Non-predefined: unexpected fields. Dynamically created.
-16. Some way for plugins to register registered attribute names: schema, ??
+13. Some way for plugins to register registered attribute names: schema, ??
+14. Rename the project
+15. Tasks, Generators, and connection handling for Rails 3. http://railsdispatch.com/posts/how-rails-3-enables-more-choices-part-1
 
 h2. Possible Names
 * Snowflake
