@@ -15,12 +15,10 @@ $hoe = Hoe.spec 'snowflake' do
   #self.post_install_message = 'PostInstall.txt' # TODO remove if post-install message not required
   self.rubyforge_name       = self.name # TODO this is default value
   self.extra_deps         = [
-    ['extlib','>= 0.9.10'],
-    ['redis','>= 2.0.0'],
+    ['redis','>= 2.0.1'],
     ['redis-namespace','>= 0.5.0'],
     ['uuidtools', '>= 2.1.1']
   ]
-
 end
 
 require 'newgem/tasks'
