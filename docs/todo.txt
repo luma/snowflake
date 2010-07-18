@@ -1,9 +1,6 @@
 
 h2. TODO
 
-16. Add explicit validation and initialize hooks
-			define_model_callbacks :validation, :save, :create, :update, :destroy, :only => [ :before, :after ]
-			define_model_callbacks :initialize, :find, :only => :after
 17. Migrations. Just because we are schemaless on the DB side doesn't mean evolving data needs won't affect us. Create a Schema model, each element should have one.
 		We store at least:
 			In %element_class_name%::schema::%guid% (SORTED SET)	=>
@@ -38,6 +35,8 @@ h2. TODO
 25. Observer classes
 26. Can we defined types on non-predefined?
 27. after filters (and before?) using pub/sub?
+28. Add an explicit find hooks
+			define_model_callbacks :find, :only => :after
 
 h2. DONE 
 
@@ -59,6 +58,9 @@ h2. DONE
 13. Some way for plugins to register registered attribute names: schema, ??
 14. Rename the project
 15. Tasks, Generators, and connection handling for Rails 3. http://railsdispatch.com/posts/how-rails-3-enables-more-choices-part-1
+16. Add explicit validation and initialize hooks
+			define_model_callbacks :validation, :save, :create, :update, :destroy, :only => [ :before, :after ]
+			define_model_callbacks :initialize, :only => :after
 
 h2. Possible Names
 * Snowflake
