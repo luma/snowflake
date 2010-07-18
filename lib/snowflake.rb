@@ -22,7 +22,6 @@ rescue LoadError
 end
 
 module Snowflake
-  VERSION = '0.0.1'
 
   class SnowflakeError < StandardError
   end
@@ -58,6 +57,9 @@ module Snowflake
   end
 
   class AliasInUseError < SnowflakeError
+  end
+
+  class OutOfDateError < SnowflakeError
   end
 
   def self.connect(*args)

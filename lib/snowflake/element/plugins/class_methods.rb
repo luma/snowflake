@@ -103,7 +103,7 @@ module Snowflake
       #     The new Element.
       # 
       # @api public
-      def create(options = {})
+      def create( options = {} )
         node = self.new(options)
         yield node if block_given?
         node.save
@@ -117,7 +117,7 @@ module Snowflake
       #     True for sucess, false otherise.
       #
       # @api public      
-      def destroy!(key)
+      def destroy!( key )
 #        raise NotImplementedError, 'Modules that include Snowflake::Element must implement a destroy! method.'
         # @todo error handling
         Snowflake.connection.del( key_for(key) )
@@ -132,14 +132,14 @@ module Snowflake
       # @todo I'm not thrilled about this being public, it needs to be public right now as instances of Element use it
       #
       # @api semi-public
-      def key_for(*segments)
+      def key_for( *segments )
         Snowflake.key( *segments.unshift(self.to_s) )
       end
-      
+
       # Construct a meta key for this element from +segments+.
       #
       # @api semi-public
-      def meta_key_for(*segments)
+      def meta_key_for( *segments )
         Snowflake.meta_key( *segments.unshift(self.to_s) )
       end
     end # module ClassMethods
