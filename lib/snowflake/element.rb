@@ -141,17 +141,17 @@ module Snowflake
     # @api private
     def send_command(path_suffix, command, *args, &block)
       unless path_suffix == nil
-        Snowflake.connection.send(command.to_sym, *args.dup.unshift( redis_key(path_suffix.to_s) ), &block)
+        Snowflake.connection.send(command.to_sym, *args.dup.unshift( key_for(path_suffix.to_s) ), &block)
       else
-        Snowflake.connection.send(command.to_sym, *args.dup.unshift( redis_key ), &block)
+        Snowflake.connection.send(command.to_sym, *args.dup.unshift( key_for ), &block)
       end
     end
 
   #    protected
 
     # @todo I'm not sure this should be public
-    def redis_key(*segments)
-      self.class.redis_key(*segments.unshift(self.key))
+    def key_for(*segments)
+      self.class.key_for(*segments.unshift(self.key))
     end
 
     private

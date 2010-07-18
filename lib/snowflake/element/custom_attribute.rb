@@ -38,7 +38,7 @@ module Snowflake
     end
 
     def key
-      @element.redis_key( name )
+      @element.key_for( name )
     end
 
     class << self      

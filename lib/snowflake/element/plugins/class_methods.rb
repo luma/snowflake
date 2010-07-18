@@ -14,7 +14,7 @@ module Snowflake
       # 
       # @api public
       def get(key)
-        node_attributes = Snowflake.connection.hgetall( redis_key(key) )
+        node_attributes = Snowflake.connection.hgetall( key_for(key) )
         return nil if node_attributes.empty?
 
         # @todo Deal with extended properties that aren't part of the hash: Maybe lazy load them?
@@ -70,7 +70,7 @@ module Snowflake
       #
       # @api public
       def exists?(key)
-        Snowflake.connection.exists( redis_key(key) )
+        Snowflake.connection.exists( key_for(key) )
       end
       
       # Rename an Element from +from_key+ to +to_key+.
@@ -86,7 +86,7 @@ module Snowflake
       #
       # @api public
       def rename(from_key, to_key)
-        Snowflake.connection.renamenx( redis_key(from_key), redis_key(to_key) )
+        Snowflake.connection.renamenx( key_for(from_key), key_for(to_key) )
         # @todo provide a hook to allow extended attributes to be moved
         
         # @todo error handling
@@ -120,16 +120,27 @@ module Snowflake
       def destroy!(key)
 #        raise NotImplementedError, 'Modules that include Snowflake::Element must implement a destroy! method.'
         # @todo error handling
-        Snowflake.connection.del( redis_key(key) )
+        Snowflake.connection.del( key_for(key) )
 
         true
       end
 
 #      protected
+
+      # Construct a key for this element from +segments+.
+      #
       # @todo I'm not thrilled about this being public, it needs to be public right now as instances of Element use it
-      # @api private
-      def redis_key(*segments)
+      #
+      # @api semi-public
+      def key_for(*segments)
         Snowflake.key( *segments.unshift(self.to_s) )
+      end
+      
+      # Construct a meta key for this element from +segments+.
+      #
+      # @api semi-public
+      def meta_key_for(*segments)
+        Snowflake.meta_key( *segments.unshift(self.to_s) )
       end
     end # module ClassMethods
   end # module Element

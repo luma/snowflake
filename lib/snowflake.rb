@@ -100,10 +100,22 @@ module Snowflake
     Thread.current[:redis_graph] ||= {}
   end
   
+  # Construct an element key from +segments+.
+  #
   # @todo I'm not thrilled about this being public. however, too many places need it and at least I can be sure everyone is generating keys of the same form.
-  # @api private
+  #
+  # @api semi-public
   def self.key(*segments)
     segments.join(':')
+  end
+
+  # Construct a meta key (for storing metainfo regarding elements) for +segments+.
+  #
+  # @todo I'm not thrilled about this being public. however, too many places need it and at least I can be sure everyone is generating keys of the same form.
+  #
+  # @api semi-public
+  def self.meta_key(*segments)
+    segments.join('::')
   end
   
   autoload :Attribute, 'snowflake/element/attribute'
