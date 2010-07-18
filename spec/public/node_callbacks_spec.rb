@@ -12,11 +12,11 @@ describe Snowflake::Node do
 
       validates_presence_of :name
       
-      attr_reader :callbacks
+      attr_accessor :callbacks
       
       def initialize(attributes = {})
-        super(attributes)
         @callbacks = []
+        super(attributes)
       end
       
       before_save "@callbacks << :before_save"
@@ -33,6 +33,12 @@ describe Snowflake::Node do
       
       before_rename "@callbacks << :before_rename"
       after_rename "@callbacks << :after_rename"
+      
+      before_validate "@callbacks << :before_validate"
+      after_validate "@callbacks << :after_validate"
+      
+      after_initialize "@callbacks << :after_initialize"
+      after_get "@callbacks << :after_get"
     end
     
     before(:all) do
@@ -102,6 +108,42 @@ describe Snowflake::Node do
         @test_callback_node.callbacks.should include(:after_destroy)
       end
     end
+
+    describe "Validate" do
+      before(:all) do
+        @test_callback_node.callbacks = []
+        @test_callback_node.age = 100
+        @test_callback_node.save.should be_true
+      end
+
+      it "triggers the before_validate callback" do
+        @test_callback_node.callbacks.should include(:before_validate)
+      end
+
+      it "triggers the after_validate callback" do
+        @test_callback_node.callbacks.should include(:after_validate)
+      end
+      
+      it "triggers validation before and after updates" do
+        @test_callback_node.callbacks.should == [:before_validate, :after_validate, :before_save, :before_update, :after_update, :after_save]
+      end
+    end
+
+    describe "Initialize" do
+      before(:all) do
+        @test_callback_node2 = TestNodeWithCallbacks.new(:name => 'rolly', :mood => 'Awesome')
+      end
+      
+      it "triggers the after initialize callback" do
+        @test_callback_node2.callbacks.should include(:after_initialize)
+      end
+    end
+
+    describe "Get" do
+      it "triggers the after get callback" do
+        pending
+      end
+    end    
   end
 
 end
