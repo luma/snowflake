@@ -17,7 +17,8 @@ $hoe = Hoe.spec 'snowflake' do
   self.extra_deps         = [
     ['redis','>= 2.0.1'],
     ['redis-namespace','>= 0.5.0'],
-    ['uuidtools', '>= 2.1.1']
+    ['uuidtools', '>= 2.1.1'],
+    ['active_support', '>= 3.0.0.beta4']
   ]
 end
 
