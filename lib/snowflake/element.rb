@@ -5,7 +5,7 @@ module Snowflake
       @_destroyed = false
       self.key = attributes.delete(:key)
       self.attributes = attributes
-      
+
       _run_initialize_callbacks
     end
 
