@@ -37,6 +37,7 @@ h2. TODO
 27. after filters (and before?) using pub/sub?
 28. Add an explicit find hooks
 			define_model_callbacks :find, :only => :after
+29. Add an Identity Map, I'm not convinced we need it but if we do, this could be helpful http://github.com/swistak/weakling
 
 h2. DONE 
 
