@@ -34,7 +34,7 @@ describe Snowflake::Element do
     it "refuses to write to the counter instance until the element is persisted" do
       @node = TestNodeWithCounter.new(:name => 'bob')
       @node.counter.should == 0
-    
+
       lambda {
         @node.counter = 10
       }.should raise_error(Snowflake::NotPersisted)
