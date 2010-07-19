@@ -29,6 +29,22 @@ module Snowflake
         node
       end
 
+      # Retrieve Elements by their +keys+, it returns [] if no Elements can be found.
+      #
+      # @param [Array<#to_s>] keys
+      #     The array keys of the Elements that you wish to retrieve.
+      #
+      # @return [Element, []]
+      #   A Element with the key of +key+
+      #   If no Elements were found with any of +keys+
+      # 
+      # @api public
+      def get_many(keys)
+        keys.collect do |key|
+          get(key)
+        end.compact
+      end
+
       # This is the same as #get, except that it raises a NotFoundError exception
       # instead of returning nil, if no Element is found.
       #
@@ -58,6 +74,9 @@ module Snowflake
       # @api public
       # @todo
       def all(options = {})
+        # @todo deal with options
+
+        indices[:all].all
       end
 
       # Indicates whether a Element exists for key +key+.
@@ -142,6 +161,7 @@ module Snowflake
       def meta_key_for( *segments )
         Snowflake.meta_key( *segments.unshift(self.to_s) )
       end
+
     end # module ClassMethods
   end # module Element
 end # module Snowflake

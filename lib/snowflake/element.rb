@@ -24,6 +24,11 @@ module Snowflake
       object_id === other.object_id
     end
 
+    # Comparing objects
+    def <=>(other)
+      self.key <=> other.key
+    end
+
     # Provides basic compatability with ActiveModel
     def to_model
       self
@@ -100,7 +105,14 @@ module Snowflake
         # the new key will do nothing as we haven't saved anything under the new key yet.
         return true unless @_key == self.key
 
-        self.class.destroy!( @_key )
+        if self.class.destroy!( @_key )
+          # I'd rather this was decoupled from Element, but I haven't figured out how yet
+          delete_from_indices
+          
+          true
+        else
+          false
+        end
       }
 
       true
@@ -173,6 +185,10 @@ module Snowflake
       _run_create_callbacks {
         if persist == true
           @_new_node = false
+          
+          # I'd rather this was decoupled from Element, but I haven't figured out how yet
+          add_to_indices
+          
           true
         else
           false
@@ -192,7 +208,17 @@ module Snowflake
       Snowflake.connection.multi do
         # If the key has been changed then shift every property to the new key
         if persisted? && @_key != self.key
-          unless _run_rename_callbacks { self.class.rename(@_key, self.key) }
+
+          success = _run_rename_callbacks do
+            if self.class.rename(@_key, self.key)
+              update_indices( @_key )
+              true
+            else
+              false
+            end
+          end
+
+          unless success
             # @todo the error
           end
         end

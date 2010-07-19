@@ -119,7 +119,8 @@ module Snowflake
   def self.meta_key(*segments)
     segments.join('::')
   end
-  
+
+  autoload :Index,     'snowflake/index'
   autoload :Attribute, 'snowflake/element/attribute'
 
   module Attributes
@@ -172,12 +173,13 @@ dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/')
 require dir + 'element'
 require dir + 'element/model'
 require dir + 'element/attributes'
-require dir + 'element/plugins/attributes'
 require dir + 'element/plugins/class_methods'
 require dir + 'element/plugins/hooks'
 require dir + 'element/plugins/naming'
 require dir + 'element/plugins/serialisers'
 require dir + 'element/plugins/validations'
+require dir + 'element/plugins/indices'
+require dir + 'element/plugins/attributes'
 
 require dir + 'element/plugins/custom_attributes'
 #require dir + 'element/plugins/counters'
