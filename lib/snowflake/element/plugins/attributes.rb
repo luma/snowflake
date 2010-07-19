@@ -311,7 +311,7 @@ module Snowflake
         # #attributes= or #add_dynamic_attribute.
         #
         # @param [Symbol, #to_sym] attribute_name
-        #     The attribute_name to look for.
+        #     The Attribute name to look for.
         #
         # @return [Boolean]
         #     True if the element has an Attribute named +attribute_name+, false otherwise.
