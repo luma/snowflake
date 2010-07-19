@@ -9,6 +9,19 @@ module Snowflake
         end
 
         module InstanceMethods
+          # Indicates whether this element has a defined CustomAttribute called +name+.
+          #
+          # @param [Symbol, #to_sym] name
+          #     The CustomAttribute name to look for.
+          #
+          # @return [Boolean]
+          #     True if the element has an CustomAttribute named +name+, false otherwise.
+          #
+          # @api public
+          def custom_attribute?( name )
+            self.class.custom_attribute?( name )
+          end
+          
           protected
 
           # All custom attributes for this element
@@ -74,6 +87,19 @@ module Snowflake
         # @api public
         def custom_attributes
           @custom_attributes ||= ::Set.new
+        end
+
+        # Indicates whether this element has a defined CustomAttribute called +name+.
+        #
+        # @param [Symbol, #to_sym] name
+        #     The CustomAttribute name to look for.
+        #
+        # @return [Boolean]
+        #     True if the element has an CustomAttribute named +name+, false otherwise.
+        #
+        # @api public
+        def custom_attribute?( name )
+          custom_attributes.include?( name.to_sym )
         end
 
         # Declare a Counter called +name+ for this element.
