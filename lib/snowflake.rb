@@ -131,6 +131,7 @@ module Snowflake
     autoload :Guid,     dir + 'guid'
     autoload :Integer,  dir + 'integer'
     autoload :String,   dir + 'string'
+    autoload :Text,     dir + 'text'
   end
   
   autoload :CustomAttribute,  'snowflake/element/custom_attribute'
