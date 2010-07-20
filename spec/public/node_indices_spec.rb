@@ -33,7 +33,7 @@ describe Snowflake::Node do
 
       it "when deleting nodes they are removed from the index" do
         @all_index.should include( @all.first.key )
-        @all.first.destroy!
+        @all.first.destroy
         @all_index.should_not include( @all.first.key )
       end
 

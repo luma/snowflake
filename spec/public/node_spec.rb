@@ -80,14 +80,14 @@ describe Snowflake::Node do
     end
   end
   
-  describe "#destroy!" do
+  describe "#destroy" do
     it "deletes a saved Node" do
-      @test_node.destroy!.should be_true
+      @test_node.destroy.should be_true
       TestNode.get('rolly').should be_nil
     end
 
     it "marks a deleted Node as not saved" do
-      @test_node.destroy!.should be_true
+      @test_node.destroy.should be_true
       @test_node.should_not be_persisted
     end
   end

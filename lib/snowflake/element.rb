@@ -92,7 +92,7 @@ module Snowflake
     #     True for sucess, false otherise.
     #
     # @api public
-    def destroy!
+    def destroy
       # Nothing persisted? Nothing to delete, we're done.
       return true unless persisted?
 
@@ -228,7 +228,7 @@ module Snowflake
         attributes.each do |key, value|
           proxy = self.class.attributes[key]
 
-          cast_attributes[key] = proxy != nil ? proxy.dump(value) : Attribute.default_typecast(value)
+          cast_attributes[key] = proxy.dump(value)
         end
 
         # Save all attributes

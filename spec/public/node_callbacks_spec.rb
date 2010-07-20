@@ -97,7 +97,7 @@ describe Snowflake::Node do
 
     describe "Destroy" do
       before(:all) do
-        @test_callback_node.destroy!.should be_true
+        @test_callback_node.destroy.should be_true
       end
 
       it "triggers the before_destroy callback" do

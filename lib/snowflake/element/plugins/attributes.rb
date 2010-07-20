@@ -29,19 +29,6 @@ module Snowflake
             @attributes ||= {}
           end
 
-          # Synonym of update_attributes.
-          #
-          # @param [Hash]
-          #     The new Node attributes.
-          #
-          # @return [Node]
-          #     The Node.
-          #
-          # @api public
-          def attributes=(attrs)
-            update_attributes(attrs)
-          end
-
           # Mass-assign the Node's attributes. If dynamic attributes are enabled unknown
           # attributes will be automatically created.
           #
@@ -51,8 +38,11 @@ module Snowflake
           # @return [Node]
           #     The Node.
           #
-          # @api public          
-          def update_attributes(attrs)
+          # @raise [NoMethodError]
+          #   An Attribute was not found on this element, only some of the attribute 
+          #
+          # @api public
+          def attributes=(attrs)
             # If dynamic attributes are allowed then we'll just write all the attributes without checking
             # whether they have been explicitly defined. If dynamic attributes are not allowed then we'll 
             # need to raise an exception on any undeclared attributes.
@@ -75,6 +65,28 @@ module Snowflake
             end
 
             self
+          end
+
+          # Mass-assign the Node's attributes and then saves it. If dynamic attributes are
+          # enabled unknown attributes will be automatically created.
+          #
+          # @param [Hash]
+          #     The new Node attributes.
+          #
+          # @return [Boolean]
+          #     True if the attributes were saved sucessfully, false otherwise.
+          #
+          # @raise [NoMethodError]
+          #   An Attribute was not found on this element, only some of the attribute 
+          #
+          # @api public
+          def update_attributes(attrs)
+            if attrs.empty?
+              return true
+            end
+
+            self.attributes = attrs
+            save
           end
 
           # Retrieve the value of the key attribute for this Node
