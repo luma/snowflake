@@ -3,9 +3,9 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 describe Snowflake::Node do
   describe "Attributes" do
     it "indicates whether an attribute name represents a attribute on this element" do
-      TestNode.has_attribute?( :name ).should be_true
-      TestNode.has_attribute?( :age ).should be_true
-      TestNode.has_attribute?( :foo ).should be_false
+      TestNode.attribute?( :name ).should be_true
+      TestNode.attribute?( :age ).should be_true
+      TestNode.attribute?( :foo ).should be_false
     end
     
     it "retrieves a list of all custom attributes" do

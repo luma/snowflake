@@ -147,12 +147,12 @@ module Snowflake
             end
 
             # Don't create it if it's already been created
-            if has_attribute?(name)
+            if self.class.attribute?(name)
               raise ArgumentError, "A dynamic attribute called '#{name}' already exists and attributes cannot be redefined."
             end
 
             # Guard against creating dynamic attributes using the restricted attribute names. 
-            if Attribute.restricted_name?(name.to_sym)
+            if Element::Model.restricted_name?(name.to_sym)
               raise ArgumentError, "'#{name}' is a restricted attribute name, it cannot be used. The following are all restricted attribute names: #{self.class.restricted_attribute_names.join(', ')}"
             end            
 
@@ -342,12 +342,12 @@ module Snowflake
         #     True if the element has an Attribute named +attribute_name+, false otherwise.
         #
         # @api public
-        def has_attribute?(attribute_name)
+        def attribute?(attribute_name)
           attributes.include?(attribute_name.to_sym)
         end
 
         # Indicates whether this element does not have a dynamically Attribute called 
-        # +attribute_name+. This is the antonym of #has_attribute?
+        # +attribute_name+. This is the antonym of #attribute?
         #
         # @param [Symbol, #to_sym] attribute_name
         #     The attribute_name to look for.
