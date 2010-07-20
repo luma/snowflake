@@ -29,8 +29,7 @@ module Snowflake
             @attributes ||= {}
           end
 
-          # Mass-assign the Node's attributes. If dynamic attributes are enabled unknown
-          # attributes will be automatically created.
+          # Synonym of update_attributes.
           #
           # @param [Hash]
           #     The new Node attributes.
@@ -40,6 +39,20 @@ module Snowflake
           #
           # @api public
           def attributes=(attrs)
+            update_attributes(attrs)
+          end
+
+          # Mass-assign the Node's attributes. If dynamic attributes are enabled unknown
+          # attributes will be automatically created.
+          #
+          # @param [Hash]
+          #     The new Node attributes.
+          #
+          # @return [Node]
+          #     The Node.
+          #
+          # @api public          
+          def update_attributes(attrs)
             # If dynamic attributes are allowed then we'll just write all the attributes without checking
             # whether they have been explicitly defined. If dynamic attributes are not allowed then we'll 
             # need to raise an exception on any undeclared attributes.
