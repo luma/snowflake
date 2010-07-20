@@ -126,6 +126,21 @@ module Snowflake
       clean!
     end
 
+    # Retrieve the value of the key property for this Node, this is provided for 
+    # ActiveModel compatability and it differs slightly from #key as it returns nil if
+    # #persisted? is false.
+    #
+    # @return [Array] The Id value
+    #
+    # @api public
+    def to_key
+      if persisted?
+        [self.key]
+      else
+        nil
+      end
+    end
+
     # Returns a string representing the object's key suitable for use in URLs
     # or nil if #persisted? is false.
     #
@@ -134,22 +149,7 @@ module Snowflake
     #
     # @api public
     def to_param
-      self.key
-    end
-
-    # Retrieve the value of the key property for this Node, this is provided for 
-    # ActiveModel compatability and it differs slightly from #key as it returns nil if
-    # #persisted? is false.
-    #
-    # @return [#to_s] The Id value
-    #
-    # @api public
-    def to_key
-      if persisted?
-        self.key
-      else
-        nil
-      end
+      to_key ? to_key.join('-') : nil
     end
 
     # @api private
