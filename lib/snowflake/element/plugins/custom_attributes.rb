@@ -227,14 +227,18 @@ module Snowflake
             raise NameInUseError, "A Counter called '#{name.to_s}' has already been defined for #{self.inspect}."
           end
 
+          if Element::Model.restricted_name?(name)
+            raise ArgumentError, "'#{name}' is a restricted name, and cannot be used for as CustomAttribute name. The following are all restricted names: #{Element::Model.restricted_names.join(', ')}"
+          end
+
           custom_attributes << name
 
           create_custom_attribute_reader(klass, name, options)
           create_custom_attribute_writer(klass, name, options)
-          
+
           name
         end
-        
+
         private
 
         # @todo prevent these from being defined if they have already been defined somewhere else
