@@ -46,36 +46,17 @@ module Snowflake
         if @raw.empty?
           clear
         else
-          # track changes to the set
-         # send_command( :watch ) do
-          # Snowflake.connection.watch( key ) do
-
-            # TODO: There must be a better way of doing this...
-            old_members = send_command( :smembers )
-
-            members_to_add = @raw
-
-            # @todo error checking
-            Snowflake.connection.multi do
-              # Remove any values that were in the set before, but aren't now
-              unless old_members.empty?
-                old_members = ::Set.new(old_members)
-
-                ( old_members - @raw ).each do |v|
-                  send_command( :srem, v )
-                end
-
-                members_to_add = members_to_add - old_members
-              else
-                members_to_add.each do |v|
-                  send_command( :sadd, v )
-                end
-              end
+          results = Snowflake.connection.multi do
+            send_command( :del )
+            @raw.each do |value|
+              send_command( :sadd, value )
             end
-          
-          # end
+            send_command( :smembers )
+          end
 
-          reload
+          # @todo check the results
+
+          @raw = ::Set.new( results.last )
         end
 
         true
