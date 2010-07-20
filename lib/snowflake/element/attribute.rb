@@ -24,8 +24,8 @@ module Snowflake
       # We only check if the key name is not 'key'. If it is called 'key', and it wasn't 
       # rejected by previous checks, it's definately a valid attribute name so we can
       # skip the next check.
-      if @name != :key && self.class.restricted_names.include?(@name)
-        raise ArgumentError, "'#{@name}' is a restricted attribute name, it cannot be used. The following are all restricted attribute names: #{self.class.restricted_names.join(', ')}"
+      if @name != :key && Element::Model.restricted_name?(@name)
+        raise ArgumentError, "'#{@name}' is a restricted name, and cannot be used as an Attribute name. The following are all restricted names: #{Element::Model.restricted_names.join(', ')}"
       end
 
       @reader_visibility = options.delete(:reader_visibility) || 'public'
@@ -91,41 +91,6 @@ module Snowflake
     # @api public
     def self.aliases
       @aliases ||= {}
-    end
-    
-    # The list of restricted attribute names. This list could be huge, we just specify
-    # several of the most damaging ones here and leave the rest to common sense...which
-    # could be a terrible error.
-    #
-    # @return [Array<Symbol>]
-    #     An array of Symbols representing restricted attribute names.
-    #
-    # @api semi-public
-    def self.restricted_names
-      @restricted_names ||= [:key, :class, :send, :inspect]
-    end
-
-    # Indicates whether +name+ is a restricted Attribute name
-    #
-    # @param [Symbol, #to_sym] name
-    #   The Attribute name to test.
-    #
-    # @return [Boolean]
-    #   True if +name+ is a restricted Attribute name, false otherwise.
-    #
-    # @api semi-public
-    def self.restricted_name?(name)
-      restricted_names.include?(name.to_sym)
-    end
-
-    # Add a name to the list of restricted Attribute names.
-    #
-    # @param [Symbol, #to_sym] name
-    #   The name to add.
-    #
-    # @api semi-public
-    def self.register_restricted_name(name)
-      restricted_names << name.to_sym
     end
 
     # Retrieves a Attribute by it's +type+. This also handles Attribute primitive names, so

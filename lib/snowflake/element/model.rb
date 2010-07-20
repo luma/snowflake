@@ -67,7 +67,41 @@ module Snowflake
           new_extensions.each { |extension| model.extend extension }
         end
       end
-      
+
+      # The list of restricted attribute names. This list could be huge, we just specify
+      # several of the most damaging ones here and leave the rest to common sense...which
+      # could be a terrible error.
+      #
+      # @return [Array<Symbol>]
+      #     An array of Symbols representing restricted attribute names.
+      #
+      # @api semi-public
+      def self.restricted_names
+        @restricted_names ||= [:key, :class, :send, :inspect]
+      end
+
+      # Indicates whether +name+ is a restricted Attribute name
+      #
+      # @param [Symbol, #to_sym] name
+      #   The Attribute name to test.
+      #
+      # @return [Boolean]
+      #   True if +name+ is a restricted Attribute name, false otherwise.
+      #
+      # @api semi-public
+      def self.restricted_name?(name)
+        restricted_names.include?(name.to_sym)
+      end
+
+      # Add a name to the list of restricted Attribute names.
+      #
+      # @param [Symbol, #to_sym] name
+      #   The name to add.
+      #
+      # @api semi-public
+      def self.register_restricted_name(name)
+        restricted_names << name.to_sym
+      end
     end # module Model
   end # module Element
 end # module Snowflake
