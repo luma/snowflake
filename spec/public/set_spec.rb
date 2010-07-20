@@ -118,6 +118,21 @@ describe Snowflake::CustomAttributes::Set do
     end
   end # #include?
 
+  describe "#join" do
+    before :each do
+      @test_node.send_command( 'set', :sadd, 'foo' )
+      @test_node.send_command( 'set', :sadd, 'bar' )
+    end
+
+    it "returns the set contents, as a string, glued together with a custom separator" do
+      Snowflake::CustomAttributes::Set.get(@test_node, 'set').join(', ').should == 'bar, foo'
+    end
+
+    it "returns the set contents, as a string, glued together with the default separator" do
+      Snowflake::CustomAttributes::Set.get(@test_node, 'set').join.should == 'bar foo'
+    end
+  end # #join
+
   describe "#add" do
     it "adds an element to an existing set" do
       @test_node.send_command( 'set', :sadd, 'foo' )

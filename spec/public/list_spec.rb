@@ -40,6 +40,21 @@ describe Snowflake::CustomAttributes::List do
     end
   end
 
+  describe "#join" do
+    before :each do
+      list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
+      list.replace(['foo', 'bar'])
+    end
+
+    it "returns the set contents, as a string, glued together with a custom separator" do
+      Snowflake::CustomAttributes::List.get(@test_node, 'list').join(', ').should == 'foo, bar'
+    end
+
+    it "returns the set contents, as a string, glued together with the default separator" do
+      Snowflake::CustomAttributes::List.get(@test_node, 'list').join.should == 'foo bar'
+    end
+  end # #join
+
   describe "#reload" do
     it "can be reloaded from the Data Store" do
       list = Snowflake::CustomAttributes::List.get(@test_node, 'list')
@@ -351,7 +366,7 @@ describe Snowflake::CustomAttributes::List do
     it "raises ArgumentError for an out of range index" do
       lambda {
         @list[3] = 'bob'
-      }.should raise(ArgumentError)
+      }.should raise_error(ArgumentError)
     end
 
     it "returns nil for an out of range slice" do
@@ -367,7 +382,7 @@ describe Snowflake::CustomAttributes::List do
     it "raises ArgumentError when providing a replacement slice larger than the slice taken" do
       lambda {
         @list[1, 2] = ['two', 'three', 'four']
-      }.should raise(ArgumentError)
+      }.should raise_error(ArgumentError)
     end
 
     it "slices the list using a range" do

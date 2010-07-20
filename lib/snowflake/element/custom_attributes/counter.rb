@@ -20,22 +20,24 @@ module Snowflake
       # @param [Integer, #to_i] raw
       #     The new value of the Counter.
       #
-      # @return [Counter]
-      #   self
+      # @return [True, String]
+      #   True if the replace was successful;
+      #   An error message otherwise.
       #
       # @api semi-public
       def replace(raw)
         assert_persisted
 
-        # I'd rather this was in the counters plugin than here...bah!
-        unless @element.persisted?
-          raise NotPersisted, "#{@element.inspect} is not persisted, you cannot modify a counter until after an element is persisted."
+        begin
+          @raw = typecast(raw)
+        rescue InvalidTypeError => e
+          # raise InvalidTypeError, "Tried to assign #{enum.inspect} to a Set Property called '#{@name}'. Only a Set or Array can be assigned to a Set Property."
+          return "Tried to assign #{raw.inspect} to '#{@name}'. Only an integer can be assigned to '#{@name}'."
         end
 
-        @raw =  typecast(raw)
         send_command( :set, @raw )
 
-        self
+        true
       end
 
       # Cast +value+ to whatever type @raw should be. Raise exceptions for invalid types.
@@ -91,11 +93,6 @@ module Snowflake
       def incriment(by = 1)
         assert_persisted
 
-        # I'd rather this was in the counters plugin than here...bah!
-        unless @element.persisted?
-          raise NotPersisted, "#{@element.inspect} is not persisted, you cannot modify a counter until after an element is persisted."
-        end
-
         @raw = send_command( :incrby, by.to_i )
       end
       alias :incr :incriment
@@ -112,11 +109,6 @@ module Snowflake
       # @api private
       def decriment(by = 1)
         assert_persisted
-
-        # I'd rather this was in the counters plugin than here...bah!
-        unless @element.persisted?
-          raise NotPersisted, "#{@element.inspect} is not persisted, you cannot modify a counter until after an element is persisted."
-        end
 
         @raw = send_command( :decrby, by.to_i )
       end

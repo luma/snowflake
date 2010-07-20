@@ -6,7 +6,7 @@ module Snowflake
       end
 
       def to_s
-        @raw.join(', ')
+        join(', ')
       end
 
       # Converts the set to an array. The order of elements is uncertain.
@@ -28,17 +28,19 @@ module Snowflake
       # @param [Enumerable] enum
       #     The new value of the Counter.
       #
-      # @return [Set]
-      #   self
+      # @return [True, String]
+      #   True if the replace was successful;
+      #   An error message otherwise.
       #
       # @api private
       def replace(enum)
         assert_persisted
 
         begin
-          @raw =  typecast(enum)
+          @raw = typecast(enum)
         rescue InvalidTypeError => e
-          raise InvalidTypeError, "Tried to assign #{enum.inspect} to a Set Property. Only a Set or Array can be assigned to a Set Property."
+          # raise InvalidTypeError, "Tried to assign #{enum.inspect} to a Set Property called '#{@name}'. Only a Set or Array can be assigned to a Set Property."
+          return "Tried to assign #{enum.inspect} to '#{@name}'. Only a Set or Array can be assigned to '#{@name}'."
         end
 
         if @raw.empty?
@@ -76,7 +78,7 @@ module Snowflake
           reload
         end
 
-        self
+        true
       end  
 
       # Cast +value+ to whatever type @raw should be. Raise exceptions for invalid types.
@@ -89,7 +91,7 @@ module Snowflake
         when Enumerable
           ::Set.new(enum)
         else
-          raise InvalidTypeError, "Cannot cast '#{value.inspect}' for #{self.inspect}."
+          raise InvalidTypeError, "Cannot cast '#{enum.inspect}' for #{self.inspect}."
         end
       end
 
@@ -262,6 +264,16 @@ module Snowflake
       # @api public
       def eql?(other)
         self == other
+      end
+
+      # This glues together the contents of the set into a single string using +separator+.
+      # 
+      # *Note:* As sets have no order, the set is converted to an Array and sorted before
+      # joining. This means that the final joined elements will always be in sorted order.
+      #
+      # @api public
+      def join(separator = ' ')
+        @raw.to_a.sort.join( separator )
       end
 
       class << self      

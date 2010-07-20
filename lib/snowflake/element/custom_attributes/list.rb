@@ -6,7 +6,7 @@ module Snowflake
       end
 
       def to_s
-        @raw.join(', ')
+        join(', ')
       end
 
       # Converts the set to an array. The order of elements is uncertain.
@@ -28,8 +28,9 @@ module Snowflake
       # @param [Enumerable] enum
       #     The new value of the Counter.
       #
-      # @return [List]
-      #   self
+      # @return [True, String]
+      #   True if the replace was successful;
+      #   An error message otherwise.
       #
       # @api private
       def replace(enum)
@@ -38,14 +39,15 @@ module Snowflake
         begin
           @raw = typecast(enum)
         rescue InvalidTypeError => e
-          raise InvalidTypeError, "Tried to assign #{enum.inspect} to a List Property. Only a Set or Enumerable can be assigned to a List Property."
+          # raise InvalidTypeError, "Tried to assign #{enum.inspect} to a List Property. Only a Set or Enumerable can be assigned to a List Property."
+          return "Tried to assign #{raw.inspect} to '#{@name}'. Only an Array or Enumerable can be assigned to '#{@name}'."
         end
 
         # @todo error check
         results = Snowflake.connection.multi do
           clear
 
-          # @bug This triggers incorrect responses from Redis, why?
+          # @bug This triggers incorrect responses from Redis, why? I mean it's wrong anyway, but why does it trigger a bug?
           # enum.each_index do |i|
           #   send_command( :lset, i, enum[i] )
           # end
@@ -58,7 +60,7 @@ module Snowflake
         end
 
         @raw = results.last
-        self
+        true
       end  
 
       # Cast +value+ to whatever type @raw should be. Raise exceptions for invalid types.
@@ -71,7 +73,7 @@ module Snowflake
         when Enumerable
           Array.new(enum)
         else
-          raise InvalidTypeError, "Cannot cast '#{value.inspect}' for #{self.inspect}."
+          raise InvalidTypeError, "Cannot cast '#{enum.inspect}' for #{self.inspect}."
         end
       end
 
@@ -304,6 +306,13 @@ module Snowflake
       # @api public
       def eql?(other)
         self == other
+      end
+
+      # The same as Array#join.
+      #
+      # @api public
+      def join(separator = ' ')
+        @raw.join( separator )
       end
 
       class << self      

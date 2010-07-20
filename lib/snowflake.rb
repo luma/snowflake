@@ -38,6 +38,12 @@ module Snowflake
   class DynamicAttributeError < SnowflakeError
   end
 
+  class CustomAttributeError < SnowflakeError
+  end
+
+  class CouldNotPersistCustomAttributeError < CustomAttributeError
+  end
+
   class NameInUseError < InvalidAttributeError
   end
 
