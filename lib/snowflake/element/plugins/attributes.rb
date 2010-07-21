@@ -9,16 +9,6 @@ module Snowflake
         end
 
         module InstanceMethods
-          # Retrieves all Node attributes that are dirty, those that have been modified.
-          #
-          # @return [Hash]
-          #     The array of dirty attributes
-          #
-          # @api public
-          def dirty_attributes
-            @dirty_attributes ||= {}
-          end
-
           # Retrieves all Node attributes.
           #
           # @return [Hash]
@@ -109,26 +99,6 @@ module Snowflake
             write_attribute(self.class.key, new_key)
           end
 
-          # Indicates true if any attributes have been modified since the last save.
-          #
-          # @return [Boolean]
-          #     True if changes have been made, false otherwise.
-          #
-          # @api public
-          def dirty?
-            !dirty_attributes.empty?
-          end
-
-          # Indicates false if any attributes have been modified since the last save.
-          #
-          # @return [Boolean]
-          #     True if no changes have been made, false otherwise.
-          #
-          # @api public          
-          def clean?
-            dirty_attributes.empty?
-          end
-
           # Adds a new dynamic attribute to the Element, you must call this method before
           # attempting to write a value to the new attribute.
           #
@@ -169,13 +139,6 @@ module Snowflake
           end
 
           protected
-
-          # Clear our attribute dirty tracking
-          #
-          # @api private
-          def clean!
-            dirty_attributes = {}
-          end
 
           # Reads the value of the Attribute called +name+.
           #
@@ -222,7 +185,7 @@ module Snowflake
           # @api private
           def write_attribute(name, value, make_dirty = true)
             if make_dirty
-              dirty_attributes[name.to_sym] = read_attribute(name)
+              attribute_will_change!(name.to_sym)
             end
 
             proxy = self.class.attributes[name.to_sym]
@@ -330,7 +293,7 @@ module Snowflake
         def attributes
           @attributes ||= {}
         end
-        
+
         # Indicates whether this element has a defined Attribute called +attribute_name+.
         # This includes dynamic attributes that already been created via either
         # #attributes= or #add_dynamic_attribute.
@@ -403,6 +366,26 @@ module Snowflake
             #{attribute.reader_visibility}
             def #{attribute.name.to_s}
               read_attribute(:#{attribute.name.to_s})
+            end
+            
+            def #{attribute.name.to_s}_changed?
+              attribute_changed?(:#{attribute.name.to_s})
+            end
+
+            def #{attribute.name.to_s}_change
+              attribute_change(:#{attribute.name.to_s})
+            end
+
+            def #{attribute.name.to_s}_was
+              attribute_was(:#{attribute.name.to_s})
+            end            
+            
+            def reset_#{attribute.name.to_s}!
+              reset_attribute!(:#{attribute.name.to_s})
+            end
+
+            def #{attribute.name.to_s}_will_change!
+              attribute_will_change!(:#{attribute.name.to_s})
             end
           EOS
 

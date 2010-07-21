@@ -40,7 +40,7 @@ describe Snowflake::Node do
       @test_node.stuff.to_set.should == Set.new(['foo', 'bar'])
     end
 
-    it "will raise an exception if errors occur when overwriting custom attribute values" do
+    it "will raise an exception if errors occur when overwriting custom attribute values with the wrong format" do
       @test_node = TestNodeWithCustomAttributes.create(:name => 'rolly', :mood => 'Awesome')
       @test_node.should be_valid
 

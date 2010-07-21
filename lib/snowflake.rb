@@ -7,6 +7,7 @@ require 'pathname'
 require 'json'
 
 require 'active_support'
+require 'active_support/hash_with_indifferent_access'
 require 'active_support/inflector'
 require 'active_model'
 
@@ -186,17 +187,9 @@ require dir + 'element/plugins/serialisers'
 require dir + 'element/plugins/validations'
 require dir + 'element/plugins/indices'
 require dir + 'element/plugins/attributes'
+require dir + 'element/plugins/dirty'
 
 require dir + 'element/plugins/custom_attributes'
-#require dir + 'element/plugins/counters'
-#require dir + 'element/plugins/sets'
 
 require dir + 'node'
-# require dir + 'node/descendants'
-# require dir + 'node/properties'
-# require dir + 'node/class_methods'
-
-# ActiveModel Compatability
-# require dir + 'node/active_model_compatability/base'
-# require dir + 'node/active_model_compatability/validations'
 

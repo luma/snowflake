@@ -7,8 +7,8 @@ module Snowflake
       
         def self.included(model)
           model.class_eval do
-            define_model_callbacks :validate, :create, :update, :save, :destroy, :rename
       			define_model_callbacks :initialize, :get, :only => :after
+            define_model_callbacks :validate, :create, :update, :save, :destroy, :rename
           end
         end
        

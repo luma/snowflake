@@ -202,6 +202,8 @@ module Snowflake
 
     # @todo error checking / handling
     def persist
+      @previously_changed = changes
+
       # @todo I'm using MULTI as if it's a transaction, except it isn't, as if one command fails 
       # all commands follow it will execute (http://code.google.com/p/redis/wiki/MultiExecCommand). This
       # is currently an unresolved issue, mainly 'cause I don't know how yet...
