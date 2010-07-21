@@ -70,6 +70,9 @@ module Snowflake
           enum
         when nil
           default
+        when String
+          # Because String is_a? Enumerable on Ruby < 1.9. Why?!!!
+          raise InvalidTypeError, "Cannot cast '#{enum.inspect}' for #{self.inspect}."
         when Enumerable
           Array.new(enum)
         else
