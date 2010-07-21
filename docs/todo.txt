@@ -1,13 +1,14 @@
 
 h2. TODO
 
-18. Indices: sorted sets of ids?
-	18.1. All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
-	18.2. Marking attributes as indices: attribute :name, String, :index => true, or attribute :name, String, :index => :unique. both would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
-	18.3. key indices (for relationships)
-	18.4. Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
-	18.5. Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
-	18.6. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
+18. Integrate include ActiveModel::Dirty
+19. Indices: sorted sets of ids?
+	19.1. All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
+	19.2. Marking attributes as indices: attribute :name, String, :index => true, or attribute :name, String, :index => :unique. both would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
+	19.3. key indices (for relationships)
+	19.4. Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
+	19.5. Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
+	19.6. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
 				
 				E.g.
 					class Product
@@ -28,22 +29,22 @@ h2. TODO
 				Basically this is just syntactic sugar for:
 					Product.all( :types => 'Multi-Function Printer', :type => 'Photo Printers' )
 
-19. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
-20. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
-21. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.
+20. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
+21. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
+22. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.
 		- Convert word docs: http://linux.die.net/man/1/antiword
 		- Convert PDF: http://en.wikipedia.org/wiki/Pdftotext
 		- http://moinmo.in/HelpOnXapian
-22. auto-populated created_at and updated_at.
-23. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
-24. after update hooks should be passed the fields that have been updated and the original values.
-25. Observer classes
-26. Can we defined types on non-predefined?
-27. after filters (and before?) using pub/sub?
-28. Add an explicit find hooks
+23. auto-populated created_at and updated_at.
+24. creation of groups based on the union of other networks, can use pub/sub to get notification of when the inner groups change then recalculate the outer group.
+25. after update hooks should be passed the fields that have been updated and the original values.
+26. Observer classes
+27. Can we defined types on non-predefined?
+28. after filters (and before?) using pub/sub?
+29. Add an explicit find hooks
 			define_model_callbacks :find, :only => :after
-29. Add an Identity Map, I'm not convinced we need it but if we do, this could be helpful http://github.com/swistak/weakling
-30. Remove the Element namespace (it was only needed while I was refactoring the old Node code) and shuffle everything down one level.
+30. Add an Identity Map, I'm not convinced we need it but if we do, this could be helpful http://github.com/swistak/weakling
+31. Remove the Element namespace (it was only needed while I was refactoring the old Node code) and shuffle everything down one level.
 
 h2. DONE 
 
