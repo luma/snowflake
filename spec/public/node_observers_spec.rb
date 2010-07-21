@@ -35,11 +35,10 @@ describe Snowflake::Node do
       end
       
     end
-    FooNode.observers = :foo_observer
-    FooNode.instantiate_observers
-    
 
     before(:all) do
+      FooNode.observers = :foo_observer
+      FooNode.instantiate_observers
       @test_foo = FooNode.create(:name => 'rolly', :mood => 'Awesome')
     end
     
