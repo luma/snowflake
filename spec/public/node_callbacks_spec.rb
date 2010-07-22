@@ -34,8 +34,8 @@ describe Snowflake::Node do
       before_rename "@callbacks << :before_rename"
       after_rename "@callbacks << :after_rename"
       
-      before_validate "@callbacks << :before_validate"
-      after_validate "@callbacks << :after_validate"
+      before_validation "@callbacks << :before_validation"
+      after_validation "@callbacks << :after_validation"
       
       after_initialize "@callbacks << :after_initialize"
       after_get "@callbacks << :after_get"
@@ -116,16 +116,16 @@ describe Snowflake::Node do
         @test_callback_node.save.should be_true
       end
 
-      it "triggers the before_validate callback" do
-        @test_callback_node.callbacks.should include(:before_validate)
+      it "triggers the before_validation callback" do
+        @test_callback_node.callbacks.should include(:before_validation)
       end
 
-      it "triggers the after_validate callback" do
-        @test_callback_node.callbacks.should include(:after_validate)
+      it "triggers the after_validation callback" do
+        @test_callback_node.callbacks.should include(:after_validation)
       end
       
       it "triggers validation before and after updates" do
-        @test_callback_node.callbacks.should == [:before_validate, :after_validate, :before_save, :before_update, :after_update, :after_save]
+        @test_callback_node.callbacks.should == [:before_validation, :after_validation, :before_save, :before_update, :after_update, :after_save]
       end
     end
 

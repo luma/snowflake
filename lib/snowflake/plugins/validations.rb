@@ -1,8 +1,7 @@
 module Snowflake
   module Plugins
     module Validations
-#        Model.add_extensions ActiveModel::Validations, self
-      Model.add_inclusions ActiveModel::Validations, self
+      Model.add_inclusions ActiveModel::Validations, ActiveModel::Validations::Callbacks, self
 
       # Reads the value of the Property called +name+.
       #

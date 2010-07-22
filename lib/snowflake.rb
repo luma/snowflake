@@ -180,16 +180,15 @@ dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/')
 require dir + 'element'
 require dir + 'model'
 require dir + 'attributes'
-require dir + 'plugins/class_methods'
 require dir + 'plugins/hooks'
-require dir + 'plugins/naming'
-require dir + 'plugins/serialisers'
 require dir + 'plugins/validations'
-require dir + 'plugins/indices'
+require dir + 'plugins/naming'
 require dir + 'plugins/attributes'
-require dir + 'plugins/dirty'
-
 require dir + 'plugins/custom_attributes'
+require dir + 'plugins/dirty'
+require dir + 'plugins/serialisers'
+require dir + 'plugins/class_methods'
+require dir + 'plugins/indices'
 
 require dir + 'node'
 
