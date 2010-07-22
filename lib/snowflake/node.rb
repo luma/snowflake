@@ -1,7 +1,7 @@
 module Snowflake
   module Node        
     def self.included(model)
-      model.extend Element::Model
+      model.extend Model
     end
     include Element
   end # module Node

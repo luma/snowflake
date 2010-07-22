@@ -128,10 +128,10 @@ module Snowflake
   end
 
   autoload :Index,     'snowflake/index'
-  autoload :Attribute, 'snowflake/element/attribute'
+  autoload :Attribute, 'snowflake/attribute'
 
   module Attributes
-    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/element/attributes/')
+    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/attributes/')
 
     # Make our custom types available in a more convienant way
     autoload :Boolean,  dir + 'boolean'
@@ -142,10 +142,10 @@ module Snowflake
     autoload :Text,     dir + 'text'
   end
   
-  autoload :CustomAttribute,  'snowflake/element/custom_attribute'
+  autoload :CustomAttribute,  'snowflake/custom_attribute'
   
   module CustomAttributes
-    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/element/custom_attributes/')
+    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/custom_attributes/')
 
     # Make our custom types available in a more convienant way
     autoload :Counter,  dir + 'counter'
@@ -178,18 +178,18 @@ end
 dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/')
 
 require dir + 'element'
-require dir + 'element/model'
-require dir + 'element/attributes'
-require dir + 'element/plugins/class_methods'
-require dir + 'element/plugins/hooks'
-require dir + 'element/plugins/naming'
-require dir + 'element/plugins/serialisers'
-require dir + 'element/plugins/validations'
-require dir + 'element/plugins/indices'
-require dir + 'element/plugins/attributes'
-require dir + 'element/plugins/dirty'
+require dir + 'model'
+require dir + 'attributes'
+require dir + 'plugins/class_methods'
+require dir + 'plugins/hooks'
+require dir + 'plugins/naming'
+require dir + 'plugins/serialisers'
+require dir + 'plugins/validations'
+require dir + 'plugins/indices'
+require dir + 'plugins/attributes'
+require dir + 'plugins/dirty'
 
-require dir + 'element/plugins/custom_attributes'
+require dir + 'plugins/custom_attributes'
 
 require dir + 'node'
 

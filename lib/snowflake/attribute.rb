@@ -24,8 +24,8 @@ module Snowflake
       # We only check if the key name is not 'key'. If it is called 'key', and it wasn't 
       # rejected by previous checks, it's definately a valid attribute name so we can
       # skip the next check.
-      if @name != :key && Element::Model.restricted_name?(@name)
-        raise ArgumentError, "'#{@name}' is a restricted name, and cannot be used as an Attribute name. The following are all restricted names: #{Element::Model.restricted_names.join(', ')}"
+      if @name != :key && Model.restricted_name?(@name)
+        raise ArgumentError, "'#{@name}' is a restricted name, and cannot be used as an Attribute name. The following are all restricted names: #{Model.restricted_names.join(', ')}"
       end
 
       @reader_visibility = options.delete(:reader_visibility) || 'public'
