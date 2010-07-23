@@ -43,7 +43,7 @@ h2. TODO
 29. Add an explicit find hooks
 			define_model_callbacks :find, :only => :after
 30. Add an Identity Map, I'm not convinced we need it but if we do, this could be helpful http://github.com/swistak/weakling
-31. Remove the Element namespace (it was only needed while I was refactoring the old Node code) and shuffle everything down one level.
+32. Treetop grammar for searching indices, just because it would be fun to create it :-)
 
 h2. DONE 
 
@@ -71,3 +71,4 @@ h2. DONE
 17. Migrations. Just because we are schemaless on the DB side doesn't mean evolving data needs won't affect us. Create a Schema model, each element should have one.
 		Then rake scripts to do common migration tasks and a dsl to write the actual migrations. Add "schema" as a restricted Attribute name.
 18. Compatibility with ActiveModel::Dirty
+31. Remove the Element namespace (it was only needed while I was refactoring the old Node code) and shuffle everything down one level.

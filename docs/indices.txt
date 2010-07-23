@@ -1,0 +1,282 @@
+
+19.1. All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
+19.2. Marking attributes as indices: attribute :name, String, :index => true, or attribute :name, String, :index => :unique. both would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
+19.3. key indices (for relationships)
+19.4. Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
+19.5. Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
+19.6. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
+			
+			E.g.
+				class Product
+				  include Snowflake::Node
+
+				  attribute :name,        String
+				  attribute :code,        String
+					attribute :supplier,		String
+
+				  set :types    # set of types, needs to be indexed
+				end
+
+			Then
+				Product.all( :types => ['Multi-Function Printer', 'Photo Printers'] )
+			Or
+				Product.all( :supplier => 'Brother', :types => ['Multi-Function Printer', 'Photo Printers'] )
+
+			Basically this is just syntactic sugar for:
+				Product.all( :types => 'Multi-Function Printer', :type => 'Photo Printers' )
+
+
+	class Product
+	  include Snowflake::Node
+
+	  attribute :name,        String, :index => unique
+	  attribute :code,        String, :index => unique
+		attribute :supplier,		String, :index => true
+
+		# set of types, needs to be indexed
+	  set :types, :index => true
+	end				
+
+	Product:1 => name:foo, code:awesome1, supplier:Brother, :types => ['Multi-Function Printer', 'Photo Printers']
+	Product:2 => name:bar, code:awesome2, supplier:Brother, :types => ['Multi-Function Printer', 'Photo Printers', 'Colour Laser Printers']
+	Product:3 => name:baz, code:awesome3, supplier:Acme, :types => ['Thermal Printer']
+
+	Product::indices::all	=> SET<1, 2, 3>
+
+	Product::indices::name:foo	=> SET<1>
+	Product::indices::name:bar	=> SET<2>
+	Product::indices::name:baz	=> SET<3>
+
+	Product::indices::code:awesome1	=> SET<1>
+	Product::indices::code:awesome2	=> SET<2>
+	Product::indices::code:awesome3	=> SET<3>
+
+	Product::indices::supplier:Brother	=> SET<1, 2>
+	Product::indices::supplier:Acme	=> SET<3>
+
+	Product::indices::types:Multi-Function Printer	=> SET<1, 2>
+	Product::indices::types:Photo Printers	=> SET<1, 2>
+	Product::indices::types:Thermal Printer	=> SET<3>
+	Product::indices::types:Colour Laser Printers	=> SET<2>
+
+Then: Product.all( :supplier => 'Brother', :types => ['Multi-Function Printer', 'Photo Printers'] ) 
+Via:
+
+def all( *options )
+	# @todo extract pagination and limits from attribute filters
+
+	if options.empty?
+		# #all returns a Collection
+		results = indices[:all].all
+	else
+		results = Collection.new
+		
+		options.each do |name, value|
+			# The return value from #select must encapsulate the value and the index it was operating on.
+			results = results & indices[name.to_sym].select( value )
+		end
+		
+		results
+	end
+
+	# @todo paginate and limit the result
+
+	# At this point the results collection holds the operation, but has not actually executed 
+	# anything against the datastore yet	
+	results
+end
+
+# This wont become clear until I work out how to transform sets of operations into a pipelined series of Redis commands
+
+class Collection
+	attr_reader :element_klass, :operation
+
+	def initialize( element_klass, operation )
+		@element_klass, @operation = element_klass, operation
+	end
+
+	def each
+		results.each do |result|
+			yield @element_klass.get(result)
+		end
+	end
+
+	# return a new collection that consists of this collection and the other one
+	def &( collection )
+		# AndOperation.new expects operations or operands, a collection is neither?
+		Collection.new( AndOperation.new( self, collection ) )
+	end
+
+	# return a new collection that consists of this collection or the other one	
+	def |( collection )
+		# OrOperation.new expects operations or operands, a collection is neither?
+		Collection.new( OrOperation.new( self, collection ) )
+	end
+	
+	private
+
+	def results
+		command_set = @operation.eval(CommandSet.new)
+		results = Snowflake.connection.multi do |multi|
+			# Execute the commands
+			command_set.each do |command|
+				multi.send( *command )
+			end
+			
+			# Get the result
+			multi.smembers( command_set.tmp_keys.last )
+
+			# Delete the temp keys
+			command_set.tmp_keys.each do |tmp_key|
+				multi.del( tmp_key )
+			end
+		end
+
+		# @todo check for errors
+
+		# return the result
+		results[ command_set.length ]
+	end
+end
+
+class CommandSet < Array
+	def initialize
+		super
+	end
+
+	def tmp_keys
+		@tmp_keys ||= []
+	end
+end
+
+class Operand
+	def initialize()
+	end
+	
+	def to_key
+	end
+end
+
+class Operation
+	def initialize( *operands )
+		@operands = operands
+	end
+
+	def command
+		raise NotImplemented
+	end
+
+	private
+
+	def tmp_key
+		@tmp_key ||= ::UUIDTools::UUID.random_create.to_s
+	end
+	
+	def eval(command_set)
+		# @todo get child commands
+		@operands.each do |operand|
+			if operand.is_a?(Operation)
+				command_set.concat(operand.command)
+			end
+		end
+
+		command_set.tmp_keys << tmp_key		
+		command_set << command
+	end
+	
+	def cleanup_command
+		# @todo get child cleanup commands
+		format_command( :del )
+	end
+
+	def format_command(command, *parameters)
+		parameters.unshift( tmp_key ).unshift( command )
+	end
+end
+
+class AndOperation < Operation
+	def command
+		format_command( :sunionstore, @operands.collect {|operand| operand.to_key } )
+	end
+end
+
+class OrOperation < Operation
+	def command
+		format_command( :sinterstore, @operands.collect {|operand| operand.to_key } )
+	end
+end
+
+
+Assuming:
+	Product:1 => name:foo, code:awesome1, supplier:Brother, :types => ['Multi-Function Printer', 'Photo Printers']
+	Product:2 => name:bar, code:awesome2, supplier:Brother, :types => ['Multi-Function Printer', 'Photo Printers', 'Colour Laser Printers']
+	Product:3 => name:baz, code:awesome3, supplier:Acme, :types => ['Thermal Printer']
+	
+	Product:1 => name:foo, code:awesome1, supplier:Brother, :types => ['Multi-Function Printer', 'Photo Printers']
+	Product:2 => name:bar, code:awesome2, supplier:Brother, :types => ['Multi-Function Printer', 'Photo Printers', 'Colour Laser Printers']
+	Product:3 => name:baz, code:awesome3, supplier:Acme, :types => ['Thermal Printer']
+
+	Product::indices::all	=> SET<1, 2, 3>
+
+	Product::indices::name:foo	=> SET<1>
+	Product::indices::name:bar	=> SET<2>
+	Product::indices::name:baz	=> SET<3>
+
+	Product::indices::code:awesome1	=> SET<1>
+	Product::indices::code:awesome2	=> SET<2>
+	Product::indices::code:awesome3	=> SET<3>
+
+	Product::indices::supplier:Brother	=> SET<1, 2>
+	Product::indices::supplier:Acme	=> SET<3>
+
+	Product::indices::types:Multi-Function Printer	=> SET<1, 2>
+	Product::indices::types:Photo Printers	=> SET<1, 2>
+	Product::indices::types:Thermal Printer	=> SET<3>
+	Product::indices::types:Colour Laser Printers	=> SET<2>
+
+And:
+	products = Product.all( :supplier => 'Foo', :code => 'Bar' )
+
+We Eval:
+	Collection( AndOperation )
+	Collection( AndOperation( Operand(:supplier, 'Brother'), Operand(:code, 'awesome1') ) )
+
+As: 
+	SUNIONSTORE TMP_KEY, Product::indices::supplier::Foo, Product::indices::code::awesome1
+	SMEMBERS TMP_KEY
+	DEL TMP_KEY
+
+A MORE COMPLEX EXAMPLE
+
+Assuming:
+	The same as previous
+
+And:
+	products = Product.all( :supplier => 'Foo', :code => 'awesome1' ).or( :types => ['Multi-Function Printer', 'Photo Printers'] )
+
+We Eval:
+	Collection( OrOperation )
+	Collection( 
+						  OrOperation( 
+									AndOperation, Operand(:types, ['Multi-Function Printer', 'Photo Printers']) 
+								) 
+						)
+	Collection(
+							OrOperation( 
+									AndOperation( Operand(:supplier, 'Foo'), Operand(:code, 'Bar') ),
+									OrOperation( Operand(:types, 'Multi-Function Printer'), Operand(:types, 'Photo Printers')  )
+								)
+						)
+
+As: 
+	SUNIONSTORE TMP_KEY1, Product::indices::supplier::Foo, Product::indices::code::awesome1
+	SUNIONSTORE TMP_KEY2, Product::indices::types:Multi-Function Printer, Product::indices::types:Photo Printers	
+	SINTERSTORE TMP_KEY3 TMP_KEY1 TMP_KEY2
+	SMEMBERS TMP_KEY3
+	DEL TMP_KEY1
+	DEL TMP_KEY2
+	DEL TMP_KEY3
+
+
+
+
