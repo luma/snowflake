@@ -23,7 +23,7 @@ describe Snowflake::Node do
       after_save "@callbacks << :after_save"
       
       before_create "@callbacks << :before_create"
-      after_create "@callbacks << :after_create"
+      after_create :do_stuff_after_create
       
       before_update "@callbacks << :before_update"
       after_update "@callbacks << :after_update"
@@ -39,6 +39,10 @@ describe Snowflake::Node do
       
       after_initialize "@callbacks << :after_initialize"
       after_get "@callbacks << :after_get"
+      
+      def do_stuff_after_create
+        @callbacks << :after_create
+      end
     end
     
     before(:all) do
