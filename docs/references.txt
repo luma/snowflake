@@ -7,3 +7,11 @@ http://wiki.github.com/tinkerpop/gremlin/
 http://jung.sourceforge.net/doc/api/edu/uci/ics/jung/algorithms/importance/BetweennessCentrality.html
 
 http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/content/pagerank.html
+
+
+http://blog.stavi.sh/tag/graphdb
+http://en.wikipedia.org/wiki/Graph_database
+
+http://www.nosqldatabases.com/main/2010/7/16/the-graph-traversal-programming-pattern-part-1-graph-structu.html
+http://www.nosqldatabases.com/main/2010/7/19/the-graph-traversal-programming-pattern-part-2-graph-databas.html
+http://www.nosqldatabases.com/main/2010/7/21/the-graph-traversal-programming-pattern-part-3-graph-travers.html
