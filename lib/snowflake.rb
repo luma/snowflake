@@ -152,6 +152,22 @@ module Snowflake
     autoload :Set,      dir + 'set'
     autoload :List,     dir + 'list'
   end
+
+  module Queries
+    dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/queries/')
+
+    autoload :Collection,   dir + 'collection'
+    autoload :CommandSet,   dir + 'command_set'
+    autoload :Operand,      dir + 'operand'
+    autoload :Operation,    dir + 'operation'
+
+    module Operations
+      dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/queries/operations/')
+
+      autoload :AndOperation,   dir + 'and_operation'
+      autoload :OrOperation,    dir + 'or_operation'
+    end
+  end
   
   protected
   
