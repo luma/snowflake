@@ -43,11 +43,11 @@ module Snowflake
     end
 
     def self.inclusions
-      @inclusions ||= ::Set.new
+      @inclusions ||= []
     end
 
     def self.add_inclusions(*new_inclusions)
-      inclusions.merge new_inclusions
+      inclusions.concat( new_inclusions )
 
       # Add the inclusion to existing descendants
       descendants.each do |model|
@@ -56,11 +56,11 @@ module Snowflake
     end
     
     def self.extensions
-      @extensions ||= ::Set.new
+      @extensions ||= []
     end
     
     def self.add_extensions(*new_extensions)
-      extensions.merge new_extensions
+      extensions.concat( new_extensions )
       
       descendants.each do |model|
         new_extensions.each { |extension| model.extend extension }
