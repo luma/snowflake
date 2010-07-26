@@ -86,7 +86,7 @@ module Snowflake
   end
 
   def self.namespace
-    thread[:namespace] ||= :redis_graph
+    thread[:namespace] ||= :snowflake
   end
 
   def self.namespace=(n)
@@ -106,7 +106,7 @@ module Snowflake
   end
 
   def self.thread
-    Thread.current[:redis_graph] ||= {}
+    Thread.current[:snowflake] ||= {}
   end
   
   # Construct an element key from +segments+.
