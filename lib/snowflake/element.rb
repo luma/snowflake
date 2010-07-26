@@ -228,13 +228,12 @@ module Snowflake
         # Cast the attributes to strings for Redis
         cast_attributes = {}
         attributes.each do |key, value|
-          proxy = self.class.attributes[key]
+          proxy = self.class.attributes[key.to_sym]
 
           cast_attributes[key] = proxy.dump(value)
         end
 
         # Save all attributes
-#        debugger
         send_command(nil, :hmset, *cast_attributes.to_a.flatten)
         # @todo error handling
       end
