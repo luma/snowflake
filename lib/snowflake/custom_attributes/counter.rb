@@ -10,6 +10,26 @@ module Snowflake
       end
       alias :to_int :to_i
 
+      # Convert the raw value into a simple value for serialisation.
+      # Examples of simple values are:
+      # * Integers
+      # * Floats
+      # * Strings
+      # * Arrays
+      # * Hashes
+      # * Booleans (TrueClass, FalseClass)
+      #
+      # @return [Rational, String, Array, Hash, TrueClass, FalseClass]
+      #
+      # @api semi-public      
+      def serialise
+        to_i
+      end
+
+      def inspect
+        "<#{self.class.to_s}: #{@raw}>"
+      end
+
       # Refresh the members of the Counter from Redis
       def reload
         @raw = send_command( :get )

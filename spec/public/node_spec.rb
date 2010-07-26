@@ -194,22 +194,48 @@ describe Snowflake::Node do
   end
 
   describe "Serialisation" do
-    it "should serialise to a hash" do
-      @test_node.attributes.should == {'name' => 'rolly', 'mood' => 'Awesome'}
-    end
+    describe "Simple" do
+      it "should serialise to a hash" do
+        @test_node.attributes.should == {'name' => 'rolly', 'mood' => 'Awesome'}
+      end
 
-    it "should serialise to JSON" do
-      @test_node.to_json.should == {'test_node' => {'name' => 'rolly', 'mood' => 'Awesome'}}.to_json
-    end
+      it "should serialise to JSON" do
+        @test_node.to_json.should == {'test_node' => {'name' => 'rolly', 'mood' => 'Awesome'}}.to_json
+      end
 
-    it "should serialise to XML" do
-      @test_node.to_xml.should == <<-EOS
+      it "should serialise to XML" do
+        @test_node.to_xml.should == <<-EOS
 <?xml version="1.0" encoding="UTF-8"?>
 <test-node>
   <name>rolly</name>
   <mood>Awesome</mood>
 </test-node>
 EOS
+      end
+    end
+    
+    describe "Custom Attributes" do
+      before :each do
+        @test_node2 = TestNodeWithCustomAttributes.create(:name => 'rolly', :mood => 'Awesome')
+        @test_node2.counter = 10
+        # @test_node2.stuff.add 'one'
+        # @test_node2.stuff.add 'two'
+        # @test_node2.stuff.add 'three'
+      end
+
+      it "should serialise to JSON" do
+        @test_node2.to_json.should == {'test_node_with_custom_attributes' => {'name' => 'rolly', 'mood' => 'Awesome', 'stuff' => [], 'counter' => 10}}.to_json
+      end
+
+      it "should serialise to XML" do
+        @test_node2.to_xml.should == <<-EOS
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<test-node-with-custom-attributes>
+  <name>rolly</name>
+  <mood>Awesome</mood>
+</test-node-with-custom-attributes>
+EOS
+      end
     end
   end
 end

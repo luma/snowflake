@@ -14,6 +14,22 @@ module Snowflake
         @raw
       end
 
+      # Convert the raw value into a simple value for serialisation.
+      # Examples of simple values are:
+      # * Integers
+      # * Floats
+      # * Strings
+      # * Arrays
+      # * Hashes
+      # * Booleans (TrueClass, FalseClass)
+      #
+      # @return [Rational, String, Array, Hash, TrueClass, FalseClass]
+      #
+      # @api semi-public
+      def serialise
+        @raw
+      end
+
       # Converts our List to a Ruby Core Set
       def to_set
         ::Set.new(@raw)
