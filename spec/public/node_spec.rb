@@ -195,15 +195,21 @@ describe Snowflake::Node do
 
   describe "Serialisation" do
     it "should serialise to a hash" do
-      pending
+      @test_node.attributes.should == {'name' => 'rolly', 'mood' => 'Awesome'}
     end
 
     it "should serialise to JSON" do
-      pending
+      @test_node.to_json.should == {'test_node' => {'name' => 'rolly', 'mood' => 'Awesome'}}.to_json
     end
 
     it "should serialise to XML" do
-      pending
+      @test_node.to_xml.should == <<-EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<test-node>
+  <name>rolly</name>
+  <mood>Awesome</mood>
+</test-node>
+EOS
     end
   end
 end
