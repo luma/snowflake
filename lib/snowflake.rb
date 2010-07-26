@@ -22,8 +22,21 @@ rescue LoadError
   # fastthread not installed
 end
 
-module Snowflake
+begin
+  # SystemTimer is preferable to the standard Ruby timeout library on Ruby 1.8.x. This is
+  # only true assuming we aren't running on jRuby or Rubinius.
+  #   http://ph7spot.com/articles/system_timer  
+  if !defined?(RUBY_ENGINE) || (RUBY_ENGINE == 'ruby' && RUBY_VERSION < '1.9.0')
+    require 'system_timer'
+  else
+    require 'timeout'
+  end
+rescue LoadError => e
+  # system_timer not installed (or not needed)
+  require 'timeout'
+end
 
+module Snowflake
   class SnowflakeError < StandardError
   end
 

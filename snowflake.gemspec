@@ -24,7 +24,16 @@ Gem::Specification.new do |s|
   s.add_dependency "activemodel", ">= 3.0.0.beta4"
 
   if RUBY_VERSION < '1.9.0'
-    s.add_dependency "system_timer"
+    # Try to use the SystemTimer gem instead of Ruby's timeout library
+    # when running on Ruby 1.8.x. See:
+    #   http://ph7spot.com/articles/system_timer
+    # We don't want to bother trying to load SystemTimer on jruby,
+    # ruby 1.9+ and rbx.
+    if !defined?(RUBY_ENGINE) || (RUBY_ENGINE == 'ruby' && RUBY_VERSION < '1.9.0')
+      s.add_dependency "system_timer"
+    end
+
+    s.add_dependency "fastthread"
   end
 
   # If you need to check in files that aren't .rb files, add them here
