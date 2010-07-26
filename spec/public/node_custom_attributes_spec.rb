@@ -2,21 +2,7 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe Snowflake::Node do
-  class TestNodeWithCustomAttributes
-    include Snowflake::Node
-
-    attribute :name,         String, :key => true
-    attribute :age,          Integer
-    attribute :mood,         String
-    attribute :description,  String
-
-    validates_presence_of :name
-
-    counter :counter
-    set :stuff
-  end
-  
+describe Snowflake::Node do  
   describe "Custom Attributes" do
     it "indicates whether an attribute name represents a custom attribute" do
       TestNodeWithCustomAttributes.custom_attribute?( :counter ).should be_true

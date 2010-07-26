@@ -25,7 +25,7 @@ module Snowflake
 
         # All custom attributes for this element
         #
-        # @return [Hash<Counter>]
+        # @return [Hash<CustomAttribute>]
         #   the Hash of custom attributes for this element.
         #
         # @api private          
@@ -52,10 +52,10 @@ module Snowflake
           end
           
           if custom_attributes.include?(name.to_sym)
-            custom_attributes[name.to_sym]
+            custom_attributes[name.to_s]
           else
             # If it hasn't been loaded yet, do so...
-            custom_attributes[name.to_sym] = klass.get( self, name )
+            custom_attributes[name.to_s] = klass.get( self, name )
           end
         end
 
