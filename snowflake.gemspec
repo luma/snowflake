@@ -23,6 +23,10 @@ Gem::Specification.new do |s|
   s.add_dependency "activesupport", ">= 3.0.0.beta4"
   s.add_dependency "activemodel", ">= 3.0.0.beta4"
 
+  if RUBY_VERSION < '1.9.0'
+    s.add_dependency "system_timer"
+  end
+
   # If you need to check in files that aren't .rb files, add them here
   s.files        = Dir["{lib}/snowflake.rb", "{lib}/snowflake/*.rb", "{lib}/snowflake/**/*.rb", "LICENSE", "*.md", "README.rdoc"]
   s.require_path = 'lib'
