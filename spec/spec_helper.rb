@@ -22,6 +22,20 @@ class TestNode
   validates_presence_of :name
 end
 
+class TestNodeWithCustomAttributes
+  include Snowflake::Node
+
+  attribute :name,         String, :key => true
+  attribute :age,          Integer
+  attribute :mood,         String
+  attribute :description,  String
+
+  validates_presence_of :name
+
+  counter :counter
+  set :stuff
+end
+
 Spec::Runner.configure do |config|
   config.mock_with :mocha
 

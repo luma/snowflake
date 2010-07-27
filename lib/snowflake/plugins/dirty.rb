@@ -76,17 +76,14 @@ module Snowflake
         changed_attributes.include?(attr)
       end
 
-      # Handle <tt>*_change</tt> for +method_missing+.
       def attribute_change(attr)
         [changed_attributes[attr], __send__(attr)] if attribute_changed?(attr)
       end
 
-      # Handle <tt>*_was</tt> for +method_missing+.
       def attribute_was(attr)
         attribute_changed?(attr) ? changed_attributes[attr] : __send__(attr)
       end
 
-      # Handle <tt>*_will_change!</tt> for +method_missing+.
       def attribute_will_change!(attr)
         begin
           value = __send__(attr)
@@ -99,6 +96,26 @@ module Snowflake
 
       def reset_attribute!(attr)
         __send__("#{attr}=", changed_attributes[attr]) if attribute_changed?(attr)
+      end
+
+      def key_changed?
+        attribute_changed?( self.class.key )
+      end
+
+      def key_change
+        attribute_change( self.class.key )
+      end
+
+      def key_was
+        attribute_was( self.class.key )
+      end
+      
+      def key_will_change!
+        attribute_will_change!( self.class.key )
+      end
+
+      def reset_key!
+        reset_attribute( self.class.key )
       end
     end # module Validations
   end # module Plugins

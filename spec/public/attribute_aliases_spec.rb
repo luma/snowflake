@@ -80,7 +80,7 @@ describe Snowflake::Attribute do
         Snowflake::Attributes::TestPrimitive.aliases.should == Set.new([::TestPrimitive])
         Snowflake::Attributes::TestNonPrimitive.aliases.should == Set.new
       end
-      
+
       describe "#aliases" do
         it "returns all the Property aliases for all Properties" do
           Snowflake::Attribute.aliases.should include("TestPrimitive")

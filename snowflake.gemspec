@@ -19,9 +19,23 @@ Gem::Specification.new do |s|
   s.add_dependency "redis", ">= 2.0.3"
   s.add_dependency "redis-namespace", ">= 0.7.0"
   s.add_dependency "uuidtools", ">= 2.1.1"
-  s.add_dependency "tzinfo"  
-  s.add_dependency "activesupport", ">= 3.0.0.beta4"
-  s.add_dependency "activemodel", ">= 3.0.0.beta4"
+  s.add_dependency "tzinfo"
+  s.add_dependency "json"  
+  s.add_dependency "activesupport", ">= 3.0.0.rc"
+  s.add_dependency "activemodel", ">= 3.0.0.rc"
+
+  if RUBY_VERSION < '1.9.0'
+    # Try to use the SystemTimer gem instead of Ruby's timeout library
+    # when running on Ruby 1.8.x. See:
+    #   http://ph7spot.com/articles/system_timer
+    # We don't want to bother trying to load SystemTimer on jruby,
+    # ruby 1.9+ and rbx.
+    if !defined?(RUBY_ENGINE) || (RUBY_ENGINE == 'ruby' && RUBY_VERSION < '1.9.0')
+      s.add_dependency "system_timer"
+    end
+
+    s.add_dependency "fastthread"
+  end
 
   # If you need to check in files that aren't .rb files, add them here
   s.files        = Dir["{lib}/snowflake.rb", "{lib}/snowflake/*.rb", "{lib}/snowflake/**/*.rb", "LICENSE", "*.md", "README.rdoc"]

@@ -11,6 +11,22 @@ module Snowflake
       @raw = typecast(raw)
     end
 
+    # Convert the raw value into a simple value for serialisation.
+    # Examples of simple values are:
+    # * Integers
+    # * Floats
+    # * Strings
+    # * Arrays
+    # * Hashes
+    # * Booleans (TrueClass, FalseClass)
+    #
+    # @return [Rational, String, Array, Hash, TrueClass, FalseClass]
+    #
+    # @api semi-public
+    def serialise
+      raise NotImplemented, "Subclasses must implment #serialise."      
+    end
+
     # Set the raw value of the Counter to +raw+. The new value is immediately persisted.
     #
     # @param [Integer, #to_i] raw

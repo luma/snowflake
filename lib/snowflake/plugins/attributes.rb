@@ -141,7 +141,7 @@ module Snowflake
 
         # Reads the value of the Attribute called +name+.
         #
-        # @param [#to_sym] name
+        # @param [#to_s] name
         #     The name of the Attribute value to read
         #
         # @return [Any]
@@ -154,7 +154,7 @@ module Snowflake
 
         # Reads the raw value of the Attribute called +name+.
         #
-        # @param [#to_sym] name
+        # @param [#to_s] name
         #     The name of the Attribute value to read
         #
         # @return [Any]
@@ -162,12 +162,12 @@ module Snowflake
         #
         # @api private
         def read_raw_attribute(name)
-          attributes[name.to_sym]
+          attributes[name.to_s]
         end
 
         # Writes the value of the Attribute called +name+ with +value+.
         #
-        # @param [#to_sym] name
+        # @param [#to_s] name
         #     The name of the Attribute value to write to.
         #
         # @param [Any] value
@@ -193,7 +193,7 @@ module Snowflake
 
         # Assigns the raw value of the Attribute called +name+ with +value+.
         #
-        # @param [#to_sym] name
+        # @param [#to_s] name
         #     The name of the Property value to write +value+ to
         #
         # @param [Any] value
@@ -206,7 +206,7 @@ module Snowflake
         #
         # @api private
         def write_raw_attribute(name, value)
-          attributes[name.to_sym] = value
+          attributes[name.to_s] = value
         end
       end # module InstanceMethods
 

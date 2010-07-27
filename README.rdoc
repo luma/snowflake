@@ -6,6 +6,8 @@
 
 FIX (describe your package)
 
+
+
 == FEATURES/PROBLEMS:
 
 * FIX (list of features or problems)
@@ -13,6 +15,50 @@ FIX (describe your package)
 == SYNOPSIS:
 
   FIX (code sample of usage)
+
+=== Atomic Operations and Custom Attributes
+
+Something that may not be obvious if you're used to ActiveRecord or DataMapper is that 
+Snowflake has two different kinds of attributes. The first work exactly as you're used to:
+
+	class Person
+	  include Snowflake::Node
+
+	  attribute :name,         String, :key => true
+	end
+
+	person = Person.new( :name => 'bob' )
+	person.attributes 											# => { 'name' => 'bob' }
+	person.name = 'jim'
+	person.save															# true
+
+The other two of attributes (CustomAttribute) take advantage of Redis' higher order 
+data structures. The following person has two custom attributes: a counter called 'counter' 
+and a set called 'stuff'. When performing any operation that modifies a CustomAttributes
+value the value will be written immediately to Redis, rather than waiting for the next 
+save. The write will be atomic, it will either succeed or fail:
+
+	class Person
+	  include Snowflake::Node
+
+	  attribute :name,         String, :key => true
+
+	  counter :counter
+	  set :stuff
+	end
+
+	person = Person.new( :name => 'bob' )
+	person.attributes 											# => { 'name' => 'bob' }
+	person.name = 'jim'
+	person.save															# true
+	person.counter = 10 										# 10. immediately saved
+	person.counter.incriment 								# 11. immediately saved
+	person.stuff.add 'foo'									# ['foo'] (an array like object proxy). immediately saved
+	person.stuff.add 'bar'									# ['foo', 'bar'] (an array like object proxy). immediately saved
+
+A limitation of this distinction is that you cannot mass assign custom attributes, either
+on initialize or using #attributes=. Custom attributes will also be omitted when calling
+#attributes.
 
 == REQUIREMENTS:
 
