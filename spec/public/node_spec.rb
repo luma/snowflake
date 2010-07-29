@@ -164,25 +164,85 @@ describe Snowflake::Node do
   end
 
   describe "Dynamic Attributes" do
-    it "can disable dynamic attributes for the entire model" do
-      pending
+    before :each do
+      # Clean up previously created dynamic attributes. They'll hang around until we 
+      # explictly undefine them. This might be an argument for making dynamic attributes
+      # local to a particular element instance rather than an element class.
+      TestNodeThatAllowsDynamicAttributes.dynamic_attributes.each do |name, attr|
+        TestNodeThatAllowsDynamicAttributes.attributes.delete(name)
+        TestNodeThatAllowsDynamicAttributes.send(:undef_method, name)
+        TestNodeThatAllowsDynamicAttributes.send(:undef_method, "#{name}=")
+        TestNodeThatAllowsDynamicAttributes.send(:undef_method, "#{name}_changed?")
+        TestNodeThatAllowsDynamicAttributes.send(:undef_method, "#{name}_change")
+        TestNodeThatAllowsDynamicAttributes.send(:undef_method, "#{name}_was")
+        TestNodeThatAllowsDynamicAttributes.send(:undef_method, "reset_#{name}!")
+        TestNodeThatAllowsDynamicAttributes.send(:undef_method, "#{name}_will_change!")
+      end
+
+      @dynamic_test_node = TestNodeThatAllowsDynamicAttributes.create( :name => 'bob' )
     end
 
-    it "can dynamically create attributes using #attributes=" do
-      pending
-    end
+    describe "#attributes=" do
+      it "will raise an exception when attempting to create dynamic attributes on a node which they are disabled" do
+        lambda {
+          @test_node.attributes = {
+            :non_existent_attribute => 'yo'
+          }
+        }.should raise_error(NoMethodError)
+      end
 
-    it "can register dynamic attributes using #add_dynamic_attribute" do
-      pending
+      it "can dynamically create attributes using #attributes=" do
+        @dynamic_test_node.attributes = {
+          :name => 'jim',
+          :mood => 'awesome!'
+        }
+        @dynamic_test_node.mood.should == 'awesome!'
+      end
+    end
+    
+    describe "#add_dynamic_attribute" do
+      it "will raise an exception when attempting to create dynamic attributes on a node which they are disabled" do
+        lambda {
+          @test_node.add_dynamic_attribute(:non_existent_attribute, 'yo!')
+        }.should raise_error(Snowflake::DynamicAttributeError)
+      end
+
+      it "can register dynamic attributes using #add_dynamic_attribute" do
+        @dynamic_test_node.add_dynamic_attribute(:non_existent_attribute, 'yo!')
+        @dynamic_test_node.non_existent_attribute.should == 'yo!'
+      end
+      
+      it "will not create a dynamic attribute for an existing attribute name" do
+        lambda {
+          @dynamic_test_node.add_dynamic_attribute(:name, 'yo!')
+        }.should raise_error(ArgumentError)
+      end
+
+      it "will not create a dynamic attribute using a restricted attribute name" do
+        lambda {
+          @dynamic_test_node.add_dynamic_attribute(:send, 'yo!')
+        }.should raise_error(ArgumentError)
+      end
+    end
+    
+    
+    it "will persist dynamic attributes" do
+      @dynamic_test_node.attributes = {
+        :name => 'jim',
+        :mood => 'awesome!'
+      }
+      @dynamic_test_node.save.should be_true
+      TestNodeThatAllowsDynamicAttributes.get( @dynamic_test_node.key ).mood.should == 'awesome!'
     end
 
     describe "#dynamic_attribute?" do
       it "can indicate if an attribute is dynamic" do
+        @dynamic_test_node.dynamic_attribute?(:mood).should be_true
         pending
       end
       
       it "can indicate if an attribute is not dynamic" do
-        pending
+        @dynamic_test_node.dynamic_attribute?(:name).should be_false
       end
     end
   end

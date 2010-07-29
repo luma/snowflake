@@ -36,6 +36,15 @@ class TestNodeWithCustomAttributes
   set :stuff
 end
 
+class TestNodeThatAllowsDynamicAttributes
+  include Snowflake::Node
+
+  allow_dynamic_attributes!
+  attribute :name,         String, :key => true
+
+  validates_presence_of :name
+end
+
 Spec::Runner.configure do |config|
   config.mock_with :mocha
 
