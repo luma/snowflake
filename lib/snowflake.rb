@@ -63,7 +63,7 @@ module Snowflake
 
   class NotPersisted < SnowflakeError
   end
-
+  
   class MissingPropertyError < SnowflakeError
   end
 

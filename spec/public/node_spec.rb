@@ -32,7 +32,31 @@ describe Snowflake::Node do
       TestNode.get('bob').should_not be_nil
     end
   end
-  
+
+  describe "#save!" do
+    it "should save the Node" do
+      lambda {
+        TestNode.new(:name => 'jim', :mood => 'Awesome').save!
+      }.should_not raise_error(Snowflake::NotPersisted)
+    end
+
+    it "should update an existing node" do
+      @test_node.description = "A Test Node"
+
+      lambda {
+        @test_node.save!
+      }.should_not raise_error(Snowflake::NotPersisted)
+    end
+
+    it "should raise the NotPersisted exception when the save fails" do
+      @test_node.name = nil
+
+      lambda {
+        @test_node.save!
+      }.should raise_error(Snowflake::NotPersisted)
+    end
+  end
+
   describe "equality" do
     describe "#==" do
       it "returns true when the two Nodes are the same" do
