@@ -197,7 +197,14 @@ module Snowflake
     end
 
     def update
-      _run_update_callbacks { persist }
+      _run_update_callbacks {
+        if persist == true
+          update_indices
+          true
+        else
+          false
+        end
+      }
     end
 
     # @todo error checking / handling
@@ -213,15 +220,12 @@ module Snowflake
 
           success = _run_rename_callbacks do
             if self.class.rename(@_key, self.key)
-              update_indices( @_key )
+              update_key_for_indices( @_key )
+              
               true
             else
               false
             end
-          end
-
-          unless success
-            # @todo the error
           end
         end
 
@@ -235,8 +239,9 @@ module Snowflake
 
         # Save all attributes
         send_command(nil, :hmset, *cast_attributes.to_a.flatten)
-        # @todo error handling
       end
+
+      # @todo error handling, check that all statements were sucessful
 
       # @todo refactor
       reset!

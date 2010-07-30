@@ -237,7 +237,12 @@ module Snowflake
           self.key = attr_name
         end
 
-        attributes[name] = attribute
+        attributes[attr_name] = attribute
+
+        # @todo Add any Indices, this is almost certainly the wrong place for this
+        if options.include?(:index) && options[:index] == true
+          indices[attr_name] = Index.new( attr_name, self )
+        end
 
         # Add the attribute to the child classes only if the attribute was
         # added after the child classes' attributes have been copied from

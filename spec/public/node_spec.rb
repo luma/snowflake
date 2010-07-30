@@ -148,19 +148,8 @@ describe Snowflake::Node do
         test = TestNode2.new :name => 'bob'
         test.key.should_not be_blank
       end
-    end
-    
-    describe "#all" do
-      it "returns all elements" do
-        all = TestNode.all
-        all.length.should == 1
-        all.should == [@test_node]
-      end
+    end    
 
-      it "returns all elements filtered by indices" do
-        pending
-      end
-    end
   end
 
   describe "Dynamic Attributes" do

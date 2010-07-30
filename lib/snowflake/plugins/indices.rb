@@ -12,19 +12,47 @@ module Snowflake
 
         def add_to_indices
           self.class.indices[:all].add( self.key )
+          
+          previous_changes.each do |key, values|
+            if self.class.index_for?( key )
+              self.class.indices[key.to_sym].add( self.key, values.last )
+            end
+          end
         end
-        
+
         def delete_from_indices
           self.class.indices[:all].delete( self.key )
+
+          previous_changes.each do |key, values|
+            if self.class.index_for?( key )
+              self.class.indices[key.to_sym].delete( self.key, values.first )
+            end
+          end
+        end
+
+        def update_indices
+          previous_changes.each do |key, values|
+            if self.class.index_for?( key )
+              self.class.indices[key.to_sym].modify( self.key, values.first, values.last )
+            end
+          end
         end
         
-        def update_indices( old_key )
-#            Snowflake.connection.multi do
-            self.class.indices[:all].delete( old_key )
-            self.class.indices[:all].add( self.key )
-#            end
+        def update_key_for_indices( old_key )
+          self.class.indices[:all].delete( old_key )
+          self.class.indices[:all].add( self.key )
+          
+          # Remove all instances of old_key from any index
+          
+          
+          # Add self.key to any indices
+
         end
       end # module InstanceMethods
+
+      def index_for?(name)
+        indices.include?( name.to_sym )
+      end
 
       def indices
         @indices ||= {

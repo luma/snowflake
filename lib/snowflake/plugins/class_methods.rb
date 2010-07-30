@@ -73,9 +73,29 @@ module Snowflake
     # @api public
     # @todo
     def all(options = {})
-      # @todo deal with options
+    	# @todo extract pagination and limits from attribute filters
 
-      indices[:all].all
+    	results = if options.empty?
+              		Queries::Collection.new( self, Queries::Operand.new( self, 'all' ) )
+              	else
+                  filters = Queries::Operand.from_options( self, options )
+
+                  # If we've got more than one filter then we'll AND them together. If there's
+                  # only one we just use the Operand directly.
+                  operand = if filters.length > 1
+                              Queries::Operations::AndOperation.new( *filters )
+                            else
+                              filters.first
+                            end
+
+                  Queries::Collection.new( self, operand )
+              	end
+
+    	# @todo paginate and limit the result
+
+    	# At this point the results collection holds the operation, but has not actually executed 
+    	# anything against the datastore yet	
+    	results
     end
 
     # Indicates whether a Element exists for key +key+.

@@ -28,6 +28,8 @@ h2. TODO
 				Basically this is just syntactic sugar for:
 					Product.all( :types => 'Multi-Function Printer', :type => 'Photo Printers' )
 
+	19.7. Some way of saying all that *don't* match some value.
+
 20. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
 21. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
 22. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.

@@ -10,7 +10,7 @@ class TestNode
 
   attribute :name,         String, :key => true
   attribute :age,          Integer
-  attribute :mood,         String
+  attribute :mood,         String, :index => true
   attribute :description,  String
   attribute :enabled,      ::Snowflake::Attributes::Boolean
 
