@@ -56,7 +56,8 @@
 				accordingly ), then we also have index management methods for custom attributes 
 				which resides in the custom attribute classes themselves. It touches way too 
 				many pieces of code.
-
+15. How do deal with updating indices to deal with schema changes. It's probably best a 
+		provide helpers to manually manage indices.
 
 
 FIXED
