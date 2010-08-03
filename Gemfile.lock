@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    snowflake (0.0.6)
+    snowflake (0.1.0)
       activemodel (>= 3.0.0.rc)
       activesupport (>= 3.0.0.rc)
       fastthread

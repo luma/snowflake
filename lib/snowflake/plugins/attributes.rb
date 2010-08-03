@@ -37,7 +37,7 @@ module Snowflake
           # need to raise an exception on any undeclared attributes.
           if self.class.allow_dynamic_attributes?
             attrs.each do |name, value|
-              if dynamic_attribute?(name)
+              if unadded_dynamic_attribute?(name)
                 add_dynamic_attribute(name, value)
               else
                 write_attribute(name, value)
@@ -45,8 +45,8 @@ module Snowflake
             end
           else
             attrs.each do |name, value|
-              if dynamic_attribute?(name)
-                raise NoMethodError, "Undefined attribute #{name.to_s} for #{inspect}:#{self.class}"
+              if unadded_dynamic_attribute?(name)
+                raise NoMethodError, "Undefined attribute \"#{name.to_s}\" for #{inspect}:#{self.class}"
               end
 
               write_attribute(name, value)
@@ -122,7 +122,7 @@ module Snowflake
 
           # Guard against creating dynamic attributes using the restricted attribute names. 
           if Model.restricted_name?(name.to_sym)
-            raise ArgumentError, "'#{name}' is a restricted attribute name, it cannot be used. The following are all restricted attribute names: #{self.class.restricted_attribute_names.join(', ')}"
+            raise ArgumentError, "'#{name}' is a restricted attribute name, it cannot be used. The following are all restricted attribute names: #{Model.restricted_names.join(', ')}"
           end            
 
           # Create the dynamic attribute
@@ -133,8 +133,32 @@ module Snowflake
           true
         end
 
+        # Indicates that +name+ represents a Dynamic Attribute. An Attribute will be dynamic
+        # if it was not defined with the #attribute class method.
+        #
+        # @param [Symbol, #to_sym] name
+        #   The Attribute name to test against.
+        #
+        # @return [Boolean]
+        #   True if +name+ represents a Dynamic Attribute.
+        #
+        # @api semi-public
         def dynamic_attribute?(name)
-          self.class.dynamic_attribute?(name)
+          self.class.dynamic_attribute?(name.to_sym)
+        end
+
+        # Indicates that +name+ represents a Dynamic Attribute that has not yet be added
+        # to this Element.
+        #
+        # @param [Symbol, #to_sym] name
+        #   The Attribute name to test against.
+        #
+        # @return [Boolean]
+        #   True if +name+ represents a Dynamic Attribute that has not yet been added to this Element.
+        #
+        # @api semi-public
+        def unadded_dynamic_attribute?(name)
+          !self.class.attributes.include?(name.to_sym)
         end
 
         protected
@@ -298,8 +322,8 @@ module Snowflake
 
       # Retrieves the list of all attributes
       #
-      # @return [Array]
-      #   the list of attributes
+      # @return [Hash<Attribute>]
+      #   the Hash of attributes
       #
       # @api public
       def attributes
@@ -333,6 +357,16 @@ module Snowflake
       # @api public        
       def dynamic_attribute?(attribute_name)
         !attributes.include?(attribute_name.to_sym) || attributes[attribute_name.to_sym].is_a?(::Snowflake::Attributes::Dynamic)
+      end
+
+      # Retrieves all dynamic attributes.
+      #
+      # @return [Array<Attributes::Dynamic>]
+      #     An Array of Dynamic Attributes.
+      #
+      # @api public        
+      def dynamic_attributes
+        attributes.dup.delete_if {|key, attr| !attr.is_a?(::Snowflake::Attributes::Dynamic) }
       end
 
       def key

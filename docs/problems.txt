@@ -20,9 +20,9 @@
 	OR perhaps it should be in Tag.dostuff, or a before/after filter in an instance of Tag
 	
 	ASIDE: Tag creation will also need to append to tags:all
-	
+
 	All of these problems could be fixed by using has n, :tags, it would be nice to have before/after filters for custom attributes.
-	
+
 	If using has  n, :tags, how would we do fid all products tagged with %name%?
 		1. Find the tag: use index tag name => tag key
 		2. Find products with that tag: use index product::indices::tag::%tag_key% => set of %product_key%

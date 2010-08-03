@@ -70,7 +70,7 @@ module Snowflake
       !(new? || destroyed?)
     end
 
-    # Save the Node to the DB.
+    # Save the Element
     #
     # @return [Boolean]
     #     True if the save was successful, false otherwise.
@@ -84,6 +84,15 @@ module Snowflake
       return false unless valid?
 
       _run_save_callbacks { new?? create : update }
+    end
+    
+    # Saves the Element.
+    #
+    # If the Element can not be saved the NotPersisted exception is raised.
+    #
+    # @api public
+    def save!(*)
+      save || raise(NotPersisted)
     end
 
     # Deletes the Node

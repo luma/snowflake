@@ -63,7 +63,7 @@ module Snowflake
 
   class NotPersisted < SnowflakeError
   end
-
+  
   class MissingPropertyError < SnowflakeError
   end
 
@@ -82,16 +82,16 @@ module Snowflake
   class OutOfDateError < SnowflakeError
   end
 
-  def self.connect(*args)
+  def self.connect(opts = {})
     handle_passenger_forking
-    options = args
+    @options = opts
     connection = nil
   end
 
   def self.connection
     # @todo fix Redis Namespacing
     #thread[:connection] ||= Redis::Namespace.new(namespace, :redis => redis)
-    thread[:connection] ||= Redis.new(*options)
+    thread[:connection] ||= Redis.new(options)
   end
 
   def self.connection=(redis)
