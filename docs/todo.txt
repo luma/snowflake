@@ -91,3 +91,7 @@ h2. DONE
 18. Compatibility with ActiveModel::Dirty
 31. Remove the Element namespace (it was only needed while I was refactoring the old Node code) and shuffle everything down one level
 32. Include CustomAttributes in serialisation. ActiveRecord has an example of doing this.
+35. Duplicating the key generating stuff in the Indexer ( where we don't have the context 
+		to say ElementModel.key_for( ... ) ) leads to brittleness, and bugs when modifying key 
+		generation. Refactor all the key_for/meta_key_for bits out into a Naming module. Then
+		we can use that Naming module in the Indexer.

@@ -121,24 +121,6 @@ module Snowflake
   def self.thread
     Thread.current[:snowflake] ||= {}
   end
-  
-  # Construct an element key from +segments+.
-  #
-  # @todo I'm not thrilled about this being public. however, too many places need it and at least I can be sure everyone is generating keys of the same form.
-  #
-  # @api semi-public
-  def self.key(*segments)
-    segments.join(':')
-  end
-
-  # Construct a meta key (for storing metainfo regarding elements) for +segments+.
-  #
-  # @todo I'm not thrilled about this being public. however, too many places need it and at least I can be sure everyone is generating keys of the same form.
-  #
-  # @api semi-public
-  def self.meta_key(*segments)
-    segments.join('::')
-  end
 
   autoload :Index,     'snowflake/index'
   autoload :Attribute, 'snowflake/attribute'
@@ -181,7 +163,7 @@ module Snowflake
       autoload :OrOperation,    dir + 'or_operation'
     end
   end
-  
+
   protected
   
   # http://www.modrails.com/documentation/Users%20guide%20Nginx.html#_smart_spawning_gotcha_1_unintential_file_descriptor_sharing
@@ -205,6 +187,8 @@ unless defined?(Infinity)
 end
 
 dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/')
+
+require dir + 'keys'
 
 require dir + 'element'
 require dir + 'model'
