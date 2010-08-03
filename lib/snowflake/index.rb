@@ -8,18 +8,30 @@ module Snowflake
     end
 
     def add( id, sub_key = nil)
-      Snowflake.connection.sadd( key_for(sub_key), id )
+      if sub_key.respond_to?(:each)
+        sub_key.each do |k|
+          Snowflake.connection.sadd( key_for(k), id )
+        end
+      else
+        Snowflake.connection.sadd( key_for(sub_key), id )
+      end
     end
 
     def delete(id, sub_key = nil)
-      Snowflake.connection.srem( key_for(sub_key), id )
+      if sub_key.respond_to?(:each)
+        sub_key.each do |k|
+          Snowflake.connection.srem( key_for(k), id )
+        end
+      else
+        Snowflake.connection.srem( key_for(sub_key), id )
+      end
     end
     
     def modify(id, old_sub_key, new_sub_key)
       delete( id, old_sub_key )
       add( id, new_sub_key )
     end
-    
+
     def include?( id, sub_key = nil)
       Snowflake.connection.sismember( key_for(sub_key), id )
     end
@@ -37,7 +49,7 @@ module Snowflake
     def all(sub_key = nil)
       element_klass.get_many( ids(sub_key) )
     end
-    
+
     protected
 
     def key_for(sub_key = nil)
