@@ -174,12 +174,12 @@ module Snowflake
 
     # @todo I'm not sure this should be public
     def key_for(*segments)
-      self.class.key_for( *segments.unshift(self.key) )
+      Keys.key_for( self.class, *segments.unshift( self.key ) )
     end
 
     # @todo I'm not sure this should be public
     def meta_key_for(*segments)
-      self.class.meta_key_for( *segments.unshift(self.key) )
+      Keys.meta_key_for( self.class, *segments.unshift( self.key ) )
     end
 
     private

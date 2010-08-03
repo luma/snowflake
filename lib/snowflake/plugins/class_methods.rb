@@ -151,14 +151,14 @@ module Snowflake
     #
     # @api semi-public
     def key_for( *segments )
-      Snowflake.key( *segments.unshift(self.to_s) )
+      Keys.key_for( self, *segments )
     end
 
     # Construct a meta key for this element from +segments+.
     #
     # @api semi-public
     def meta_key_for( *segments )
-      Snowflake.meta_key( *segments.unshift(self.to_s) )
+      Keys.meta_key_for( self, *segments )
     end
 
   end # module ClassMethods
