@@ -5,7 +5,7 @@ describe Snowflake::Node do
     @test_nodes = []
 
     10.times do |i|
-      @test_nodes << TestNode.create(:name => "test #{i}", :mood => "Awesome #{(i%2).to_i}")
+      @test_nodes << TestNode.create(:name => "test #{i}", :mood => "Awesome #{(i%2).to_i}", :age => (i + 20) )
     end
   end
 
@@ -27,10 +27,20 @@ describe Snowflake::Node do
     end
 
     it "filters the nodes via a match against multiple values ANDed together" do
+      TestNode.all( :mood => "Awesome 0" ).and( :age => 28 ).all.should == [@test_nodes[8]]
+    end
+    
+    it "returns an empty collection when filtering for two values on an attribute that only accepts one" do
       # Should be empty as no TestNode can have a mood of Both "Awesome 0" and "Awesome 1"
-      nodes = TestNode.all( :mood => "Awesome 0" ).and( :mood => "Awesome 1" ).all
-      debugger
-      nodes.should be_empty
+      TestNode.all( :mood => "Awesome 0" ).and( :mood => "Awesome 1" ).all.should be_empty
+    end
+
+    it "returns nodes when filtering with two values against an attribute that accept two values" do
+      @test_node2 = TestNodeWithCustomAttributes.create(:name => 'rolly', :mood => 'Awesome')
+      @test_node2.stuff = ['foo', 'bar']
+
+      nodes = TestNodeWithCustomAttributes.all( :stuff => ['foo', 'bar'] ).all
+      nodes.first.should == @test_node2
     end
 
     it "filters the nodes via a match against multiple values ANDed together" do

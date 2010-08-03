@@ -8,7 +8,7 @@ h2. TODO
 	19.4. Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
 	19.5. Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
 	19.6. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
-				
+
 				E.g.
 					class Product
 					  include Snowflake::Node
@@ -29,6 +29,21 @@ h2. TODO
 					Product.all( :types => 'Multi-Function Printer', :type => 'Photo Printers' )
 
 	19.7. Some way of saying all that *don't* match some value.
+	19.8. Refactor and DRY up Indices and Index Management
+					This mirrors a similar piece in #attribute in attributes.rb. The index stuff 
+					is beginning to feel like a big ball of mud. We instanciate the Index object
+					in custom_attributes.rb and attributes.rb, then add index management methods 
+					(add to, delete from, modify) in Index, and element specific Index management 
+					in Indices.rb (respond to Element workflow and call Index management methods 
+					accordingly ), then we also have index management methods for custom attributes 
+					which resides in the custom attribute classes themselves. It touches way too 
+					many pieces of code.
+
+			 One possibility is to decouple Indices from the core and wait for keys that are 
+ 			 associated with indices to be modified (using Redis' PUB/SUB), then update the 
+			 indices. This does mean that the code that maintains the indices must be run as
+			 a separate program, probably some kind of long-running daemon.
+			 
 
 20. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
 21. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/

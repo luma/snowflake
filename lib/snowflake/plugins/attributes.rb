@@ -239,7 +239,15 @@ module Snowflake
 
         attributes[attr_name] = attribute
 
-        # @todo Add any Indices, this is almost certainly the wrong place for this
+        # This mirrors a similar piece in #attribute in attributes.rb. The index stuff 
+        # is beginning to feel like a big ball of mud. We instanciate the Index object
+        # in custom_attributes.rb and attributes.rb, then add index management methods 
+        # (add to, delete from, modify) in Index, and element specific Index management 
+        # in Indices.rb (respond to Element workflow and call Index management methods 
+        # accordingly ), then we also have index management methods for custom attributes 
+        # which resides in the custom attribute classes themselves. It touches way too 
+        # many pieces of code.
+        # @todo Refactor and DRY up indices and index management.
         if options.include?(:index) && options[:index] == true
           indices[attr_name] = Index.new( attr_name, self )
         end

@@ -3,12 +3,13 @@ module Snowflake
   #
   # @todo typecast?
   class CustomAttribute
-    attr_reader :name, :element
+    attr_reader :name, :element, :options
 
-    def initialize(name, element, raw = default)
+    def initialize(name, element, raw = default, options = {})
       @name = name
       @element = element
       @raw = typecast(raw)
+      @options = options
     end
 
     # Convert the raw value into a simple value for serialisation.
@@ -63,17 +64,21 @@ module Snowflake
       #
       # @param [Element] element
       #     The Element, to find Counter +name+ for.
+      #
       # @param [String, #to_string] key
       #     The name of Counter we're looking for.
+      #
+      # @param [Hash] options
+      #     Extra configuration options.
       #
       # @return [Element, nil]
       #   A Element with the key of +key+
       #   If no Element was found with the key of +key+
       # 
       # @api public      
-      def get(element, name)
+      def get(element, name, options = {})
         value = element.send_command( name, :get )
-        self.new(name, element, value )
+        self.new(name, element, value, options )
       end
 
       # This is the same as #get, except that it raises a NoFoundError exception
@@ -81,8 +86,12 @@ module Snowflake
       #
       # @param [Element] element
       #     The Element, to find Counter +name+ for.
+      #
       # @param [String, #to_string] name
       #     The name of Counter we're looking for.
+      #
+      # @param [Hash] options
+      #     Extra configuration options.
       #
       # @return [Element, nil]
       #   A Element with the key of +name+
@@ -92,8 +101,8 @@ module Snowflake
       #   The Element was not found
       # 
       # @api public
-      def get!(element, name)
-        get(name) || raise(NotFoundError, "A #{name} with the name of \"#{name.to_s}\" could not be found.")
+      def get!(element, name, options = {})
+        get(element, name, options) || raise(NotFoundError, "A #{name} with the name of \"#{name.to_s}\" could not be found.")
       end
 
       def name

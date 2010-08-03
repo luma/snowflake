@@ -9,7 +9,7 @@ class TestNode
   include Snowflake::Node
 
   attribute :name,         String, :key => true
-  attribute :age,          Integer
+  attribute :age,          Integer, :index => true
   attribute :mood,         String, :index => true
   attribute :description,  String
   attribute :enabled,      ::Snowflake::Attributes::Boolean
@@ -33,7 +33,7 @@ class TestNodeWithCustomAttributes
   validates_presence_of :name
 
   counter :counter
-  set :stuff
+  set :stuff, :index => true
 end
 
 Spec::Runner.configure do |config|

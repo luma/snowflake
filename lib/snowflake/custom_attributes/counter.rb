@@ -1,8 +1,8 @@
 module Snowflake
   module CustomAttributes
     class Counter < CustomAttribute
-      def initialize(name, element, raw = default)
-        super name, element, raw.to_i
+      def initialize(name, element, raw = nil, options = {})
+        super( name, element, raw.to_i, options )
       end
   
       def to_i

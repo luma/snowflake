@@ -55,7 +55,7 @@ module Snowflake
             custom_attributes[name.to_s]
           else
             # If it hasn't been loaded yet, do so...
-            custom_attributes[name.to_s] = klass.get( self, name )
+            custom_attributes[name.to_s] = klass.get( self, name, self.class.custom_attribute_options[ name ] )
           end
         end
 
@@ -132,6 +132,18 @@ module Snowflake
       # @api public
       def custom_attributes
         @custom_attributes ||= ::Set.new
+      end
+
+      # Options for all custom attributes. This is kept separate from #custom_attributes
+      # for simplicity, as it's only used in one place: when the CustomAttribute objects
+      # are first instanciated.
+      #
+      # @return [Hash]
+      #   a Hash of options for the custom attributes.
+      #
+      # @api private      
+      def custom_attribute_options
+        @custom_attribute_options ||= {}
       end
 
       # Indicates whether this element has a defined CustomAttribute called +name+.
@@ -231,9 +243,23 @@ module Snowflake
         end
 
         custom_attributes << name
+        custom_attribute_options[name] = options.dup
 
-        create_custom_attribute_reader(klass, name, options)
-        create_custom_attribute_writer(klass, name, options)
+        # This mirrors a similar piece in #attribute in attributes.rb. The index stuff 
+        # is beginning to feel like a big ball of mud. We instanciate the Index object
+        # in custom_attributes.rb and attributes.rb, then add index management methods 
+        # (add to, delete from, modify) in Index, and element specific Index management 
+        # in Indices.rb (respond to Element workflow and call Index management methods 
+        # accordingly ), then we also have index management methods for custom attributes 
+        # which resides in the custom attribute classes themselves. It touches way too 
+        # many pieces of code.
+        # @todo Refactor and DRY up indices and index management.
+        if options.include?(:index) && options[:index] == true
+          indices[name] = Index.new( name, self )
+        end
+
+        create_custom_attribute_reader(klass, name, custom_attribute_options[name])
+        create_custom_attribute_writer(klass, name, custom_attribute_options[name])
 
         name
       end

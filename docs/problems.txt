@@ -47,6 +47,17 @@
 
 		# This would be nicer, but requires messing with the Ruby AST
 	 	People.get('rolly').friends.with(recommendations.rating > 4)
+14. Indices and Index Management is Very Messy
+				This mirrors a similar piece in #attribute in attributes.rb. The index stuff 
+				is beginning to feel like a big ball of mud. We instanciate the Index object
+				in custom_attributes.rb and attributes.rb, then add index management methods 
+				(add to, delete from, modify) in Index, and element specific Index management 
+				in Indices.rb (respond to Element workflow and call Index management methods 
+				accordingly ), then we also have index management methods for custom attributes 
+				which resides in the custom attribute classes themselves. It touches way too 
+				many pieces of code.
+
+
 
 FIXED
 1. We're not really making best use of Redis.

@@ -1,8 +1,8 @@
 module Snowflake
   module CustomAttributes
     class Set < CustomAttribute
-      def initialize(name, element, raw = default)
-        super( name, element, raw.is_a?(::Set) ? raw : ::Set.new(raw) )
+      def initialize(name, element, raw = nil, options = {})
+        super( name, element, raw.is_a?(::Set) ? raw : ::Set.new(raw), options )
       end
 
       def to_s
@@ -282,17 +282,20 @@ module Snowflake
         #
         # @param [Element] element
         #     The Element, to find Counter +name+ for.
+        #
         # @param [String, #to_string] key
         #     The name of Counter we're looking for.
+        #
+        # @param [Hash] options
+        #     Extra configuration options.
         #
         # @return [Element, nil]
         #   A Element with the key of +key+
         #   If no Element was found with the key of +key+
         # 
         # @api public      
-        def get(element, name)
-
-          self.new(name, element, element.send_command( name, :smembers ) )
+        def get(element, name, options = {})
+          self.new(name, element, element.send_command( name, :smembers ), options )
         end
       end
 
