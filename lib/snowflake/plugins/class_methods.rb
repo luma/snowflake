@@ -61,6 +61,17 @@ module Snowflake
       get(key) || raise(NotFoundError, "A #{self.to_s} with the key of \"#{key.to_s}\" could not be found.")
     end
 
+    # Retrieve a random Element. It returns nil, if no Element is found.
+    #
+    # @return [Element, []]
+    #   A random Element
+    #   If there are no Elements
+    # 
+    # @api public
+    def random 
+      indices[:all].random
+    end
+
     # Retrieve a collection of nodes based on +options+, if +options+ is omitted all
     # nodes will be returned.
     #
@@ -74,7 +85,6 @@ module Snowflake
     # @todo
     def all(options = {})
       # @todo deal with options
-
       indices[:all].all
     end
 
