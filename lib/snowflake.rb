@@ -135,6 +135,7 @@ module Snowflake
     autoload :Integer,  dir + 'integer'
     autoload :String,   dir + 'string'
     autoload :Text,     dir + 'text'
+    autoload :Textile,  dir + 'textile'
   end
   
   autoload :CustomAttribute,  'snowflake/custom_attribute'

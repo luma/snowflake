@@ -9,9 +9,8 @@ module Snowflake
     def initialize(node, name, options = {})
       @node = node
       @name = name.to_sym
-      @options = options
 
-      @key = options.include?(:key) && options[:key] == true
+      @key = options.delete(:key) == true
 
       # 'key' is a restricted attribute name, you can use it but you must set :key => true 
       # as well. We could implictly set :key => true but I'd rather make users aware of
@@ -30,6 +29,8 @@ module Snowflake
 
       @reader_visibility = options.delete(:reader_visibility) || 'public'
       @writer_visibility = options.delete(:writer_visibility) || 'public'
+
+      @options = options
     end
 
     # Returns the default value for this Attribute.
