@@ -44,6 +44,7 @@ h2. TODO
 			define_model_callbacks :find, :only => :after
 30. Add an Identity Map, I'm not convinced we need it but, if we do, this could be helpful http://github.com/swistak/weakling
 33. Hook intro Rails instrumentation
+36. Consider using ZSets as an option for Indices, the sort criteria could be the Edge weight.
 
 h2. DONE 
 
