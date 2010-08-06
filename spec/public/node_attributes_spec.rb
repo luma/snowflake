@@ -28,8 +28,11 @@ describe Snowflake::Node do
 
       it "will retrieve the attributes as a hash" do
         @test_node.attributes.should == {
-          "name" => "rolly", 
-          "mood" => "Awesome"
+          "name"        => "rolly", 
+          "mood"        => "Awesome", 
+          "enabled"     => false, 
+          "description" => nil, 
+          "age"         => nil
         }
       end
 

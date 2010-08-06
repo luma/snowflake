@@ -12,7 +12,7 @@ class TestNode
   attribute :age,          Integer, :index => true
   attribute :mood,         String, :index => true
   attribute :description,  String
-  attribute :enabled,      ::Snowflake::Attributes::Boolean
+  attribute :enabled,      ::Snowflake::Attributes::Boolean, :default => false
 
 #  counter :visits      # <-- native Redis Counter
 #  set :tags            # <-- native Redis Set

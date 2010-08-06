@@ -15,7 +15,23 @@ module Snowflake
         #
         # @api public
         def attributes
-          @attributes ||= {}
+          # attrs = {}
+          # 
+          # self.class.attributes.keys.each do |name|
+          #   attrs[name] = read_attribute( name )
+          # end
+          # 
+          # attrs
+
+          @attributes ||= begin
+            attrs = {}
+
+            self.class.attributes.each do |name, attribute|
+              attrs[name.to_s] = attribute.default
+            end
+
+            attrs
+          end
         end
 
         # Mass-assign the Node's attributes. If dynamic attributes are enabled unknown
@@ -32,11 +48,26 @@ module Snowflake
         #
         # @api public
         def attributes=(attrs)
+          # @todo this is dumb, but we need to make sure the attributes array is populated 
+          # with defaults now otherwise #attributes= will prevent this from happening
+          if @attributes == nil
+            self.attributes
+          end
+
+          # The key field cannot be mass-assigned
+          # @todo This should probably be generalised for allow any fields to be protected mass-assignment.
+          non_key_attrs = if persisted?
+                            key_name = self.class.key
+                            attrs.dup.delete_if { |key, value| key == key_name }
+                          else
+                            attrs
+                          end
+
           # If dynamic attributes are allowed then we'll just write all the attributes without checking
           # whether they have been explicitly defined. If dynamic attributes are not allowed then we'll 
           # need to raise an exception on any undeclared attributes.
           if self.class.allow_dynamic_attributes?
-            attrs.each do |name, value|
+            non_key_attrs.each do |name, value|
               if unadded_dynamic_attribute?(name)
                 add_dynamic_attribute(name, value)
               else
@@ -44,7 +75,7 @@ module Snowflake
               end
             end
           else
-            attrs.each do |name, value|
+            non_key_attrs.each do |name, value|
               if unadded_dynamic_attribute?(name)
                 raise NoMethodError, "Undefined attribute \"#{name.to_s}\" for #{inspect}:#{self.class}"
               end
@@ -87,7 +118,10 @@ module Snowflake
           read_attribute(self.class.key)
         end
 
-        # Assigns the value of the key attribute for this Node
+        # Assigns the value of the key attribute for this Node.
+        #
+        # *Note:* This will take affect immediately so, if the Node is persisted, it will 
+        # actually shuffle the data to the new keys and update the indices.
         #
         # @param [#to_s] The key value
         #
@@ -95,6 +129,38 @@ module Snowflake
         #
         # @api public
         def key=(new_key)
+          old_key = self.key
+          
+          write_attribute(self.class.key, new_key)
+
+          # If the Element is persisted, then this is actually a rename operation, which
+          # is a bit more delicate. 
+          if persisted?
+            success = _run_rename_callbacks do
+              if self.class.rename(old_key, new_key)
+                update_indices( old_key )
+                true
+              else
+                false
+              end
+            end
+
+            unless success
+              # @todo the error. Raise an exception?
+            end
+
+          end
+        end
+        
+        # The same as #key=, except that it doesn't trigger a rename. This is only used
+        # internally for low-level Element construction.
+        #
+        # @param [#to_s] The key value
+        #
+        # @return [#to_s] The key value
+        #
+        # @api private
+        def update_key_with_renaming(new_key)
           write_attribute(self.class.key, new_key)
         end
 
@@ -173,7 +239,18 @@ module Snowflake
         #
         # @api private
         def read_attribute(name)
-          read_raw_attribute(name)
+          value = read_raw_attribute(name)
+          if value == nil
+            proxy = self.class.attributes[name.to_sym]
+            
+            # If there's no proxy it's either an undeclared dynamic attribute, or it's 
+            # not an attribute at all. Either way we use the default value of nil.
+            return nil if proxy == nil
+
+            value = proxy.default
+          end
+
+          value
         end
 
         # Reads the raw value of the Attribute called +name+.
@@ -446,13 +523,25 @@ module Snowflake
       # @todo prevent these from being defined if they have already been defined somewhere else
       # @todo Handle Typecasting
       def create_attribute_writer(attribute)
-        class_eval <<-EOS, __FILE__, __LINE__ + 1
-          #{attribute.writer_visibility}
-          def #{attribute.name.to_s}=(value)
-            write_attribute(:#{attribute.name.to_s}, value)
-          end
-        EOS
+        # We treat key attributes different as changing the key is actually a rename
+        # operation.
+        unless attribute.key?
+          class_eval <<-EOS, __FILE__, __LINE__ + 1
+            #{attribute.writer_visibility}
+            def #{attribute.name.to_s}=(value)
+              write_attribute(:#{attribute.name.to_s}, value)
+            end
+          EOS
+        else
+          class_eval <<-EOS, __FILE__, __LINE__ + 1
+            #{attribute.writer_visibility}
+            def #{attribute.name.to_s}=(value)
+              self.key = value
+            end
+          EOS
+        end
       end
+
     end # module Attributes
   end # module Plugins
 end # module Snowflake

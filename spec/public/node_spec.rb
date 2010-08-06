@@ -15,6 +15,19 @@ describe Snowflake::Node do
     end
   end
   
+  describe "#new" do
+    it "should create a new Node" do
+      node = TestNode.new
+      node.should be_a(TestNode)
+    end
+
+    it "should create a new Node with specific attributes" do
+      node = TestNode.new(:name => 'rolly', :mood => 'Awesome')
+      node.name.should == 'rolly'
+      node.mood.should == 'Awesome'
+    end
+  end
+  
   describe "#save" do
     it "should save the Node" do
       TestNode.get('rolly').should_not be_nil
@@ -269,11 +282,11 @@ describe Snowflake::Node do
   describe "Serialisation" do
     describe "Simple" do
       it "should serialise to a hash" do
-        @test_node.attributes.should == {'name' => 'rolly', 'mood' => 'Awesome'}
+        @test_node.attributes.should == {"name"=>"rolly", "mood"=>"Awesome", "enabled"=>false, "description"=>nil, "age"=>nil}
       end
 
       it "should serialise to JSON" do
-        @test_node.to_json.should == {'test_node' => {'name' => 'rolly', 'mood' => 'Awesome'}}.to_json
+        @test_node.to_json.should == {'test_node' => {"name"=>"rolly", "mood"=>"Awesome", "enabled"=>false, "description"=>nil, "age"=>nil}}.to_json
       end
 
       it "should serialise to XML" do
@@ -282,6 +295,9 @@ describe Snowflake::Node do
 <test-node>
   <name>rolly</name>
   <mood>Awesome</mood>
+  <enabled type="boolean">false</enabled>
+  <description nil="true"></description>
+  <age nil="true"></age>
 </test-node>
 EOS
       end
@@ -297,15 +313,17 @@ EOS
       end
 
       it "should serialise to JSON" do
-        @test_node2.to_json.should == {'test_node_with_custom_attributes' => {'name' => 'rolly', 'mood' => 'Awesome', 'stuff' => [], 'counter' => 10}}.to_json
+        @test_node2.to_json.should == {'test_node_with_custom_attributes' => {'name' => 'rolly', 'mood' => 'Awesome', 'stuff' => [], 'description' => nil, 'counter' => 10, 'age' => nil}}.to_json
       end
 
       it "should serialise to XML" do
         @test_node2.to_xml.should == <<-EOS
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <test-node-with-custom-attributes>
   <name>rolly</name>
   <mood>Awesome</mood>
+  <description type="yaml" nil="true"></description>
+  <age type="yaml" nil="true"></age>
 </test-node-with-custom-attributes>
 EOS
       end

@@ -135,6 +135,9 @@ module Snowflake
     autoload :Integer,  dir + 'integer'
     autoload :String,   dir + 'string'
     autoload :Text,     dir + 'text'
+    autoload :Textile,  dir + 'textile'
+    autoload :DateTime, dir + 'date_time'
+    autoload :Enum,     dir + 'enum'
   end
   
   autoload :CustomAttribute,  'snowflake/custom_attribute'

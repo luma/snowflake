@@ -44,6 +44,11 @@ module Snowflake
       Snowflake.connection.smembers( key_for(sub_key) )
     end
 
+    def random
+      element_key = Snowflake.connection.srandmember( @key )
+      element_key == nil ? nil : element_klass.get( element_key )
+    end
+
     # @todo indices should be combinable with union, difference, and intersection
 
     def all(sub_key = nil)
