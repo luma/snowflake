@@ -3,7 +3,8 @@ module Snowflake
     def initialize(attributes = {})
       @_new_node = true
       @_destroyed = false
-      self.key = attributes.delete(:key)
+
+      update_key_with_renaming( attributes.delete(:key) )
       self.attributes = attributes
 
       _run_initialize_callbacks
@@ -109,12 +110,7 @@ module Snowflake
         # Mark it as destroyed
         @_destroyed = true
 
-        # Hmmm, if the key has been changed we're gonna assume they mean to delete the new
-        # key, but as the record is dirty, and it always when @_key != self.key, deleting
-        # the new key will do nothing as we haven't saved anything under the new key yet.
-        return true unless @_key == self.key
-
-        if self.class.destroy!( @_key )
+        if self.class.destroy!( self.key )
           # I'd rather this was decoupled from Element, but I haven't figured out how yet
           delete_from_indices
           
@@ -131,7 +127,6 @@ module Snowflake
     #
     # @api semi-public
     def reset!
-      @_key = self.key
       clean!
     end
 
@@ -213,39 +208,19 @@ module Snowflake
     def persist
       @previously_changed = changes
 
-      # @todo I'm using MULTI as if it's a transaction, except it isn't, as if one command fails 
-      # all commands follow it will execute (http://code.google.com/p/redis/wiki/MultiExecCommand). This
-      # is currently an unresolved issue, mainly 'cause I don't know how yet...
-      Snowflake.connection.multi do
-        # If the key has been changed then shift every property to the new key
-        if persisted? && @_key != self.key
+      # Cast the attributes to strings for Redis
+      cast_attributes = {}
+      attributes.each do |key, value|
+        proxy = self.class.attributes[key.to_sym]
 
-          success = _run_rename_callbacks do
-            if self.class.rename(@_key, self.key)
-              update_indices( @_key )
-              true
-            else
-              false
-            end
-          end
-
-          unless success
-            # @todo the error
-          end
-        end
-
-        # Cast the attributes to strings for Redis
-        cast_attributes = {}
-        attributes.each do |key, value|
-          proxy = self.class.attributes[key.to_sym]
-
+        unless proxy.default?(value)
           cast_attributes[key] = proxy.dump(value)
         end
-
-        # Save all attributes
-        send_command(nil, :hmset, *cast_attributes.to_a.flatten)
-        # @todo error handling
       end
+
+      # Save all attributes
+      send_command(nil, :hmset, *cast_attributes.to_a.flatten)
+      # @todo error handling
 
       # @todo refactor
       reset!

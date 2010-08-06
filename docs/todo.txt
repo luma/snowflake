@@ -45,6 +45,10 @@ h2. TODO
 30. Add an Identity Map, I'm not convinced we need it but, if we do, this could be helpful http://github.com/swistak/weakling
 33. Hook intro Rails instrumentation
 36. Consider using ZSets as an option for Indices, the sort criteria could be the Edge weight.
+37. Add a DateTime Attribute
+38. Add a reference Custom Attribute: "reference :superceeded_by,  Product". Also allow some form of basic validation for references: "reference :related_service,   Product, :category => :service"
+39. Add a Enum Attribute: "attribute :type, Enum[:service, :hardware, :software, :training]"
+40. Support Time Zones in the DateTime attribute
 
 h2. DONE 
 

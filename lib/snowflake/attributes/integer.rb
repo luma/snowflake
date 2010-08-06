@@ -8,7 +8,7 @@ module Snowflake
         super(node, name, options)
       end
 
-      # Convert +value+ to a String
+      # Convert +value+ to a String. This should only ever be called with a +value+ that's been typecast.
       def dump(value)
         value.to_s
       end

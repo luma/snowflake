@@ -47,6 +47,11 @@ module Snowflake
       end
     end
 
+    # Does +value+ equal the Attribute default value?
+    def default?(value)
+      default == value
+    end
+
     # Indicates whether this Attribute represents an element key
     #
     # @return [Boolean]

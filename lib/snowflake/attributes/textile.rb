@@ -15,7 +15,7 @@ module Snowflake
         super(node, name, options)
       end
 
-      # Convert +value+ to a String
+      # Convert +value+ to a String. This should only ever be called with a +value+ that's been typecast.
       def dump(value)
         value.to_s
       end
@@ -26,8 +26,8 @@ module Snowflake
       #     The value to convert.
       #
       # @return [RedCloth::TextileDoc, #default]
-      #     A typecast version of +value+. Usually a RedCloth::TextileDoc, or the return 
-      #     value from #default.
+      #     A typecast version of +value+. Usually a RedCloth::TextileDoc
+      #     the return value from #default.
       # 
       # @api semi-public
       def typecast(value)

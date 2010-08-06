@@ -21,7 +21,7 @@ module Snowflake
       # We use #allocate, rather than #new, as we use #new to mean a Element that has not yet been
       # saved in the DB.
       node = self.allocate
-      node.key = key
+      node.update_key_with_renaming( key )
       node.attributes = node_attributes
 
       node.reset!
@@ -114,9 +114,13 @@ module Snowflake
     #
     # @api public
     def rename(from_key, to_key)
-      Snowflake.connection.renamenx( key_for(from_key), key_for(to_key) )
-      # @todo provide a hook to allow extended attributes to be moved
+      Snowflake.connection.multi do
+        Snowflake.connection.renamenx( key_for(from_key), key_for(to_key) )
       
+        # @todo provide a hook to allow extended attributes to be moved
+        # @todo move indices      
+      end
+
       # @todo error handling
       true
     end

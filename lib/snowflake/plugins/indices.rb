@@ -19,10 +19,10 @@ module Snowflake
         end
         
         def update_indices( old_key )
-#            Snowflake.connection.multi do
+          Snowflake.connection.multi do
             self.class.indices[:all].delete( old_key )
             self.class.indices[:all].add( self.key )
-#            end
+          end
         end
       end # module InstanceMethods
 
