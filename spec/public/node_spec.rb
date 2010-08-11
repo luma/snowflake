@@ -40,7 +40,6 @@ describe Snowflake::Node do
     
     it "should rename all redis keys when modifying the node key" do
       @test_node.key = 'bob'
-      @test_node.save
       TestNode.get('rolly').should be_nil
       TestNode.get('bob').should_not be_nil
     end
@@ -62,7 +61,7 @@ describe Snowflake::Node do
     end
 
     it "should raise the NotPersisted exception when the save fails" do
-      @test_node.name = nil
+      @test_node.mood = nil
 
       lambda {
         @test_node.save!
@@ -105,15 +104,15 @@ describe Snowflake::Node do
   describe "validation" do
     # @todo add proper tests for this
     it "should not save when validation fails" do
-      @test_node.name = nil
+      @test_node.mood = nil
       @test_node.save.should be_false
-      @test_node.errors[:name].should_not be_blank
+      @test_node.errors[:mood].should_not be_blank
     end
     
     it "should not save a new Node with a key that's identical to an existing one" do
       node = TestNode.new(:name => @test_node.name)
       node.save.should be_false
-      node.errors[:name].should_not be_blank
+      node.errors[:mood].should_not be_blank
     end
   end
   
@@ -167,26 +166,32 @@ describe Snowflake::Node do
       end
     end
 
-    describe "#key" do
+  end # describe "class"
+
+  describe "#key" do
+    
+    it "returns the value of the Property that is the key" do
+      @test_node.key.should == @test_node.name
+    end
+
+    it "should automagically create an key property when one is not defined" do
+      class TestNode2
+        include Snowflake::Node
+
+        attribute :name,         String
+        attribute :age,          Integer
+        attribute :mood,         String
+      end
       
-      it "returns the value of the Property that is the key" do
-        @test_node.key.should == @test_node.name
-      end
-
-      it "should automagically create an key property when one is not defined" do
-        class TestNode2
-          include Snowflake::Node
-
-          attribute :name,         String
-          attribute :age,          Integer
-          attribute :mood,         String
-        end
-        
-        test = TestNode2.new :name => 'bob'
-        test.key.should_not be_blank
-      end
-    end    
-
+      test = TestNode2.new :name => 'bob'
+      test.key.should_not be_blank
+    end
+    
+    it "requires that a key be present before persisting" do
+      test = TestNode.new :mood => 'Sweet'
+      test.save.should be_false
+      test.errors[:name].should_not be_blank
+    end
   end
 
   describe "Dynamic Attributes" do
@@ -286,7 +291,7 @@ describe Snowflake::Node do
       end
 
       it "should serialise to JSON" do
-        @test_node.to_json.should == {'test_node' => {"name"=>"rolly", "mood"=>"Awesome", "enabled"=>false, "description"=>nil, "age"=>nil}}.to_json
+        @test_node.to_json.should == {'test_node' => {"name"=>"rolly", "mood"=>"Awesome", "enabled"=>false, "tags" => [], "description"=>nil, "age"=>nil}}.to_json
       end
 
       it "should serialise to XML" do

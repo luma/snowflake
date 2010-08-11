@@ -42,7 +42,8 @@ describe Snowflake::Node do
       @test_node = TestNodeWithCustomAttributes.create(:name => 'rolly', :mood => 'Awesome')
       @test_node.should be_valid
 
-      @test_node.name = nil
+      @test_node.mood = nil
+      @test_node.save
 
       lambda {
         @test_node.stuff = ['foo', 'bar']

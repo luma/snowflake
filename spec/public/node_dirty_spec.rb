@@ -10,29 +10,29 @@ describe Snowflake::Node do
 
     describe "Changed Attributes" do
       it "indicates if an attribute has been changed" do
-        @test_node.name_changed?.should be_false
-        @test_node.name = 'bar'
-        @test_node.name_changed?.should be_true
+        @test_node.mood_changed?.should be_false
+        @test_node.mood = 'bar'
+        @test_node.mood_changed?.should be_true
       end
 
       it "returns the old value" do
-        @test_node.name = 'bar'
-        @test_node.name_was.should == 'rolly'
+        @test_node.mood = 'bar'
+        @test_node.mood_was.should == 'Awesome'
       end
 
       it "returns the old and current values" do
-        @test_node.name = 'bar'
-        @test_node.name_change.should == ['rolly', 'bar']
+        @test_node.mood = 'bar'
+        @test_node.mood_change.should == ['Awesome', 'bar']
       end
 
       it "resets a modified value" do
-        @test_node.name = 'bar'
-        @test_node.name_changed?.should be_true
-        @test_node.reset_name!
+        @test_node.mood = 'bar'
+        @test_node.mood_changed?.should be_true
+        @test_node.reset_mood!
         
-        @test_node.name.should == 'rolly'
-        @test_node.name_was.should == 'bar'
-        @test_node.name_change.should == ['bar', 'rolly']
+        @test_node.mood.should == 'Awesome'
+        @test_node.mood_was.should == 'bar'
+        @test_node.mood_change.should == ['bar', 'Awesome']
       end
     end
     

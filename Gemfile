@@ -10,6 +10,7 @@ gem "rspec", "1.3.0"#, "2.0.0.beta.8"
 gem "yard"
 gem "rcov"
 gem "mocha"
+gem 'daemon-kit', '0.1.8.1'
 
 if RUBY_VERSION > '1.9.0'
 	gem 'ruby-debug19'

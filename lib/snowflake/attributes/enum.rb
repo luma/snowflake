@@ -33,8 +33,12 @@ module Snowflake
       # @api semi-public
       def typecast(value)
         case value
-        when nil
-          default
+        when /^[0-9]+$/i, ::Integer
+          if value.to_i == 0 || (cast_value = @options[:values][value.to_i - 1]) == nil
+            raise ArgumentError, "Could not assign #{value.to_i.inspect} to #{@name}, possible integer index values are 1 - #{@options[:values].length}"
+          end
+          
+          cast_value
         when ::String
           cast_value = value.to_sym
 
@@ -49,12 +53,6 @@ module Snowflake
           end
           
           value
-        when ::Integer
-          if value == 0 || (cast_value = @options[:values][value - 1]) == nil
-            raise ArgumentError, "Could not assign #{value.inspect} to #{@name}, possible integer index values are 1 - #{@options[:values].length}"
-          end
-          
-          cast_value
         else
           raise ArgumentError, "Could not cast #{value.inspect} to a Enum Attribute for #{@name}."
         end

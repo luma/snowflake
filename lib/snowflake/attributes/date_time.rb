@@ -40,8 +40,6 @@ module Snowflake
       # @api semi-public
       def typecast(value)
         case value
-        when nil
-          default
         when ::DateTime
           value
         else

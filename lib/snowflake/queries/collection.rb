@@ -20,21 +20,33 @@ module Snowflake
     	def first
     	  if elements_loaded?
       	  all.first
-  	    else
+  	    elsif !empty?
   	      @element_klass.get( keys.first )
+	      else
+	        nil
 	      end
   	  end
   	  
   	  def last
     	  if elements_loaded?
       	  all.last
-  	    else
+  	    elsif !empty?
   	      @element_klass.get( keys.last )
+	      else
+	        nil
 	      end
 	    end
+	    
+	    def random
+    	  Collection.new( @element_klass, Operations::RandomOperation.new( @operand ) ).first
+      end
 
       def length
         keys.length
+      end
+
+      def empty?
+        keys.empty?
       end
 
       def include?( key )
@@ -79,6 +91,14 @@ module Snowflake
     	  @all = nil
       end
 
+    	def keys
+    		@keys ||= ( @operand.eval(nil, true).execute( @operand.results_size ) || [] )
+    	end
+    	
+    	def explain
+    	  @operand.eval(nil, true).explain
+  	  end
+
     	private
 
     	def keys_loaded?
@@ -89,9 +109,9 @@ module Snowflake
         @all != nil
       end
 
-    	def keys
-    		@keys ||= @operand.eval.execute
-    	end
+      # def keys
+      #   @keys ||= ( @operand.eval(nil, true).execute( @operand.results_size ) || [] )
+      # end
     end
   end # module Queries
 end # module Snowflake

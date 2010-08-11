@@ -63,10 +63,9 @@ h2. TODO
 33. Hook intro Rails instrumentation
 34. Treetop grammar for searching indices, just because it would be fun to create it :-)
 36. Consider using ZSets as an option for Indices, the sort criteria could be the Edge weight.
-37. Add a DateTime Attribute
 38. Add a reference Custom Attribute: "reference :superceeded_by,  Product". Also allow some form of basic validation for references: "reference :related_service,   Product, :category => :service"
-39. Add a Enum Attribute: "attribute :type, Enum[:service, :hardware, :software, :training]"
 40. Support Time Zones in the DateTime attribute
+41. Add a :store_default_values option to #attribute, default it to false
 
 h2. DONE 
 
@@ -100,3 +99,6 @@ h2. DONE
 		to say ElementModel.key_for( ... ) ) leads to brittleness, and bugs when modifying key 
 		generation. Refactor all the key_for/meta_key_for bits out into a Naming module. Then
 		we can use that Naming module in the Indexer.
+37. Add a DateTime Attribute
+39. Add a Enum Attribute: "attribute :type, Enum[:service, :hardware, :software, :training]"
+42. Support :required => true on attribute definitions, basically it should just add validates_presence_of attributename

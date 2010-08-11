@@ -2,6 +2,25 @@ module Snowflake
   # The Attribute base class
   #
   # @todo typecast?
+  #
+  # == Defaults
+  #
+  # Default values can be passed in using the +:default+ option.
+  #
+  # Defaults come in two flavours: Normal and Dynamic. Normal Defaults are just a single
+  # Ruby value. Dynamic defaults are Lambdas of the form lambda {|element, attribute| ... }.
+  # To calculate a dynamic default the Lambda will be executed, and the return value used
+  # as the value of the default.
+  #
+  # Another difference between Normal Defaults and Dynamic ones is that Normal Defaults are
+  # never persisted to the DB (to save on space) but, because they are very contextual, 
+  # Dynamic Defaults always are.
+  #
+  # @note If you create a dynamic default, that calls another dynamic default
+  #       it may or may not work, depending on the order that the defaults are
+  #       executed. We make not guarantees on this point, it's just better not
+  #       to do it.
+  #
   class Attribute
     attr_accessor :name
     attr_reader :node, :options, :reader_visibility, :writer_visibility
@@ -40,16 +59,13 @@ module Snowflake
     #
     # @api public
     def default
-      if options[:default].respond_to?(:call)
-        options[:default].call(@node, self)
-      else
-        options[:default]
-      end
+      options[:default]
     end
 
-    # Does +value+ equal the Attribute default value?
-    def default?(value)
-      default == value
+    # True if the default is actually a Lambda.
+    #
+    def dynamic_default?
+      options[:default].respond_to?(:call)
     end
 
     # Indicates whether this Attribute represents an element key

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    snowflake (0.1.1)
+    snowflake (0.2.8)
       RedCloth (>= 4.2.3)
       activemodel (>= 3.0.0.rc)
       activesupport (>= 3.0.0.rc)
@@ -24,16 +24,19 @@ GEM
     activesupport (3.0.0.rc)
     builder (2.1.2)
     columnize (0.3.1)
+    daemon-kit (0.1.8.1)
+      eventmachine (>= 0.12.10)
+    eventmachine (0.12.10)
     fastthread (1.0.7)
     i18n (0.4.1)
-    json (1.4.3)
+    json (1.4.6)
     linecache (0.43)
     mocha (0.9.8)
       rake
     rake (0.8.7)
     rcov (0.9.8)
     redis (2.0.5)
-    redis-namespace (0.8.0)
+    redis-namespace (0.9.0)
       redis (< 3.0.0)
     rspec (1.3.0)
     ruby-debug (0.10.3)
@@ -50,6 +53,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  daemon-kit (= 0.1.8.1)
   mocha
   rake
   rcov

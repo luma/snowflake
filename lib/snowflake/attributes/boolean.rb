@@ -26,12 +26,10 @@ module Snowflake
         case value
         when TrueClass
           value
-        when 't'
+        when 1, 't', '1'
           true
-        when 'f'
+        when 0, 'f', '0'
           false
-        when nil
-          default
         else
           raise ArgumentError, "Tried to cast #{value.inspect} to a Boolean Property. Only a Boolean or String ('t' for true, 'f' for false) can be assigned to a Boolean Property."
         end

@@ -20,10 +20,6 @@ describe Snowflake::Attributes::DateTime do
   end
 
   describe "#typecast" do
-    it "typecasts a nil value to the default" do
-      @t.typecast( nil ).should == DateTime.parse( @default )
-    end
-
     it "typecasts a DateTime to itself" do
       @date = DateTime.parse( '2010-01-01 12:00' )
       @t.typecast( @date ).should == @date

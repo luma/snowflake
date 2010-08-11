@@ -29,8 +29,12 @@ describe Snowflake::Attribute do
       Snowflake::Attributes::String.new(TestNode, :foo, :default => 'Yo!').default.should == 'Yo!'
     end
 
-    it "return the default from a lambda/proc when there is no other value" do
-      Snowflake::Attributes::String.new(TestNode, :foo, :default => lambda { |element, attribute| "Yo!" }).default.should == 'Yo!'
+    it "return the default as a lambda/proc when there is no other value" do
+      node = TestNode.new(:name => 'rolly', :mood => 'Awesome')
+      a = Snowflake::Attributes::String.new(TestNode, :foo, :default => lambda { |element, attribute| element.name })
+      d = a.default
+      
+      d.call(node, a).should == 'rolly'
     end
   end
 

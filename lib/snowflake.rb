@@ -162,8 +162,9 @@ module Snowflake
     module Operations
       dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/queries/operations/')
 
-      autoload :AndOperation,   dir + 'and_operation'
-      autoload :OrOperation,    dir + 'or_operation'
+      autoload :AndOperation,     dir + 'and_operation'
+      autoload :OrOperation,      dir + 'or_operation'
+      autoload :RandomOperation,  dir + 'random_operation'
     end
   end
 

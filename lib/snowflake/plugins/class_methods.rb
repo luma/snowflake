@@ -68,8 +68,16 @@ module Snowflake
     #   If there are no Elements
     # 
     # @api public
-    def random 
-      indices[:all].random
+    def random (options = {})
+      all( options ).random
+    end
+    
+    def first(options = {})
+      all( options ).first
+    end
+
+    def last(options = {})
+      all( options ).last
     end
 
     # Retrieve a collection of nodes based on +options+, if +options+ is omitted all

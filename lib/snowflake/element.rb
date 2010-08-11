@@ -37,16 +37,6 @@ module Snowflake
 
     # Indicates whether this Node has been saved yet.
     #
-    # @return [Boolean]
-    #   True if this Node has been saved, false otherwise.
-    #
-    # @api public
-    def new?
-      @_new_node ||= false
-    end
-
-    # Indicates whether this Node has been saved yet. Synonym of #new?
-    #
     # Provided for ActiveModel compatability.
     #
     # @return [Boolean]
@@ -54,7 +44,7 @@ module Snowflake
     #
     # @api public
     def new_record?
-      self.new?
+      @_new_node ||= false
     end
 
     # Indicates whether this Node has been destroyed
@@ -68,7 +58,7 @@ module Snowflake
     #
     # @api public
     def persisted?
-      !(new? || destroyed?)
+      !(new_record? || destroyed?)
     end
 
     # Save the Element
@@ -84,7 +74,7 @@ module Snowflake
       # Bail, if there's validation errors.
       return false unless valid?
 
-      _run_save_callbacks { new?? create : update }
+      _run_save_callbacks { new_record?? create : update }
     end
     
     # Saves the Element.
@@ -92,7 +82,7 @@ module Snowflake
     # If the Element can not be saved the NotPersisted exception is raised.
     #
     # @api public
-    def save!(*)
+    def save!
       save || raise(NotPersisted)
     end
 
@@ -106,13 +96,22 @@ module Snowflake
       # Nothing persisted? Nothing to delete, we're done.
       return true unless persisted?
 
+      # We need to store this as all the custom attributes will be gone as soon as we 
+      # call destroy!
+      # @todo the fact that I serialise the element, unserialise it, add a single key/value, and then
+      # reserialise it again is awful. There's no defense, but I am very tired and this will be rewritten
+      # before being pulled into Master
+      deleted_attributes = JSON.parse(to_json).values.first
+
       _run_destroy_callbacks {
         # Mark it as destroyed
         @_destroyed = true
 
         if self.class.destroy!( self.key )
           # I'd rather this was decoupled from Element, but I haven't figured out how yet
-          delete_from_indices
+          # delete_from_indices
+
+          broadcast_event_to_listeners(:destroy, {:attributes => deleted_attributes})
           
           true
         else
@@ -176,6 +175,13 @@ module Snowflake
     def meta_key_for(*segments)
       Keys.meta_key_for( self.class, *segments.unshift( self.key ) )
     end
+    
+    protected
+    
+    def broadcast_event_to_listeners(event, payload)
+      payload[:event] = event
+      send_command(nil, :publish, payload.to_json)
+    end
 
     private
 
@@ -189,10 +195,12 @@ module Snowflake
       _run_create_callbacks {
         if persist == true
           @_new_node = false
-          
-          # I'd rather this was decoupled from Element, but I haven't figured out how yet
-          add_to_indices
-          
+
+          # @todo the fact that I serialise the element, unserialise it, add a single key/value, and then
+          # reserialise it again is awful. There's no defense, but I am very tired and this will be rewritten
+          # before being pulled into Master
+          broadcast_event_to_listeners(:create, {:attributes => JSON.parse(to_json).values.first})
+
           true
         else
           false
@@ -203,7 +211,10 @@ module Snowflake
     def update
       _run_update_callbacks {
         if persist == true
-          update_indices
+          # update_indices
+
+          broadcast_event_to_listeners(:update, {:changes => previous_changes})
+
           true
         else
           false
@@ -217,15 +228,19 @@ module Snowflake
 
       # Cast the attributes to strings for Redis
       cast_attributes = {}
-      attributes.each do |key, value|
-        proxy = self.class.attributes[key.to_sym]
+      attributes.each do |name, value|
+        proxy = self.class.attributes[name.to_sym]
 
-        unless proxy.default?(value)
-          cast_attributes[key] = proxy.dump(value)
+        # We don't store default values, unless they are the dynamic, the result of 
+        # executing a Proc for example.
+        if proxy.dynamic_default? || value != default_for_attribute(name)
+          cast_attributes[name] = proxy.dump(value)
         end
       end
 
-      # Save all attributes
+      # Save all attributes. Note we save the hash even if it's empty, that was we can
+      # tell the difference between an Element with all empty (default) values, and one
+      # that doesn't even exist (nil).
       send_command(nil, :hmset, *cast_attributes.to_a.flatten)
 
       # @todo refactor

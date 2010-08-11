@@ -15,23 +15,51 @@ module Snowflake
         #
         # @api public
         def attributes
-          # attrs = {}
+          # if @attributes == nil
+          #   @attributes = {}
+          #   dynamic_defaults = {}
           # 
-          # self.class.attributes.keys.each do |name|
-          #   attrs[name] = read_attribute( name )
+          #   # Default all non-dynamic defaults first. This is as dynamic defaults frequently
+          #   # use other attributes as part of their default method, so we make sure all
+          #   # the normal defaults are defaulted before we execute the dynamic defaults
+          #   #
+          #   # @note If you create a dynamic default, that calls another dynamic default
+          #   #       it may or may not work, depending on the order that the defaults are
+          #   #       executed. We make not guarantees on this point, it's just better not
+          #   #       to do it.
+            # self.class.attributes.each do |name, attribute|
+            #   unless attribute.dynamic_default?
+            #     puts "Adding #{name.to_s}"
+            #     @attributes[name.to_s] = attribute.default
+            #   else
+            #     dynamic_defaults[name.to_s] = attribute
+            #   end
+            # end
+            #           
+            # dynamic_defaults.each do |name, attribute|
+            #   @attributes[name.to_s] = attribute.default.call(self, attribute)
+            # end
+          #   
           # end
           # 
-          # attrs
+          # @attributes
 
-          @attributes ||= begin
-            attrs = {}
+          attrs = {}
+          dynamic_defaults = {}
 
-            self.class.attributes.each do |name, attribute|
-              attrs[name.to_s] = attribute.default
+          self.class.attributes.each do |name, attribute|
+            unless attribute.dynamic_default?
+              attrs[name.to_s] = read_attribute(name)
+            else
+              dynamic_defaults[name.to_s] = attribute
             end
-
-            attrs
           end
+
+          dynamic_defaults.each do |name, attribute|
+            attrs[name.to_s] = read_attribute(name)
+          end
+
+          attrs
         end
 
         # Mass-assign the Node's attributes. If dynamic attributes are enabled unknown
@@ -50,9 +78,9 @@ module Snowflake
         def attributes=(attrs)
           # @todo this is dumb, but we need to make sure the attributes array is populated 
           # with defaults now otherwise #attributes= will prevent this from happening
-          if @attributes == nil
-            self.attributes
-          end
+          # if @attributes == nil
+          #   self.attributes
+          # end
 
           # The key field cannot be mass-assigned
           # @todo This should probably be generalised for allow any fields to be protected mass-assignment.
@@ -115,7 +143,7 @@ module Snowflake
         #
         # @api public
         def key
-          read_attribute(self.class.key)
+          read_raw_attribute( self.class.key )
         end
 
         # Assigns the value of the key attribute for this Node.
@@ -129,8 +157,17 @@ module Snowflake
         #
         # @api public
         def key=(new_key)
-          old_key = self.key
+          if new_key == nil
+            raise ArgumentError, "You cannont assign nil to the key."
+          end
+
+          # Unless it's a new object, we don't want to be trying to rename it AND persist 
+          # other changes...
+          if persisted? && dirty?
+            raise NotPersisted, 'The Element has unsaved changes, you can only change the Element key when there are no other changes.'
+          end
           
+          old_key = self.key
           write_attribute(self.class.key, new_key)
 
           # If the Element is persisted, then this is actually a rename operation, which
@@ -138,7 +175,13 @@ module Snowflake
           if persisted?
             success = _run_rename_callbacks do
               if self.class.rename(old_key, new_key)
-                update_indices( old_key )
+                reset!
+
+                # @todo the fact that I serialise the element, unserialise it, add a single key/value, and then
+                # reserialise it again is awful. There's no defense, but I am very tired and this will be rewritten
+                # before being pulled into Master
+                broadcast_event_to_listeners(:rename, {:old_key => old_key, :attributes => JSON.parse(to_json).values.first})
+
                 true
               else
                 false
@@ -148,7 +191,8 @@ module Snowflake
             unless success
               # @todo the error. Raise an exception?
             end
-
+          else
+            save
           end
         end
         
@@ -229,28 +273,41 @@ module Snowflake
 
         protected
 
+        # Returns the default value of the Attribute called +name+.
+        #
+        # @param [#to_s] name
+        #     The name of the Attribute value to read
+        #
+        # @return [Any]
+        #   The default value
+        #
+        # @api private        
+        def default_for_attribute(name)
+          proxy = self.class.attributes[name.to_sym]
+
+          # If there's no proxy it's either an undeclared dynamic attribute, or it's 
+          # not an attribute at all. Either way we use the default value of nil.
+          return nil if proxy == nil
+
+          # Get the actual default
+          unless proxy.dynamic_default?
+            proxy.default
+          else
+            proxy.default.call(self, proxy)
+          end
+        end
+
         # Reads the value of the Attribute called +name+.
         #
         # @param [#to_s] name
         #     The name of the Attribute value to read
         #
         # @return [Any]
-        #   +value+
+        #   The value of +name+
         #
         # @api private
         def read_attribute(name)
-          value = read_raw_attribute(name)
-          if value == nil
-            proxy = self.class.attributes[name.to_sym]
-            
-            # If there's no proxy it's either an undeclared dynamic attribute, or it's 
-            # not an attribute at all. Either way we use the default value of nil.
-            return nil if proxy == nil
-
-            value = proxy.default
-          end
-
-          value
+          read_raw_attribute(name) || default_for_attribute(name)
         end
 
         # Reads the raw value of the Attribute called +name+.
@@ -263,7 +320,8 @@ module Snowflake
         #
         # @api private
         def read_raw_attribute(name)
-          attributes[name.to_s]
+          # attributes[name.to_s]
+          instance_variable_get( "@#{name}".to_sym )
         end
 
         # Writes the value of the Attribute called +name+ with +value+.
@@ -289,7 +347,11 @@ module Snowflake
           end
 
           proxy = self.class.attributes[name.to_sym]
-          write_raw_attribute(name, proxy.typecast(value))
+
+          # Assign default values for nils
+          cast_value = value != nil ? proxy.typecast(value) : default_for_attribute(name)
+
+          write_raw_attribute(name, cast_value)
         end
 
         # Assigns the raw value of the Attribute called +name+ with +value+.
@@ -307,7 +369,8 @@ module Snowflake
         #
         # @api private
         def write_raw_attribute(name, value)
-          attributes[name.to_s] = value
+          # attributes[name.to_s] = value
+          instance_variable_set( "@#{name}".to_sym, value )
         end
       end # module InstanceMethods
 
@@ -340,14 +403,18 @@ module Snowflake
 
         attributes[attr_name] = attribute
 
-        # This mirrors a similar piece in #attribute in attributes.rb. The index stuff 
-        # is beginning to feel like a big ball of mud. We instanciate the Index object
-        # in custom_attributes.rb and attributes.rb, then add index management methods 
-        # (add to, delete from, modify) in Index, and element specific Index management 
-        # in Indices.rb (respond to Element workflow and call Index management methods 
-        # accordingly ), then we also have index management methods for custom attributes 
-        # which resides in the custom attribute classes themselves. It touches way too 
-        # many pieces of code.
+        # Key is always required
+        if attribute.key? || options[:required] == true
+          validates_presence_of attr_name
+        end
+
+        # The index stuff is beginning to feel like a big ball of mud. We instanciate the 
+        # Index object in custom_attributes.rb and attributes.rb, then add index 
+        # management methods (add to, delete from, modify) in Index, and element specific 
+        # Index management in Indices.rb (respond to Element workflow and call Index 
+        # management methods accordingly ), then we also have index management methods for 
+        # custom attributes which resides in the custom attribute classes themselves. It 
+        # touches way too many pieces of code.
         # @todo Refactor and DRY up indices and index management.
         if options.include?(:index) && options[:index] == true
           indices[attr_name] = Index.new( attr_name, self )

@@ -8,18 +8,19 @@ require 'snowflake'
 class TestNode
   include Snowflake::Node
 
-  attribute :name,         String, :key => true
+  attribute :name,         String, :key => true, :index => true
   attribute :age,          Integer, :index => true
-  attribute :mood,         String, :index => true
+  attribute :mood,         String, :required => true, :index => true
   attribute :description,  String
   attribute :enabled,      ::Snowflake::Attributes::Boolean, :default => false
 
 #  counter :visits      # <-- native Redis Counter
-#  set :tags            # <-- native Redis Set
+  set :tags, :index => true            # <-- native Redis Set
 #  list :awards         # <-- native Redis List
   # @TODO: Hash
 
-  validates_presence_of :name
+  # validates_presence_of :name
+  # validates_presence_of :mood
 end
 
 class TestNodeWithCustomAttributes
@@ -27,10 +28,11 @@ class TestNodeWithCustomAttributes
 
   attribute :name,         String, :key => true
   attribute :age,          Integer
-  attribute :mood,         String
+  attribute :mood,         String, :required => true
   attribute :description,  String
 
-  validates_presence_of :name
+  # validates_presence_of :name
+  # validates_presence_of :mood
 
   counter :counter
   set :stuff, :index => true
@@ -42,14 +44,28 @@ class TestNodeThatAllowsDynamicAttributes
   allow_dynamic_attributes!
   attribute :name,         String, :key => true
 
-  validates_presence_of :name
 end
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
 
+  config.before :suite do
+    puts "Starting indexer for testing..."
+    
+    indexer_path = File.expand_path( File.dirname(__FILE__) + '/../../snowflake-indexer/' )
+    puts "cd #{indexer_path} && ./bin/snowflake-indexer start"
+    `cd #{indexer_path} && ./bin/snowflake-indexer start`
+  end
+
   config.after :each do
     Snowflake.connect
     Snowflake.flush_db
+  end
+
+  config.after :suite do
+    puts "Shutting down indexer for testing..."
+    indexer_path = File.expand_path( File.dirname(__FILE__) + '/../../snowflake-indexer/' )
+    puts "cd #{indexer_path} && ./bin/snowflake-indexer stop"
+    `cd #{indexer_path} && ./bin/snowflake-indexer stop`
   end
 end

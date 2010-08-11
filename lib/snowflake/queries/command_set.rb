@@ -15,7 +15,24 @@ module Snowflake
     	  @tmp_keys == []
       end
 
-    	def execute
+    	def execute( results_size = 1)
+        if empty?
+          return nil
+        end
+
+        case length
+        when 0
+          nil
+        when 1
+          Snowflake.connection.send( *first )
+        else
+          execute_multiple( results_size )
+        end
+      end
+      
+      private
+      
+      def execute_multiple( results_size = 1 )
     		results = Snowflake.connection.multi do |multi|
     			# Execute the commands
     			each do |command|
@@ -23,9 +40,6 @@ module Snowflake
     			end
 
           unless keys.empty?
-      			# Get the result
-      			multi.smembers( keys.last )
-
       			# Delete the temp keys
       			keys.each do |key|
       				multi.del( key )
@@ -36,8 +50,21 @@ module Snowflake
     		# @todo check for errors
 
     		# return the result
-    		results[ keys.empty?? length - 1 : length ]	  
+    		results_start = length - keys.length - results_size
+    		results_end = length - keys.length - 1
+
+    		results = results[results_start..results_end]
+
+    		case results.length 
+  		  when 0
+  		    nil
+		    when 1
+		      results.first
+	      else
+	        results
+        end
       end
+      
     end
   end # module Queries
 end # module Snowflake

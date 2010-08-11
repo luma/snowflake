@@ -25,10 +25,6 @@ describe Snowflake::Attributes::Enum do
   end
 
   describe "#typecast" do
-    it "typecasts nil to the default value" do
-      @t.typecast( nil ).should == @t.default
-    end
-
     it "typecasts String values to symbols" do
       @t.typecast( 'two' ).should == :two
     end
@@ -45,6 +41,10 @@ describe Snowflake::Attributes::Enum do
 
     it "tries to typecast an Integer value by using it as an index into the :values option" do
       @t.typecast( 1 ).should == :one
+    end
+
+    it "tries to typecast a String that contains an Integer value by using it as an index into the :values option" do
+      @t.typecast( '1' ).should == :one
     end
     
     it "raises an ArgumentError when attempting to typecast an Integer that is out of range" do

@@ -31,11 +31,7 @@ module Snowflake
       # 
       # @api semi-public
       def typecast(value)
-        if value == nil
-          default
-        else
-          RedCloth.new(value.to_s, @options[:restrictions])
-        end
+        RedCloth.new(value.to_s, @options[:restrictions])
       # rescue NoMethodError => e
       #   raise ArgumentError, "Tried to cast #{value.inspect} to a Textile Attribute. Only values that can be cast to a String (via #to_s) can be assigned to a Textile Attribute."
       end

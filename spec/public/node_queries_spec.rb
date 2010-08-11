@@ -1,17 +1,23 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
 describe Snowflake::Node do
-  before(:each) do
+  before(:all) do
+    Snowflake.flush_db
+
     @test_nodes = []
 
     10.times do |i|
       @test_nodes << TestNode.create(:name => "test #{i}", :mood => "Awesome #{(i%2).to_i}", :age => (i + 20) )
     end
+    
+    # wait for the index to catchup
+    sleep 5
   end
 
   describe "#all" do
     it "returns all elements" do
       nodes = TestNode.all
+      # debugger
       nodes.length.should == 10
       nodes.all.sort.should == @test_nodes.sort
     end
@@ -51,6 +57,9 @@ describe Snowflake::Node do
       3.times do |i|
         @test_nodes << TestNode.create(:name => "test #{10 + i}", :mood => "Awesome 3")
       end
+      
+      # Wait for the indexer to catch up
+      sleep 2
 
       nodes = TestNode.all( :mood => "Awesome 0" ).or( :mood => "Awesome 3" )
       nodes.length.should == 8

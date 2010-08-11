@@ -20,11 +20,7 @@ module Snowflake
       # 
       # @api semi-public
       def typecast(value)
-        if value == nil
-          default
-        else
-          value.to_s
-        end
+        value.to_s
       rescue NoMethodError => e
         raise ArgumentError, "Tried to cast #{value.inspect} to a Text Attribute. Only values that can be cast to a String (via #to_s) can be assigned to a Text Attribute."
       end
