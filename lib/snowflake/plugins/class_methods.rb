@@ -102,7 +102,7 @@ module Snowflake
                   # If we've got more than one filter then we'll AND them together. If there's
                   # only one we just use the Operand directly.
                   operand = if filters.length > 1
-                              Queries::Operations::AndOperation.new( *filters )
+                              Queries::Operations::OrOperation.new( *filters )
                             else
                               filters.first
                             end

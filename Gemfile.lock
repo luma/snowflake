@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    snowflake (0.2.9)
+    snowflake (0.2.10)
       RedCloth (>= 4.2.3)
       activemodel (>= 3.0.0.rc)
       activesupport (>= 3.0.0.rc)

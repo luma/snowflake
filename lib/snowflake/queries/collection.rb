@@ -77,7 +77,7 @@ module Snowflake
   	    filters = Operand.from_options( @element_klass, options )
   	    
   	    inner_op =  if filters.length > 1
-              	      Operations::AndOperation.new( *filters )
+              	      Operations::OrOperation.new( *filters )
             	      else
             	        filters.first
                     end
@@ -103,7 +103,7 @@ module Snowflake
   	  end
 
     	def explain_analyse
-    	  @operand.explain
+    	  explain
 
         puts "\nSTATISTICS:"
     	  ['length', 'keys'].each do |attr|

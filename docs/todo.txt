@@ -66,6 +66,7 @@ h2. TODO
 38. Add a reference Custom Attribute: "reference :superceeded_by,  Product". Also allow some form of basic validation for references: "reference :related_service,   Product, :category => :service"
 40. Support Time Zones in the DateTime attribute
 41. Add a :store_default_values option to #attribute, default it to false
+43. Add a reference attribute? reference :related_service, Product, :type => :service. The class can anything ActiveModel compatible.
 
 h2. DONE 
 
