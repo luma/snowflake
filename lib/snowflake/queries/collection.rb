@@ -96,7 +96,23 @@ module Snowflake
     	end
     	
     	def explain
-    	  @operand.eval(nil, true).explain
+    	  puts "\nEXPLAIN:"
+    	  @operand.explain(1)
+
+    	  true
+  	  end
+
+    	def explain_analyse
+    	  @operand.explain
+
+        puts "\nSTATISTICS:"
+    	  ['length', 'keys'].each do |attr|
+    	    tab_stops = " " * (10 - attr.length)
+
+    	    puts "#{tab_stops}#{attr}: #{send(attr).inspect}"
+  	    end
+
+  	    true
   	  end
 
     	private

@@ -10,7 +10,7 @@ module Snowflake
   	  end
 
     	def to_key
-    	  @key# ||= ::UUIDTools::UUID.random_create.to_s
+    	  @key
     	end
 
       # @note top_level is ignore for Operands
@@ -22,7 +22,7 @@ module Snowflake
     	
     	# For debugging purposes, think the EXPLAIN statement in SQL
     	def explain(level = 0)
-    	  puts "#{[\t*level]}Index on #{name}"
+    	  puts ["\t"*level, "Index on #{@key}"].join('')
   	  end
 
     	class << self
