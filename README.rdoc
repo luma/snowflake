@@ -4,6 +4,8 @@
 
 == DESCRIPTION:
 
+Still todo, I'm afraid. This is still missing the actual graph (relationship) stuff, I'm still focusing on doing the basics right.
+
 FIX (describe your package)
 
 
@@ -55,6 +57,9 @@ save. The write will be atomic, it will either succeed or fail:
 	person.counter.incriment 								# 11. immediately saved
 	person.stuff.add 'foo'									# ['foo'] (an array like object proxy). immediately saved
 	person.stuff.add 'bar'									# ['foo', 'bar'] (an array like object proxy). immediately saved
+
+Every operation you can perform on custom attributes should be performed atomically and,
+assuming it modifies the db, persisted immediately.
 
 A limitation of this distinction is that you cannot mass assign custom attributes, either
 on initialize or using #attributes=. Custom attributes will also be omitted when calling
