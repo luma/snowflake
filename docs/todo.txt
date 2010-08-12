@@ -2,12 +2,13 @@
 h2. TODO
 
 19. Indices: sorted sets of ids?
-	19.1. All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
-	19.2. Marking attributes as indices: attribute :name, String, :index => true, or attribute :name, String, :index => :unique. both would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
-	19.3. key indices (for relationships)
-	19.4. Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
-	19.5. Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
-	19.6. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
+	19.1. DONE All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
+	19.2. DONE Marking attributes as indices: attribute :name, String, :index => true. it would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
+	19.3. Marking attributes as indices: attribute :name, String, :index => :unique...
+	19.4. key indices (for relationships)
+	19.5. DONE Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
+	19.6. DONE Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
+	19.7. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
 
 				E.g.
 					class Product
@@ -28,10 +29,10 @@ h2. TODO
 				Basically this is just syntactic sugar for:
 					Product.all( :types => 'Multi-Function Printer', :type => 'Photo Printers' )
 
-	19.7. Some way of saying all that *don't* match some value.
-	19.8. Refactor and DRY up Indices and Index Management
+	19.8. Some way of saying all that *don't* match some value.
+	19.9. Refactor and DRY up Indices and Index Management
 					This mirrors a similar piece in #attribute in attributes.rb. The index stuff 
-					is beginning to feel like a big ball of mud. We instanciate the Index object
+					is beginning to feel like a big ball of mud. We instantiate the Index object
 					in custom_attributes.rb and attributes.rb, then add index management methods 
 					(add to, delete from, modify) in Index, and element specific Index management 
 					in Indices.rb (respond to Element workflow and call Index management methods 
@@ -45,7 +46,6 @@ h2. TODO
 			 a separate program, probably some kind of long-running daemon.
 			 
 
-20. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
 21. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
 22. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.
 		- Convert word docs: http://linux.die.net/man/1/antiword
@@ -97,6 +97,7 @@ h2. DONE
 17. Migrations. Just because we are schemaless on the DB side doesn't mean evolving data needs won't affect us. Create a Schema model, each element should have one.
 		Then rake scripts to do common migration tasks and a dsl to write the actual migrations. Add "schema" as a restricted Attribute name.
 18. Compatibility with ActiveModel::Dirty
+20. Retrieve random element: using http://code.google.com/p/redis/wiki/SrandmemberCommand
 31. Remove the Element namespace (it was only needed while I was refactoring the old Node code) and shuffle everything down one level
 32. Include CustomAttributes in serialisation. ActiveRecord has an example of doing this.
 35. Duplicating the key generating stuff in the Indexer ( where we don't have the context 
