@@ -5,6 +5,7 @@ end
 require 'set'
 require 'pathname'
 require 'json'
+require 'logger'
 
 require 'active_support'
 require 'active_support/hash_with_indifferent_access'
@@ -84,7 +85,7 @@ module Snowflake
 
   def self.connect(opts = {})
     handle_passenger_forking
-    @options = opts
+    @options = opts.merge(:logger => Snowflake.logger)
     connection = nil
   end
 
@@ -107,7 +108,7 @@ module Snowflake
   end
 
   def self.options
-    @options ||= []
+    @options ||= {}
   end
 
   def self.options=(options)
@@ -120,6 +121,35 @@ module Snowflake
 
   def self.thread
     Thread.current[:snowflake] ||= {}
+  end
+  
+  def self.logger=(logger)
+    @logger = logger
+  end
+
+  def self.logger
+    @logger ||= begin
+      log = Logger.new(STDOUT)
+
+      log.level = case log_level
+                  when :debug
+                    Logger::DEBUG
+                  when :error
+                    Logger::ERROR
+                  else
+                    Logger::INFO
+                  end
+
+      log
+    end
+  end
+  
+  def self.log_level
+    @log_level ||= :info
+  end
+
+  def self.log_level=(level)
+    @log_level = level.to_sym
   end
 
   autoload :Index,     'snowflake/index'
