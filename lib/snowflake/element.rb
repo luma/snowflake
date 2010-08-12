@@ -231,8 +231,8 @@ module Snowflake
       attributes.each do |name, value|
         proxy = self.class.attributes[name.to_sym]
 
-        # We don't store default values, unless they are the dynamic, the result of 
-        # executing a Proc for example.
+        # We don't store default values in the data hash. We do need them for filtering
+        # though. So we do store them in the indices.
         if proxy.dynamic_default? || value != default_for_attribute(name)
           cast_attributes[name] = proxy.dump(value)
         end
