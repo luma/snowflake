@@ -67,6 +67,9 @@ h2. TODO
 40. Support Time Zones in the DateTime attribute
 41. Add a :store_default_values option to #attribute, default it to false
 43. Add a reference attribute? reference :related_service, Product, :type => :service. The class can anything ActiveModel compatible.
+45. Add a logger to Snowflake
+	45.1. The logger should default to STDOUT
+	45.2. If the log level is debug it should "explain_analyse" every query
 
 h2. DONE 
 
@@ -103,3 +106,4 @@ h2. DONE
 37. Add a DateTime Attribute
 39. Add a Enum Attribute: "attribute :type, Enum[:service, :hardware, :software, :training]"
 42. Support :required => true on attribute definitions, basically it should just add validates_presence_of attributename
+44. DON'T store attribute defaults in the data area, but DO store them in the indices.
