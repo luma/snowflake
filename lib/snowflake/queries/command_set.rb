@@ -29,9 +29,18 @@ module Snowflake
           execute_multiple( results_size )
         end
       end
-      
+
+      def statistics
+        {
+          'intermediate keys'    => keys,
+          'commands'             => length,
+          'clean up commands'    => keys.length,
+          'total commands'       => length + keys.length
+        }
+      end
+
       private
-      
+
       def execute_multiple( results_size = 1 )
     		results = Snowflake.connection.multi do |multi|
     			# Execute the commands

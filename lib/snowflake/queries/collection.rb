@@ -89,11 +89,12 @@ module Snowflake
     	def reload
     	  @keys = nil
     	  @all = nil
+    	  @command_set = nil
       end
 
     	def keys
-    		@keys ||= ( @operand.eval(nil, true).execute( @operand.results_size ) || [] )
-    	end
+    		@keys ||= ( command_set.execute( @operand.results_size ) || [] )
+    	end 
     	
     	def explain
     	  puts "\nEXPLAIN:"
@@ -105,17 +106,26 @@ module Snowflake
     	def explain_analyse
     	  explain
 
-        puts "\nSTATISTICS:"
+        puts "\nRESULTS STATISTICS:"
     	  ['length', 'keys'].each do |attr|
-    	    tab_stops = " " * (10 - attr.length)
-
+    	    tab_stops = " " * (20 - attr.length)
     	    puts "#{tab_stops}#{attr}: #{send(attr).inspect}"
   	    end
+
+        puts "\nCOMMANDS STATISTICS:"
+        command_set.statistics.each do |statistic, value|
+    	    tab_stops = " " * (20 - statistic.length)
+    	    puts "#{tab_stops}#{statistic}: #{value.inspect}"
+        end
 
   	    true
   	  end
 
     	private
+
+    	def command_set
+    	  @command_set ||= @operand.eval(nil, true)
+  	  end
 
     	def keys_loaded?
     	  @keys != nil
