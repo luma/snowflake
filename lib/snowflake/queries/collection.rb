@@ -77,7 +77,7 @@ module Snowflake
   	    filters = Operand.from_options( @element_klass, options )
   	    
   	    inner_op =  if filters.length > 1
-              	      Operations::OrOperation.new( *filters )
+              	      Operations::AndOperation.new( *filters )
             	      else
             	        filters.first
                     end

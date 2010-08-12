@@ -17,7 +17,6 @@ describe Snowflake::Node do
   describe "#all" do
     it "returns all elements" do
       nodes = TestNode.all
-      # debugger
       nodes.length.should == 10
       nodes.all.sort.should == @test_nodes.sort
     end
