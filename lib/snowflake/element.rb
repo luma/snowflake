@@ -228,22 +228,36 @@ module Snowflake
 
       # Cast the attributes to strings for Redis
       cast_attributes = {}
+      deleted_attributes = []
+
       attributes.each do |name, value|
         proxy = self.class.attributes[name.to_sym]
 
         # We don't store default values in the data hash. We do need them for filtering
         # though. So we do store them in the indices.
-        if proxy.dynamic_default? || value != default_for_attribute(name)
+        if proxy.dynamic_default? || ( !value.blank? && value != default_for_attribute(name) )
           cast_attributes[name] = proxy.dump(value)
+        elsif attribute_was(name) != value
+          # It's been modified to a default value, so we'll nil the currently persisted
+          # value
+          deleted_attributes << name
         end
       end
 
-      # Save all attributes. Note we save the hash even if it's empty, that was we can
-      # tell the difference between an Element with all empty (default) values, and one
-      # that doesn't even exist (nil).
-      send_command(nil, :hmset, *cast_attributes.to_a.flatten)
+      Snowflake.connection.multi do
+        # Delete all removed attributes
+        deleted_attributes.each do |att|
+          send_command(nil, :hdel, att)
+        end
+        
+        # Save all attributes. Note we save the hash even if it's empty, that was we can
+        # tell the difference between an Element with all empty (default) values, and one
+        # that doesn't even exist (nil).
+        send_command(nil, :hmset, *cast_attributes.to_a.flatten)
+      end
 
-      # @todo refactor
+      # @todo check errors
+
       reset!
       true  
     end

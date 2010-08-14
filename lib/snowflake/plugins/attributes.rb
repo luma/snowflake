@@ -349,7 +349,7 @@ module Snowflake
           proxy = self.class.attributes[name.to_sym]
 
           # Assign default values for nils
-          cast_value = value != nil ? proxy.typecast(value) : default_for_attribute(name)
+          cast_value = !value.blank? ? proxy.typecast(value) : default_for_attribute(name)
 
           write_raw_attribute(name, cast_value)
         end
