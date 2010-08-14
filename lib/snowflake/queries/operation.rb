@@ -39,10 +39,15 @@ module Snowflake
 
     	# For debugging purposes, think the EXPLAIN statement in SQL
     	def explain(level = 0)
-    	  puts ["\t"*level, "#{ActiveSupport::Inflector.demodulize(self.class.to_s)}"].join('')
+    	  lines = [
+    	    ["\t"*level, "#{ActiveSupport::Inflector.demodulize(self.class.to_s)}"].join('')
+  	    ]
+
     	  @operands.each do |operand|
-    	    operand.explain(level + 1)
+    	    lines << operand.explain(level + 1)
   	    end
+  	    
+  	    lines.join("\n")
   	  end
 
     	protected

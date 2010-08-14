@@ -22,7 +22,7 @@ module Snowflake
     	
     	# For debugging purposes, think the EXPLAIN statement in SQL
     	def explain(level = 0)
-    	  puts ["\t"*level, "Index on #{@key}"].join('')
+    	  ["\t"*level, "Index on #{@key}"].join('')
   	  end
 
     	class << self

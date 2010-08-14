@@ -93,31 +93,37 @@ module Snowflake
       end
 
     	def keys
-    		@keys ||= ( command_set.execute( @operand.results_size ) || [] )
+        # @todo this is a little clumsy
+    		if @keys == nil
+    		  @keys = command_set.execute( @operand.results_size ) || []
+    		  
+          if Snowflake.log_level == :debug
+            explain
+          end
+  		  end
+
+  		  @keys
     	end 
-    	
+
     	def explain
-    	  puts "\nEXPLAIN:"
-    	  @operand.explain(1)
+    	  lines = [
+    	    "\nEXPLAIN:",
+    	    @operand.explain(1),
+    	    "\nRESULTS STATISTICS:"
+  	    ]
 
-    	  true
-  	  end
-
-    	def explain_analyse
-    	  explain
-
-        puts "\nRESULTS STATISTICS:"
     	  ['length', 'keys'].each do |attr|
     	    tab_stops = " " * (20 - attr.length)
-    	    puts "#{tab_stops}#{attr}: #{send(attr).inspect}"
+    	    lines << "#{tab_stops}#{attr}: #{send(attr).inspect}"
   	    end
 
-        puts "\nCOMMANDS STATISTICS:"
+        lines << "\nCOMMANDS STATISTICS:"
         command_set.statistics.each do |statistic, value|
     	    tab_stops = " " * (20 - statistic.length)
-    	    puts "#{tab_stops}#{statistic}: #{value.inspect}"
+    	    lines << "#{tab_stops}#{statistic}: #{value.inspect}"
         end
 
+        Snowflake.logger.debug lines.join("\n")
   	    true
   	  end
 
