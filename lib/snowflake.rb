@@ -130,26 +130,17 @@ module Snowflake
   def self.logger
     @logger ||= begin
       log = Logger.new(STDOUT)
-
-      log.level = case log_level
-                  when :debug
-                    Logger::DEBUG
-                  when :error
-                    Logger::ERROR
-                  else
-                    Logger::INFO
-                  end
-
+      log.level = log_level unless log_level.nil?
       log
     end
   end
-  
+
   def self.log_level
-    @log_level ||= :info
+    @log_level
   end
 
   def self.log_level=(level)
-    @log_level = level.to_sym
+    @log_level = level
   end
 
   autoload :Index,     'snowflake/index'
