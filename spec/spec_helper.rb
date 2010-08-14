@@ -58,6 +58,7 @@ Spec::Runner.configure do |config|
   end
 
   config.after :each do
+    Snowflake.log_level = Logger::DEBUG
     Snowflake.connect
     Snowflake.flush_db
   end
