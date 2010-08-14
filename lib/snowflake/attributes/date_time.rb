@@ -11,6 +11,7 @@ module Snowflake
           when ::String
             options[:default] = ::DateTime.parse( options[:default] )
           when ::DateTime
+          # fallthrough
           else
             raise ArgumentError, "The default for a DateTime attribute must be either a Ruby DateTime or a String that can be converted to a DateTIme (using Datetime#parse)"
           end
