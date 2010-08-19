@@ -55,7 +55,7 @@ Spec::Runner.configure do |config|
     indexer_path = File.expand_path( File.dirname(__FILE__) + '/../../snowflake-indexer/' )
     puts "cd #{indexer_path} && ./bin/snowflake-indexer start"
     `cd #{indexer_path} && ./bin/snowflake-indexer start`
-  end
+  end 
 
   config.after :each do
     Snowflake.log_level = Logger::DEBUG

@@ -12,6 +12,8 @@ require 'active_support/hash_with_indifferent_access'
 require 'active_support/inflector'
 require 'active_model'
 
+require 'zmq'
+
 require 'redis'
 #require 'redis/namespace'
 require 'uuidtools'
@@ -145,6 +147,7 @@ module Snowflake
 
   autoload :Index,     'snowflake/index'
   autoload :Attribute, 'snowflake/attribute'
+  autoload :Listener,  'snowflake/listener'
 
   module Attributes
     dir = File.join(Pathname(__FILE__).dirname.expand_path + 'snowflake/attributes/')

@@ -180,7 +180,7 @@ module Snowflake
                 # @todo the fact that I serialise the element, unserialise it, add a single key/value, and then
                 # reserialise it again is awful. There's no defense, but I am very tired and this will be rewritten
                 # before being pulled into Master
-                broadcast_event_to_listeners(:rename, {:old_key => old_key, :attributes => JSON.parse(to_json).values.first})
+                broadcast_event_to_listeners(:rename, {:old_key => key_for(old_key), :attributes => JSON.parse(to_json).values.first})
 
                 true
               else

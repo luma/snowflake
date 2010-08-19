@@ -179,8 +179,10 @@ module Snowflake
     protected
     
     def broadcast_event_to_listeners(event, payload)
-      payload[:event] = event
-      send_command(nil, :publish, payload.to_json)
+      # send_command(nil, :publish, payload.merge(:event => event).to_json)
+
+      @listener ||= ::Snowflake::Listener.new
+      @listener.broadcast(event, key_for, payload)
     end
 
     private

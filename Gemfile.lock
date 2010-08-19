@@ -12,6 +12,7 @@ PATH
       system_timer
       tzinfo
       uuidtools (>= 2.1.1)
+      zmq (>= 2.0.7)
 
 GEM
   remote: http://rubygems.org/
@@ -48,6 +49,7 @@ GEM
     tzinfo (0.3.22)
     uuidtools (2.1.1)
     yard (0.5.8)
+    zmq (2.0.7)
 
 PLATFORMS
   ruby
