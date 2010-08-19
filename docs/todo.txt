@@ -4,12 +4,11 @@ h2. TODO
 19. Indices: sorted sets of ids?
 	19.1. DONE All Elements: %model_name%::indices::all => %model_keys% so product::indices::all => set of product_keys;
 	19.2. DONE Marking attributes as indices: attribute :name, String, :index => true. it would use the form: %model_name%::indices::%index_name%::%index_values% => %set of model keys%.
-	19.3. Marking attributes as indices: attribute :name, String, :index => :unique...
+	19.3. Marking attributes as unique indices: attribute :name, String, :index => :unique...
 	19.4. key indices (for relationships)
 	19.5. DONE Number indices. %model_name%::indices::%index_name%::%index_values (integers or floats)% => %set of model keys%.
 	19.6. DONE Date/Time indices, cast of unix timestamps when saving %model_name%::indices::%index_name%::%index_values (unix timestamps)% => %set of model keys%.
-	19.7. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
-
+	19.7. Indexing multiple values for a single key in a single Attribute. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
 				E.g.
 					class Product
 					  include Snowflake::Node
@@ -17,7 +16,7 @@ h2. TODO
 					  attribute :name,        String
 					  attribute :code,        String
 						attribute :supplier,		String
-
+			
 					  set :types    # set of types, needs to be indexed
 					end
 
@@ -29,8 +28,72 @@ h2. TODO
 				Basically this is just syntactic sugar for:
 					Product.all( :types => 'Multi-Function Printer', :type => 'Photo Printers' )
 
-	19.8. Some way of saying all that *don't* match some value.
-	19.9. Refactor and DRY up Indices and Index Management
+	19.8. Sorted set of types for filtering. In the example below there is a 'types' set, this needs to be indexed so we can filter by it. 
+
+				E.g.
+					class Product
+					  include Snowflake::Node
+
+					  attribute :name,        String
+					  attribute :code,        String
+						attribute :supplier,		String
+
+						attribute :cost,				Float
+
+					  set :types    # set of types, needs to be indexed
+					end
+
+				Then
+					Product.all( :cost => 10.0 )
+				Or
+					Product.all( :cost => 10.0..20.0 )
+
+				For this example we need a sorted set index for the cost attribute, we can then use ZRANGEBYSCORE to retrieve a range of results.
+
+				Some attribute type should have a sorted set index created for them, others shouldn't. Here's the list of those that definitely should:
+				* Integer
+				* Float
+				* DateTime
+				
+				And some extended types that should
+				* Counter
+
+				I don't want to hardcode which attributes need this  maintained. But I also don't 
+				want to create a whole pile of extra maintenance work for users. It would be nice
+				to have a method that can dump an index config for an Array of Elements.
+
+				So...
+				Snowflake::Indices.dump_definition( Product, User ) => YAML output is as follows:
+				# Each index can be defined using just a name, or a hash that contains a name
+				# and a type. If you only provide a name the Indexer will assume that the date 
+				# is a String.
+				elements:
+				  - name: Product
+				    indices:
+				      - name
+				      - permalink
+				      - brand
+				      - name: web_shops
+							  type: Set
+				      - name: type
+								type: Enum
+				      - name: status
+								type: Enum
+				      - sku
+				  - name: User
+				    indices:
+				      - name
+				      - name: age
+								type: Integer
+				      - mood
+				      - name: tags
+								type: Set
+        
+				Which can then be read by the indexer, and it can use the Type hints to work out
+				what kind of Indices to create for each attribute.
+
+	19.9. Some way of saying all that *don't* match some value.
+	19.10. Refactor and DRY up Indices and Index Management
 					This mirrors a similar piece in #attribute in attributes.rb. The index stuff 
 					is beginning to feel like a big ball of mud. We instantiate the Index object
 					in custom_attributes.rb and attributes.rb, then add index management methods 
@@ -44,7 +107,19 @@ h2. TODO
  			 associated with indices to be modified (using Redis' PUB/SUB), then update the 
 			 indices. This does mean that the code that maintains the indices must be run as
 			 a separate program, probably some kind of long-running daemon.
-			 
+	19.11. When reading many elements we should send the hgetall's pipelined at once. So Product.all should get the ids then send all hgetalls as one pipelined command
+	19.12. Some tidy way of clearing and rebuilding all indices, without needing to also 
+				 rebuilding the data. Maybe:
+						Snowflake::Indices.teardown!
+						Snowflake::Indices.build!
+					And possible more specifically:
+						Snowflake::Indices.teardown!(Product, User)
+						Snowflake::Indices.build!(Product, User)
+
+					Although I not totally happy with the method names (teardown and build). 
+					"Snowflake::Indices" could be a good place to put other Index management bits,
+					some ways of getting index statistics, total usage, and helpers for peeking at
+					the index data would be really handy for debugging.
 
 21. Relationships. Create a relationship model that includes Element, it can have properties but no relationships. mate /Users/rollyfordham/.rvm/gems/ruby-1.9.2-head/gems/rgl-0.4.0/
 22. Search through Sphinx/Xapian/Solr: handy full-text node search. http://xapian.org/features. Xapian supports indexing PDFs, Word docs, etc. Need to provide a way to easily dynamicise what gets indexed and how.
@@ -67,9 +142,7 @@ h2. TODO
 40. Support Time Zones in the DateTime attribute
 41. Add a :store_default_values option to #attribute, default it to false
 43. Add a reference attribute? reference :related_service, Product, :type => :service. The class can anything ActiveModel compatible.
-45. Add a logger to Snowflake
-	45.1. The logger should default to STDOUT
-	45.2. If the log level is debug it should "explain_analyse" every query
+
 
 h2. DONE 
 
@@ -107,4 +180,7 @@ h2. DONE
 37. Add a DateTime Attribute
 39. Add a Enum Attribute: "attribute :type, Enum[:service, :hardware, :software, :training]"
 42. Support :required => true on attribute definitions, basically it should just add validates_presence_of attributename
-44. DON'T store attribute defaults in the data area, but DO store them in the indices.
+44. [[REVERTED: THIS CAUSED WAY TO MANY PROBLEMS]] DON'T store attribute defaults in the data area, but DO store them in the indices.
+45. Add a logger to Snowflake
+	45.1. The logger should default to STDOUT
+	45.2. If the log level is debug it should "explain_analyse" every query
