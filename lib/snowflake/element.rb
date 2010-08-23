@@ -108,11 +108,8 @@ module Snowflake
         @_destroyed = true
 
         if self.class.destroy!( self.key )
-          # I'd rather this was decoupled from Element, but I haven't figured out how yet
-          # delete_from_indices
-
           broadcast_event_to_listeners(:destroy, {:attributes => deleted_attributes})
-          
+
           true
         else
           false
@@ -163,6 +160,26 @@ module Snowflake
         Snowflake.connection.send(command.to_sym, *args.dup.unshift( key_for ), &block)
       end
     end
+    
+    def send_commands(commands) 
+      case commands.length
+      when 0
+      when 1
+        c = commands.first[0].to_sym
+        k = commands.first[1] || key_for
+
+        Snowflake.connection.send( c.to_sym, *commands.first[2..-1].dup.unshift( k ) )
+      else
+        Snowflake.connection.multi do |conn|
+          commands.each do |command|
+            c = command[0].to_sym
+            k = command[1] || key_for
+
+            conn.send( c.to_sym, *command[2..-1].dup.unshift( k ) )
+          end
+        end
+      end
+    end
 
   #    protected
 
@@ -179,10 +196,7 @@ module Snowflake
     protected
     
     def broadcast_event_to_listeners(event, payload)
-      # send_command(nil, :publish, payload.merge(:event => event).to_json)
-
-      @listener ||= ::Snowflake::Listener.new
-      @listener.broadcast(event, key_for, payload)
+      self.class.broadcast_event_to_listeners(event, key_for, payload)
     end
 
     private
@@ -246,17 +260,22 @@ module Snowflake
         end
       end
 
-      Snowflake.connection.multi do
-        # Delete all removed attributes
-        deleted_attributes.each do |att|
-          send_command(nil, :hdel, att)
-        end
-        
-        # Save all attributes. Note we save the hash even if it's empty, that was we can
-        # tell the difference between an Element with all empty (default) values, and one
-        # that doesn't even exist (nil).
-        send_command(nil, :hmset, *cast_attributes.to_a.flatten)
+      # Delete all removed attributes and then save all others. Note we save the hash 
+      # even if it's empty, that was we can tell the difference between an Element with 
+      # all empty (default) values, and one that doesn't even exist (nil).
+      commands = deleted_attributes.collect {|att| [:hdel, nil, att] }
+
+      # Set the actual attributes
+      commands.push([:hmset, nil, *cast_attributes.to_a.flatten])
+
+      if new_record?
+        # Add this record into the list of all elements of that type. This could actually
+        # be part of the Indexer, but we need it to be more available than Indices (which
+        # have a delay before they'll be ready).
+        commands << [:sadd, meta_key_for( 'indices', 'all' ), key_for]
       end
+
+      send_commands( commands )
 
       # @todo check errors
 
