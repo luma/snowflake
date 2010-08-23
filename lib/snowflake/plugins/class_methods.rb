@@ -38,11 +38,34 @@ module Snowflake
     #   If no Elements were found with any of +keys+
     # 
     # @api public
-    def get_many(keys)
-      keys.collect do |key|
-        get(key)
-      end.compact
-    end
+    # def get_many(keys)
+    #   hashes = Snowflake.connection.multi do
+    #     keys.each do |key|
+    #       Snowflake.connection.hgetall( key_for(key) )
+    #     end
+    #   end
+    # 
+    #   # @todo error check
+    #   i = 0
+    #   hashes.collect do |attributes|
+    #     unless attributes == nil
+    #       # @todo Deal with extended properties that aren't part of the hash: Maybe lazy load them?
+    # 
+    #       # We use #allocate, rather than #new, as we use #new to mean a Element that has not yet been
+    #       # saved in the DB.
+    #       node = self.allocate
+    #       node.update_key_with_renaming( keys[i] )
+    #       node.attributes = attributes
+    #       node.reset!
+    #       
+    #       i++ 
+    #       node
+    #     else
+    #       i++ 
+    #       nil
+    #     end        
+    #   end.compact
+    # end
 
     # This is the same as #get, except that it raises a NotFoundError exception
     # instead of returning nil, if no Element is found.
@@ -132,6 +155,13 @@ module Snowflake
     
     # Rename an Element from +from_key+ to +to_key+.
     #
+    # README: This method is a little dangerous, right now. It doesn't trigger an index
+    #         generating event. So if you want the indices to be updated you'll need to
+    #         manually broadcast the event after calling this, or use the destroy method
+    #         on an Element instance (which *does* broadcasts events).
+    #         
+    #         This will be fixed when I get a chance to refactor.
+    #
     # @param [#to_s] from_key
     #     The key of the Element that we are moving.
     #
@@ -143,14 +173,21 @@ module Snowflake
     #
     # @api public
     def rename(from_key, to_key)
-      Snowflake.connection.multi do
-        Snowflake.connection.renamenx( key_for(from_key), key_for(to_key) )
-      
-        # @todo provide a hook to allow extended attributes to be moved
-        # @todo move indices      
-      end
+      full_from_key = key_for(from_key)
+      full_to_key = key_for(to_key)
 
-      # @todo error handling
+      # results = Snowflake.connection.multi do |conn|
+        Snowflake.connection.renamenx( full_from_key, full_to_key )
+
+        Snowflake.connection.srem( meta_key_for( 'indices', 'all' ), full_from_key )
+        Snowflake.connection.sadd( meta_key_for( 'indices', 'all' ), full_to_key )
+        
+        # @todo provide a hook to allow extended attributes to be moved
+      # end
+
+      # @todo error handling    
+      # @todo move indices     
+
       true
     end
 
@@ -174,14 +211,27 @@ module Snowflake
     # Deletes the Element by its key. This does not trigger any callbacks, if you need
     # to trigger callbacks use: Model.get(key).destroy!
     #
+    # README: This method is a little dangerous, right now. It doesn't trigger an index
+    #         generating event. So if you want the indices to be updated you'll need to
+    #         manually broadcast the event after calling this, or use the destroy method
+    #         on an Element instance (which *does* broadcasts events).
+    #         
+    #         This will be fixed when I get a chance to refactor.
+    #
     # @return [Boolean]
     #     True for sucess, false otherise.
     #
     # @api public      
     def destroy!( key )
-#        raise NotImplementedError, 'Modules that include Snowflake::Element must implement a destroy! method.'
+      full_key = key_for(key)
+
+      results = Snowflake.connection.multi do |conn|
+        conn.del( full_key )
+        conn.srem( meta_key_for( 'indices', 'all' ), full_key )
+      end
+
       # @todo error handling
-      Snowflake.connection.del( key_for(key) )
+      # @todo broadcast destroy event to indexer
 
       true
     end
@@ -204,5 +254,9 @@ module Snowflake
       Keys.meta_key_for( self, *segments )
     end
 
+    def broadcast_event_to_listeners(event, key, payload)
+      @listener ||= ::Snowflake::Listener.new
+      @listener.broadcast(event, key, payload)
+    end
   end # module ClassMethods
 end # module Snowflake
