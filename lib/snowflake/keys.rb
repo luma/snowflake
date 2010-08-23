@@ -34,6 +34,11 @@ module Snowflake
         segments.join('::')
       end
 
+      def parts_from_key( full_key )
+        element_klass, *key = full_key.split(':')
+        [element_klass, key.join(':')]
+      end
+
     end
   end # module Keys
 end # module Snowflake
