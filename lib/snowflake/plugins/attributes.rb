@@ -342,14 +342,19 @@ module Snowflake
         #
         # @api private
         def write_attribute(name, value, make_dirty = true)
-          if make_dirty
-            attribute_will_change!(name.to_sym)
-          end
-
           proxy = self.class.attributes[name.to_sym]
 
           # Assign default values for nils
           cast_value = !value.blank? ? proxy.typecast(value) : default_for_attribute(name)
+
+          # If the current data is identical, don't bother
+          if cast_value == read_raw_attribute( name )
+            return
+          end
+
+          if make_dirty
+            attribute_will_change!(name.to_sym)
+          end
 
           write_raw_attribute(name, cast_value)
         end
