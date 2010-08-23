@@ -58,9 +58,9 @@ h2. TODO
 				And some extended types that should
 				* Counter
 
-				I don't want to hardcode which attributes need this  maintained. But I also don't 
-				want to create a whole pile of extra maintenance work for users. It would be nice
-				to have a method that can dump an index config for an Array of Elements.
+				I don't want to hardcode which attributes need this. But I also don't want to 
+				create a whole pile of extra maintenance work for users. It would be nice to have 
+				a method that can dump an index config for an Array of Elements.
 
 				So...
 				Snowflake::Indices.dump_definition( Product, User ) => YAML output is as follows:
@@ -70,25 +70,20 @@ h2. TODO
 				elements:
 				  - name: Product
 				    indices:
-				      - name
-				      - permalink
-				      - brand
-				      - name: web_shops
-							  type: Set
-				      - name: type
-								type: Enum
-				      - name: status
-								type: Enum
-				      - sku
+							name: String
+							permalink: String
+							brand: String
+							web_shops: Set
+							type: Enum
+							status: Enum
+							sku: String
 				  - name: User
 				    indices:
-				      - name
-				      - name: age
-								type: Integer
-				      - mood
-				      - name: tags
-								type: Set
-        
+							name: String
+							age: Integer
+							mood: String
+							tags: Set
+
 				Which can then be read by the indexer, and it can use the Type hints to work out
 				what kind of Indices to create for each attribute.
 
@@ -109,7 +104,7 @@ h2. TODO
 			 a separate program, probably some kind of long-running daemon.
 	19.11. When reading many elements we should send the hgetall's pipelined at once. So Product.all should get the ids then send all hgetalls as one pipelined command
 	19.12. Some tidy way of clearing and rebuilding all indices, without needing to also 
-				 rebuilding the data. Maybe:
+				 rebuild the data. Maybe:
 						Snowflake::Indices.teardown!
 						Snowflake::Indices.build!
 					And possible more specifically:
@@ -142,7 +137,7 @@ h2. TODO
 40. Support Time Zones in the DateTime attribute
 41. Add a :store_default_values option to #attribute, default it to false
 43. Add a reference attribute? reference :related_service, Product, :type => :service. The class can anything ActiveModel compatible.
-
+46. Embedded document support
 
 h2. DONE 
 
