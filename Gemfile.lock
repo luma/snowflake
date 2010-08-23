@@ -7,7 +7,7 @@ PATH
       activesupport (>= 3.0.0.rc)
       fastthread
       json
-      redis (>= 2.0.3)
+      redis (>= 2.0.5)
       redis-namespace (>= 0.7.0)
       system_timer
       tzinfo
@@ -46,10 +46,10 @@ GEM
     ruby-debug-base (0.10.3)
       linecache (>= 0.3)
     system_timer (1.0)
-    tzinfo (0.3.22)
+    tzinfo (0.3.23)
     uuidtools (2.1.1)
     yard (0.5.8)
-    zmq (2.0.7)
+    zmq (2.0.7.1)
 
 PLATFORMS
   ruby
