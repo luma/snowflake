@@ -12,7 +12,19 @@ module Snowflake
 
     def broadcast(event, key, payload)
       puts "Broadcasting #{event} to #{@address} for \"#{key}\""
-      @socket.send( {:event => event, :key => key, :payload => payload}.to_json )
+      unless self.class.broadcast_disabled?
+        @socket.send( {:event => event, :key => key, :payload => payload}.to_json )
+      end
+    end
+
+    class << self
+      def broadcast_disabled?
+        @broadcast_disabled ||= false
+      end
+
+      def broadcast_disabled=(state)
+        @broadcast_disabled = state
+      end
     end
   end
 end # module Snowflake
