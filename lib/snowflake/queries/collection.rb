@@ -8,7 +8,41 @@ module Snowflake
     	end
 
       def all
-        @all ||= @element_klass.get_many( keys )
+        # @all ||= @element_klass.get_many( keys )
+        @all ||= begin          
+          # We need this to make as the keys must be loaded outside the multi-block
+          tmp_keys = keys
+          
+          hashes = tmp_keys.collect do |key|
+            Snowflake.connection.hgetall( key )
+          end
+
+          # hashes = Snowflake.connection.multi do |con|
+          #   tmp_keys.each do |key|
+          #     puts @element_klass.key_for(key).inspect
+          #     debugger
+          #     con.hgetall( @element_klass.key_for(key) )
+          #   end
+          # end
+          # 
+          # debugger
+
+          # @todo error check
+          i = 0
+          hashes.collect do |attributes|
+            unless attributes == nil
+              # @todo Deal with extended properties that aren't part of the hash: Maybe lazy load them?
+              
+              node = initialize_element_from_key_and_attributes( keys[i], attributes )
+
+              i += 1
+              node
+            else
+              i += 1
+              nil
+            end        
+          end.compact
+        end
       end
 
     	def each
@@ -21,7 +55,7 @@ module Snowflake
     	  if elements_loaded?
       	  all.first
   	    elsif !empty?
-  	      @element_klass.get( keys.first )
+  	      get_element_from_key_and_attributes( keys.first )
 	      else
 	        nil
 	      end
@@ -31,7 +65,7 @@ module Snowflake
     	  if elements_loaded?
       	  all.last
   	    elsif !empty?
-  	      @element_klass.get( keys.last )
+  	      get_element_from_key_and_attributes( keys.last )
 	      else
 	        nil
 	      end
@@ -50,19 +84,28 @@ module Snowflake
       end
 
       def include?( key )
-        keys.include?( key.to_s )
-      end
-      
-      def get( key )
-        unless include?( key )
-          return nil
+        matcher = Regexp.new("([a-zA-Z][a-zA-Z0-9]*)\:(#{key})")
+
+        keys.each do |full_key|
+          if ( full_key =~ matcher ) == 0
+            return true
+          end
         end
 
-        if elements_loaded?
-          all.select {|element| element.key == key.to_s }.first
-        else
-          @element_klass.get( key )
+        false
+      end
+
+      # Only return an element if it is actually contained in this collection
+      def get( key )
+        matcher = Regexp.new("([a-zA-Z][a-zA-Z0-9]*)\:(#{key})")
+
+        keys.each do |full_key|
+          if ( full_key =~ matcher ) == 0
+            return get_element_from_key_and_attributes( key )
+          end
         end
+
+        nil
       end
 
     	# return a new collection that consists of this collection and the other one
@@ -139,6 +182,43 @@ module Snowflake
 
       def elements_loaded?
         @all != nil
+      end
+      
+      def element_for_key( full_key )
+        element_klass, key = Keys.parts_from_key( full_key )
+
+        # We use #allocate, rather than #new, as we use #new to mean a Element that has not yet been
+        # saved in the DB.        
+        node = element_klass.constantize.allocate
+        node.update_key_with_renaming( key )
+
+        node
+      end
+      
+      def initialize_element_from_key_and_attributes( full_key, attributes )
+        node = element_for_key( full_key )
+        node.attributes = attributes
+
+        node.reset!
+        node
+      end
+
+      def get_element_from_key_and_attributes( full_key )
+        node_attributes = Snowflake.connection.hgetall( full_key )
+        return nil if node_attributes.empty?
+
+        element_klass, key = Keys.parts_from_key( full_key )
+
+        # @todo Deal with extended properties that aren't part of the hash: Maybe lazy load them?
+
+        # We use #allocate, rather than #new, as we use #new to mean a Element that has not yet been
+        # saved in the DB.
+        node = element_klass.constantize.allocate
+        node.update_key_with_renaming( key )
+        node.attributes = node_attributes
+
+        node.reset!
+        node
       end
 
       # def keys
