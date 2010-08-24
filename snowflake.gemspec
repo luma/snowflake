@@ -16,15 +16,15 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "snowflake"
 
   # If you have other dependencies, add them here
-  s.add_dependency "redis", ">= 2.0.5"
-  s.add_dependency "redis-namespace", ">= 0.7.0"
-  s.add_dependency "uuidtools", ">= 2.1.1"
+  s.add_dependency "redis", "~> 2.0.5"
+  s.add_dependency "redis-namespace", "~> 0.7.0"
+  s.add_dependency "uuidtools", "~> 2.1.1"
   s.add_dependency "tzinfo"
   s.add_dependency "json"  
-  s.add_dependency "activesupport", ">= 3.0.0.rc"
-  s.add_dependency "activemodel", ">= 3.0.0.rc"
-  s.add_dependency "RedCloth", ">= 4.2.3"
-  s.add_dependency 'zmq', ">= 2.0.7"
+  s.add_dependency "activesupport", "~> 3.0.0.rc"
+  s.add_dependency "activemodel", "~> 3.0.0.rc"
+  s.add_dependency "RedCloth", "~> 4.2.3"
+  s.add_dependency 'zmq', "~> 2.0.7"
 
   if RUBY_VERSION < '1.9.0'
     # Try to use the SystemTimer gem instead of Ruby's timeout library

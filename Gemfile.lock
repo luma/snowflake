@@ -1,18 +1,18 @@
 PATH
   remote: .
   specs:
-    snowflake (0.2.12)
-      RedCloth (>= 4.2.3)
-      activemodel (>= 3.0.0.rc)
-      activesupport (>= 3.0.0.rc)
+    snowflake (0.2.13)
+      RedCloth (~> 4.2.3)
+      activemodel (~> 3.0.0.rc)
+      activesupport (~> 3.0.0.rc)
       fastthread
       json
-      redis (>= 2.0.5)
-      redis-namespace (>= 0.7.0)
+      redis (~> 2.0.5)
+      redis-namespace (~> 0.7.0)
       system_timer
       tzinfo
-      uuidtools (>= 2.1.1)
-      zmq (>= 2.0.7)
+      uuidtools (~> 2.1.1)
+      zmq (~> 2.0.7)
 
 GEM
   remote: http://rubygems.org/
@@ -37,7 +37,7 @@ GEM
     rake (0.8.7)
     rcov (0.9.8)
     redis (2.0.5)
-    redis-namespace (0.9.0)
+    redis-namespace (0.7.0)
       redis (< 3.0.0)
     rspec (1.3.0)
     ruby-debug (0.10.3)
