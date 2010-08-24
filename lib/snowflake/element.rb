@@ -272,7 +272,7 @@ module Snowflake
         # Add this record into the list of all elements of that type. This could actually
         # be part of the Indexer, but we need it to be more available than Indices (which
         # have a delay before they'll be ready).
-        commands << [:sadd, meta_key_for( 'indices', 'all' ), key_for]
+        commands << [:sadd, self.class.meta_key_for( 'indices', 'all' ), key_for]
       end
 
       send_commands( commands )
