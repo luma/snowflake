@@ -14,11 +14,11 @@ class Project
 
   attribute :name,         String
   attribute :description,  String
-  
+
   # Boolean index type, create two sets: one true, one false
   # Project:index:active:true and Project:index:active:false
   attribute :active,       Boolean, :index => true
-  
+
   allow_dynamic_attributes!
 
   list :todos
@@ -87,7 +87,7 @@ class Category
     # @todo all methods that might perform stuff in a MULTI block should accept a block to allow extra bits to get tacked on the end
     super do
       p = self.parent
-      
+
       # Remove ourselves from our parent
       p.children.delete(self)
 
