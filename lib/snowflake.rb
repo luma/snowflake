@@ -15,7 +15,6 @@ require 'active_model'
 require 'zmq'
 
 require 'redis'
-#require 'redis/namespace'
 require 'uuidtools'
 
 # Speed boost, and reduced memory leaks from standard ruby threading (on Ruby < 1.9), if it's available: use it.
@@ -92,21 +91,11 @@ module Snowflake
   end
 
   def self.connection
-    # @todo fix Redis Namespacing
-    #thread[:connection] ||= Redis::Namespace.new(namespace, :redis => redis)
     thread[:connection] ||= Redis.new(options)
   end
 
   def self.connection=(redis)
     thread[:connection] = redis
-  end
-
-  def self.namespace
-    thread[:namespace] ||= :snowflake
-  end
-
-  def self.namespace=(n)
-    thread[:namespace] = n
   end
 
   def self.options
