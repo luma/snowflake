@@ -44,7 +44,7 @@ module Snowflake
         when ::DateTime
           value
         else
-          ::DateTime.parse( value )
+          ::DateTime.parse( value.to_s )
         end
       rescue ArgumentError => e
         raise ArgumentError, "Tried to cast #{value.inspect} to a DateTime Attribute. Only DateTime objects and strings that are formatted as string can be typecast to DateTime"

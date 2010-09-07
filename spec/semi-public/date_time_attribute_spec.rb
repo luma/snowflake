@@ -25,6 +25,12 @@ describe Snowflake::Attributes::DateTime do
       @t.typecast( @date ).should == @date
     end
 
+    it "typecasts a Time value" do
+      @date = Time.parse( '2010-01-01 12:00' )
+      @t.typecast( @date ).should == DateTime.parse( @date.to_s )
+    end
+
+
     it "typecasts a String value, if it can be parsed as a Date" do
       @date = DateTime.parse( '2010-01-01 12:00' )
       @t.typecast( '2010-01-01 12:00' ).should == @date
