@@ -45,6 +45,7 @@ describe Snowflake::Node do
 
       it "includes all nodes of that type" do
         # debugger
+        debugger
         @all_from_index.length.should == @all.length
         @all_from_index.all.sort.should == @all.sort
       end
