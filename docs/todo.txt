@@ -152,6 +152,9 @@ h2. TODO
 		NOTE: We can only overload operators like '!=' on Ruby 1.9.x, but I was thinking of
 		dropping support for 1.8.x in the short term anyway. It's only really needed for short
 		term compatibility.
+	http://github.com/knowtheory/dm-sugar-glider
+	http://github.com/dkubb/veritas
+	
 
 h2. DONE 
 
