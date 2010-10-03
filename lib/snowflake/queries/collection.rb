@@ -12,20 +12,23 @@ module Snowflake
         @all ||= begin          
           # We need this to make as the keys must be loaded outside the multi-block
           tmp_keys = keys
-          
-          hashes = tmp_keys.collect do |key|
-            Snowflake.connection.hgetall( key )
+          unless tmp_keys.empty?
+            debugger
+          end
+          # @fixme this should work, but it doesn't. Hence the hack below.
+          # hashes = tmp_keys.collect do |key|
+          #   Snowflake.connection.hgetall( key )
+          # end
+          hashes = Snowflake.connection.multi do |con|
+            # debugger
+            for key in tmp_keys
+              puts key.inspect
+              # debugger
+              con.hgetall( key )
+            end
           end
 
-          # hashes = Snowflake.connection.multi do |con|
-          #   tmp_keys.each do |key|
-          #     puts @element_klass.key_for(key).inspect
-          #     debugger
-          #     con.hgetall( @element_klass.key_for(key) )
-          #   end
-          # end
-          # 
-          # debugger
+          #debugger
 
           # @todo error check
           i = 0
