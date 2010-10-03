@@ -38,6 +38,21 @@ Gem::Specification.new do |s|
     s.add_dependency "fastthread"
   end
 
+  s.add_development_dependency "bundler", ">= 1.0.0"
+  s.add_development_dependency "rspec", "~> 1.3.0"
+  s.add_development_dependency "yard", "~> 0.6.1"
+  s.add_development_dependency "rcov", "~> 0.9.8"
+  s.add_development_dependency "mocha", "~> 0.9.8"
+
+  if RUBY_VERSION > '1.9.0'
+    s.add_development_dependency "ruby-debug19", "~> 0.11.6"
+  else
+    s.add_development_dependency "ruby-debug", "~> 0.10.3"
+  end
+
+  # gem 'ffi', :git => 'git://github.com/ffi/ffi.git' #'~> 0.6.3'
+  # gem 'ffi-rzmq', :git => 'git://github.com/chuckremes/ffi-rzmq.git'
+
   # If you need to check in files that aren't .rb files, add them here
   s.files        = Dir["{lib}/snowflake.rb", "{lib}/snowflake/*.rb", "{lib}/snowflake/**/*.rb", "LICENSE", "*.md", "README.rdoc"]
   s.require_path = 'lib'
